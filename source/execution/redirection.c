@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   redirection.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 17:34:05 by mkling            #+#    #+#             */
-/*   Updated: 2024/11/28 14:13:23 by mkling           ###   ########.fr       */
+/*   Updated: 2024/11/29 16:46:25 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/minishell.h"
+#include "minishell.h"
 
 int	redirect(int new_fd, int old_fd)
 {
@@ -31,6 +31,8 @@ void	replace_stdin_by_infile(t_cmd_tab *cmd_tab)
 	t_cmd	*cmd;
 
 	cmd = get_current_cmd(cmd_tab);
+	if (cmd->infile == NULL)
+		return ;
 	fork_exit_if((access(cmd->infile, F_OK) == -1), NO_FILE,
 		cmd, "Input file does not exist");
 	fork_exit_if((access(cmd->infile, R_OK) == -1), READ_ERROR,
@@ -48,6 +50,8 @@ void	replace_stdout_by_outfile(t_cmd_tab *cmd_tab)
 	t_cmd	*cmd;
 
 	cmd = get_current_cmd(cmd_tab);
+	if (cmd->outfile == NULL)
+		return ;
 	fork_exit_if((access(cmd->infile, R_OK) == -1), READ_ERROR,
 		cmd, "Forbidden input file");
 	outfile_fd = open_file(cmd->infile, WRITE);

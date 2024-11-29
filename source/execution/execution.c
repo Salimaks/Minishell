@@ -6,21 +6,21 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 15:37:36 by mkling            #+#    #+#             */
-/*   Updated: 2024/11/29 10:43:36 by alex             ###   ########.fr       */
+/*   Updated: 2024/11/29 16:44:08 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/minishell.h"
+#include "minishell.h"
 
 void	send_fork_exec_cmd(t_cmd_tab *cmd_tab)
 {
 	t_cmd	*cmd;
 
 	cmd = get_current_cmd(cmd_tab);
-	if (cmd->fork_pid != 0 || are_error(cmd_tab))
+	if (cmd->fork_pid != 0 || catch_error(cmd_tab))
 		return ;
 	connect_pipe(cmd_tab);
-	// extract_cmd_filepath(cmd_tab);
+	get_cmd_path(cmd, cmd_tab);
 	execve(cmd->cmd_path, cmd->argv, cmd_tab->env);
 	fork_exit_if(1, CANT_EXECUTE_CMD, cmd,
 		"Failed to execute command");
@@ -37,7 +37,7 @@ void	wait_on_all_forks(t_cmd_tab *cmd_tab)
 	while (cmd_tab->index < cmd_tab->cmd_count)
 	{
 		cmd = get_current_cmd(cmd_tab);
-		if (!are_error(cmd_tab))
+		if (!catch_error(cmd_tab))
 			waitpid(cmd->fork_pid, &cmd->exit_code, 0);
 		cmd_tab->index++;
 	}

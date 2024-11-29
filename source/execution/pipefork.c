@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   pipefork.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 17:41:32 by mkling            #+#    #+#             */
-/*   Updated: 2024/11/28 14:14:45 by mkling           ###   ########.fr       */
+/*   Updated: 2024/11/29 16:46:24 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/minishell.h"
+#include "minishell.h"
 
 void	fork_exit_if(int condition, int err_code, t_cmd *cmd, char *err_message)
 {
@@ -26,7 +26,7 @@ void	create_fork(t_cmd_tab *cmd_tab)
 {
 	t_cmd	*cmd;
 
-	if (are_error(cmd_tab))
+	if (catch_error(cmd_tab))
 		return ;
 	cmd = get_current_cmd(cmd_tab);
 	cmd->fork_pid = fork();
@@ -42,7 +42,7 @@ void	create_pipe(t_cmd_tab *cmd_tab)
 	t_cmd	*cmd;
 
 	cmd = get_current_cmd(cmd_tab);
-	if (is_last_cmd(cmd_tab) | are_error(cmd_tab))
+	if (is_last_cmd(cmd_tab) | catch_error(cmd_tab))
 		return ;
 	if (pipe(cmd->pipe_fd) == -1)
 	{

@@ -6,11 +6,11 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 12:37:12 by alex              #+#    #+#             */
-/*   Updated: 2024/11/29 13:31:16 by alex             ###   ########.fr       */
+/*   Updated: 2024/11/29 17:29:07 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../include/minishell.h"
+#include "minishell.h"
 
 t_cmd	*get_last_cmd(t_cmd_tab *cmd_tab)
 {
@@ -64,18 +64,18 @@ void	load_cmd(t_cmd_tab *cmd_tab, char **cmd_argv,
 	new_cmd = create_cmd();
 	if (!new_cmd)
 	{
-		cmd_tab->critical_er = MALLOC_FAIL;
-		perror("Failed to allocate command structure");
+		set_error_if(!new_cmd, MALLOC_FAIL, cmd_tab,
+			"Failed to allocate command structure");
 		return ;
 	}
 	append_cmd(new_cmd, cmd_tab);
 	new_cmd->argv = cmd_argv;
-	new_cmd->env = cmd_tab->env;
 	new_cmd->outfile = outfile;
 	new_cmd->infile = infile;
+	cmd_tab->cmd_count = 1;
 }
 
-t_cmd_tab	*create_cmd_tab(char **argv, char **env)
+t_cmd_tab	*create_cmd_tab(char **env)
 {
 	t_cmd_tab	*cmd_tab;
 
@@ -84,6 +84,6 @@ t_cmd_tab	*create_cmd_tab(char **argv, char **env)
 		return (NULL);
 	cmd_tab->index = 0;
 	cmd_tab->env = env;
-	load_cmd(cmd_tab, argv, NULL, NULL);
+	extract_paths(cmd_tab);
 	return (cmd_tab);
 }

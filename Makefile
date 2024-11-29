@@ -6,7 +6,7 @@
 #    By: alex <alex@student.42.fr>                  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/14 14:56:12 by mkling            #+#    #+#              #
-#    Updated: 2024/11/29 13:00:14 by alex             ###   ########.fr        #
+#    Updated: 2024/11/29 17:21:31 by alex             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -28,6 +28,7 @@ FUNC_EXEC	= 	execution.c \
 				pipefork.c \
 				readability.c \
 				redirection.c \
+				path.c \
 				setup.c \
 				cleanup.c
 
@@ -42,9 +43,9 @@ SRC			= $(FUNC) $(MAIN)
 
 OBJ			= $(SRC:%.c=/%.o)
 
-LIB			= -L$(DIR_LIB) -lft
+LIB			= -L$(DIR_LIB) -lft -lreadline
 
-INC			= -I$(DIR_LIB)
+INC			= -I$(DIR_INC) -I$(DIR_LIB)
 
 CC			= cc
 
@@ -64,10 +65,11 @@ T_SRC		= utest.c
 T_OBJ		= utest.o
 
 T_INC		= 	-I$(HOME)/Criterion/include/criterion \
-				-I$(HOME)/Criterion/
+				-I$(HOME)/Criterion/ \
+				$(INC)
 
 T_LIB		= 	-Wl,-rpath=$(HOME)/Criterion/build/src \
-				-L${HOME}/Criterion/build/src \
+				-L$(HOME)/Criterion/build/src \
 				-lcriterion \
 
 T_CC		= cc $(CFLAGS) $(T_INC) $(T_LIB) $(LIB) -g
@@ -84,7 +86,7 @@ T_EXCL		= ./obj/main.o
 all:				$(NAME)
 
 $(NAME):			$(HEADER) $(LIB)
-					$(CC) $(CFLAGS) -o $(NAME) $(addprefix $(DIR_SRC)/, $(SRC)) $(LIB)
+					$(CC) $(CFLAGS) $(INC) -o $(NAME) $(addprefix $(DIR_SRC)/, $(SRC)) $(LIB)
 
 $(OBJ_DIR)/%.o:		$(DIR_SRC)/%.c $(DIR_OBJ)
 					@echo "Compiling object files $@"
@@ -106,7 +108,7 @@ $(LIB):
 
 debug:		$(OBJ) $(HEADER)
 			@echo "Compiling with debug flag"
-			$(CC) $(CFLAGS) -g -o $(NAME) $(addprefix $(DIR_SRC)/, $(SRC))
+			$(CC) $(CFLAGS) -g $(INC) -o $(NAME) $(addprefix $(DIR_SRC)/, $(SRC)) $(LIB)
 
 $(T_NAME):	$(OBJ)
 			@echo "Compiling unit test"
@@ -128,7 +130,9 @@ clean:
 			rm -rf $(T_DIR)/$(T_NAME)
 			make -C $(DIR_LIB) clean
 
-fclean:		clean
+fclean:
+			rm -rf $(DIR_OBJ)
+			rm -rf $(T_DIR)/$(T_NAME)
 			rm -rf $(NAME)
 			make -C $(DIR_LIB) fclean
 

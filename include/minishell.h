@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/11/29 13:24:43 by alex             ###   ########.fr       */
+/*   Updated: 2024/11/29 17:56:35 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,12 +20,22 @@
 # include <stdlib.h>
 # include <sys/types.h>
 # include <sys/wait.h>
+# include <readline/readline.h>
+# include <readline/history.h>
 # include "libft/inc/libft.h"
+
+typedef struct s_lexer
+{
+	int				type;
+	int				subtype;
+	char			*content;
+	struct s_lexer	*next;
+	struct s_lexer	*prev;
+}	t_token;
 
 typedef struct s_cmd
 {
 	char			**argv;		// array created with cmd_path, then arguments
-	char			**env;		// needed by executing fork for execve()
 	char			*outfile;	// filepath from which input must be redirected
 	char			*infile;	// filepath to which output must be redirected
 	char			*cmd_path;	// binary filepath, absolute/through PATH
@@ -39,11 +49,13 @@ typedef struct s_cmd
 
 typedef struct s_cmd_table
 {
+	char	*cmd_line;		// readline return
+	t_lex	*token_list;	// linked list of tokens identified from cmd line
 	t_cmd	*cmd_list;		// first commands mini structures in linked list
 	int		cmd_count;		// total of commands in commmand line
 	int		index;			// index of command currently being executed
 	char	**env;			// env received at start of program
-	char	**path;			// extracted PATH variable of the env
+	char	**paths;		// extracted PATH variable of the env
 	int		critical_er;	// flag if critical error in parent process
 }	t_cmd_tab;
 
@@ -55,15 +67,21 @@ typedef struct s_maman
 }	t_maman;
 
 
+/* PARSING */
+
+void		extract_paths(t_cmd_tab *cmd_tab);
+void		init_readline(t_cmd_tab *cmd_tab);
 
 /* EXECUTION */
 
-t_cmd_tab	*create_cmd_tab(char **argv, char **env);
+t_cmd_tab	*create_cmd_tab(char **env);
 void		create_pipe(t_cmd_tab *cmd_tab);
 void		create_fork(t_cmd_tab *cmd_tab);
+void		get_cmd_path(t_cmd *cmd, t_cmd_tab *cmd_tab);
 void		close_pipe(t_cmd_tab *cmd_tab);
 void		fork_exit_if(int condition, int error_code, t_cmd *cmd,
 				char *error_message);
+int			execute_all_cmd(t_cmd_tab *cmd_tab);
 
 /* REDIRECTION */
 
@@ -76,12 +94,45 @@ int			is_last_cmd(t_cmd_tab *cmd_tab);
 int			is_first_cmd(t_cmd_tab *cmd_tab);
 t_cmd		*get_current_cmd(t_cmd_tab *cmd_tab);
 t_cmd		*get_last_cmd(t_cmd_tab *cmd_tab);
-int			are_error(t_cmd_tab *cmd_tab);
+int			catch_error(t_cmd_tab *cmd_tab);
 int			open_file(char *filepath, int mode);
 int			get_last_cmd_exit_code(t_cmd_tab *cmd_tab);
 
+/* ERROR HANDLING */
+
+void		set_error_if(int condition, int err_code, t_cmd_tab *cmd_tab,
+				char *err_message);
+int			catch_error(t_cmd_tab *cmd_tab);
+
+/* CLEAN UP */
+
+void		free_cmd_tab(t_cmd_tab *cmd_tab);
+
 # define TRUE	1
 # define FALSE	0
+
+enum e_token_type
+{
+	NONE,
+	WORD,
+	WHITE_SPACE,
+	DELIMITER,
+	STRING,
+	OPERATOR,
+	END,
+};
+
+enum e_token_subtype
+{
+	NONE,
+	CMD,
+	SING_QUOTE,
+	DOUB_QUOTE,
+	PIPE,
+	INFILE,
+	OUTFILE,
+	HEREDOC,
+};
 
 enum e_exit_code
 {
