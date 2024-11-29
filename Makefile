@@ -3,22 +3,22 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: mkling <mkling@student.42.fr>              +#+  +:+       +#+         #
+#    By: alex <alex@student.42.fr>                  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/14 14:56:12 by mkling            #+#    #+#              #
-#    Updated: 2024/11/28 16:05:21 by mkling           ###   ########.fr        #
+#    Updated: 2024/11/29 13:00:14 by alex             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME		= minishell
 
-DIR_SRC		= ./source
+DIR_SRC		= source
 DIR_EXEC	= execution
 DIR_PARS	= parsing
 
-DIR_OBJ		= ./object
+DIR_OBJ		= object
 
-DIR_INC		= ./include
+DIR_INC		= include
 
 DIR_LIB		= $(DIR_INC)/libft
 
@@ -27,7 +27,10 @@ HEADER		= $(DIR_INC)/minishell.h
 FUNC_EXEC	= 	execution.c \
 				pipefork.c \
 				readability.c \
-				redirection.c
+				redirection.c \
+				setup.c \
+				cleanup.c
+
 FUNC_PARS	=	readline.c
 
 FUNC		= 	$(addprefix $(DIR_EXEC)/, $(FUNC_EXEC)) \
@@ -39,7 +42,7 @@ SRC			= $(FUNC) $(MAIN)
 
 OBJ			= $(SRC:%.c=/%.o)
 
-LIB			= $(DIR_LIB)/libft.a
+LIB			= -L$(DIR_LIB) -lft
 
 INC			= -I$(DIR_LIB)
 
@@ -60,13 +63,14 @@ T_SRC		= utest.c
 
 T_OBJ		= utest.o
 
-T_INC		= -I$(HOME)/Criterion/include/criterion
+T_INC		= 	-I$(HOME)/Criterion/include/criterion \
+				-I$(HOME)/Criterion/
 
 T_LIB		= 	-Wl,-rpath=$(HOME)/Criterion/build/src \
 				-L${HOME}/Criterion/build/src \
 				-lcriterion \
 
-T_CC		= gcc $(CFLAGS) $(T_INC) $(T_LIB) $(LIB)
+T_CC		= cc $(CFLAGS) $(T_INC) $(T_LIB) $(LIB) -g
 
 T_EXCL		= ./obj/main.o
 
@@ -80,7 +84,7 @@ T_EXCL		= ./obj/main.o
 all:				$(NAME)
 
 $(NAME):			$(HEADER) $(LIB)
-					$(CC) $(CFLAGS) -o $(NAME) $(LIB) $(addprefix $(DIR_SRC)/, $(SRC))
+					$(CC) $(CFLAGS) -o $(NAME) $(addprefix $(DIR_SRC)/, $(SRC)) $(LIB)
 
 $(OBJ_DIR)/%.o:		$(DIR_SRC)/%.c $(DIR_OBJ)
 					@echo "Compiling object files $@"
@@ -104,10 +108,10 @@ debug:		$(OBJ) $(HEADER)
 			@echo "Compiling with debug flag"
 			$(CC) $(CFLAGS) -g -o $(NAME) $(addprefix $(DIR_SRC)/, $(SRC))
 
-$(T_NAME):	$(T_DIR)/$(T_SRC) $(HEADER) $(OBJ)
+$(T_NAME):	$(OBJ)
 			@echo "Compiling unit test"
-			$(T_CC) $(filter-out $(DIR_OBJ)/$(T_EXCL), $(addprefix $(DIR_OBJ)/, $(OBJ))) \
-			$(T_DIR)/$(T_SRC) -o $(T_DIR)/$(T_NAME)
+			$(T_CC) $(filter-out $(DIR_OBJ)/$(T_EXCL), $(addprefix $(DIR_OBJ), $(OBJ))) \
+			$(addprefix $(T_DIR)/, $(T_SRC)) -o $(T_DIR)/$(T_NAME) $(LIB)
 
 test:		$(T_NAME)
 			@echo "Running unit tests :"

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 15:37:36 by mkling            #+#    #+#             */
-/*   Updated: 2024/11/28 14:40:22 by mkling           ###   ########.fr       */
+/*   Updated: 2024/11/29 10:43:36 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,9 @@ void	send_fork_exec_cmd(t_cmd_tab *cmd_tab)
 		"Failed to execute command");
 }
 
-/* Reset command table index, wait on all forks with
-their forkpid, set their exit code */
+/* Reset command table index,
+Wait on all forks with their forkpid,
+Set their exit code */
 void	wait_on_all_forks(t_cmd_tab *cmd_tab)
 {
 	t_cmd	*cmd;

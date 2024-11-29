@@ -3,45 +3,66 @@
 /*                                                        :::      ::::::::   */
 /*   utest.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/20 15:58:43 by mkling            #+#    #+#             */
-/*   Updated: 2024/11/28 16:05:58 by mkling           ###   ########.fr       */
+/*   Updated: 2024/11/29 12:23:13 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/minishell.h"
 #include "../include/libft/inc/libft.h"
-#include "/home/mkling/Criterion/include/criterion/criterion.h"
-#include "/home/mkling/Criterion/include/criterion/redirect.h"
+#include "criterion/criterion.h"
+#include "criterion/redirect.h"
+#include <stdio.h>
 
-void	redirect_all_stdout(void)
+// void	*ft_calloc(size_t nbr, size_t size);
+
+// void	redirect_all_stdout(void)
+// {
+// 	cr_redirect_stdout();
+// 	cr_redirect_stderr();
+// }
+
+void	ft_bzero(void *ptr, unsigned long len)
 {
-	cr_redirect_stdout();
-	cr_redirect_stderr();
+	unsigned char	*str;
+
+	str = ptr;
+	while (len--)
+		*str++ = 0;
 }
 
-t_cmd_tab	*create_cmd_tab(int cmd_count)
+void	*ft_calloc(size_t nbr, size_t size)
 {
-	t_cmd_tab	*cmd_tab;
+	void	*result;
 
-	cmd_tab = ft_calloc(sizeof(t_cmd_tab), 1);
-	if (!cmd_tab)
+	if (nbr == 0 || size == 0 || ((size_t) - 1 / nbr) < size)
+		return (cr_malloc(0));
+	result = cr_malloc(nbr * size);
+	if (!result)
 		return (NULL);
-	cmd_tab->cmd_array = ft_calloc(sizeof(t_cmd), cmd_count);
-	if (!cmd_tab->cmd_array)
-		return (NULL);
-	cmd_tab->index = 0;
-	return (cmd_tab);
+	ft_bzero(result, nbr * size);
+	return (result);
 }
 
-Test(execution, create_cmd_tab)
-{
-	t_cmd_tab	*cmd_tab;
+// t_cmd_tab	*create_cmd_tab(int cmd_count)
+// {
+// 	t_cmd_tab	*cmd_tab;
 
-	cmd_tab = create_cmd_tab(2);
-	printf("Command Table initialized\n");
-	printf("Index = %d\n", cmd_tab->index);
+// 	cmd_tab = ft_calloc(sizeof(t_cmd_tab), 1);
+// 	if (!cmd_tab)
+// 		return (NULL);
+// 	cmd_tab->cmd_array = ft_calloc(sizeof(t_cmd), cmd_count);
+// 	if (!cmd_tab->cmd_array)
+// 		return (NULL);
+// 	cmd_tab->index = 0;
+// 	return (cmd_tab);
+// }
+
+Test(Criterion, Setup)
+{
+	cr_assert_eq("meow", "meow");
 }
 
 
