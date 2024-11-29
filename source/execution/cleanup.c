@@ -1,24 +1,36 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   error.c                                            :+:      :+:    :+:   */
+/*   cleanup.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/27 17:41:32 by mkling            #+#    #+#             */
-/*   Updated: 2024/11/27 17:54:23 by mkling           ###   ########.fr       */
+/*   Created: 2024/11/28 14:37:02 by mkling            #+#    #+#             */
+/*   Updated: 2024/11/28 14:40:48 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "include/minishell.h"
+#include "../../include/minishell.h"
 
-void	fork_exit_if(int condition, int err_code, t_cmd *cmd, char *err_message)
+void	free_cmd(t_cmd *cmd)
 {
-	if (condition)
+	free(cmd->argv);
+	free(cmd->env);
+	free(cmd->outfile);
+	free(cmd->infile);
+	free(cmd->cmd_path);
+	free(cmd->pipe_fd);
+	free(cmd);
+}
+
+void	free_cmd_tab(t_cmd_tab *cmd_tab)
+{
+	cmd_tab->index = 0;
+	while (cmd_tab->index < cmd_tab->cmd_count)
 	{
-		ft_putstr_fd(err_message);
-		ft_putstr_fd("\n");
-		cmd->exit_code = err_code;
-		exit(err_code);
+		free_cmd(cmd_tab->cmd_array[cmd_tab->index]);
+		cmd_tab->index++;
 	}
+	free(cmd_tab->cmd_array);
+	free(cmd_tab);
 }
