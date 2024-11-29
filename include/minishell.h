@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/11/29 17:56:35 by alex             ###   ########.fr       */
+/*   Updated: 2024/11/30 00:54:49 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ typedef struct s_cmd
 typedef struct s_cmd_table
 {
 	char	*cmd_line;		// readline return
-	t_lex	*token_list;	// linked list of tokens identified from cmd line
+	t_token	*token_list;	// linked list of tokens identified from cmd line
 	t_cmd	*cmd_list;		// first commands mini structures in linked list
 	int		cmd_count;		// total of commands in commmand line
 	int		index;			// index of command currently being executed
@@ -71,6 +71,13 @@ typedef struct s_maman
 
 void		extract_paths(t_cmd_tab *cmd_tab);
 void		init_readline(t_cmd_tab *cmd_tab);
+void		id_delimiter(t_cmd_tab *cmd_tab);
+void		id_operator(t_cmd_tab *cmd_tab);
+void		id_whitespace(t_cmd_tab *cmd_tab);
+void		id_word(t_cmd_tab *cmd_tab);
+void		add_token(t_cmd_tab *cmd_tab, int type, char *content);
+void		tokenize(t_cmd_tab *cmd_tab);
+void		free_token_list(t_cmd_tab *cmd_tab);
 
 /* EXECUTION */
 
@@ -108,8 +115,11 @@ int			catch_error(t_cmd_tab *cmd_tab);
 
 void		free_cmd_tab(t_cmd_tab *cmd_tab);
 
-# define TRUE	1
-# define FALSE	0
+# define TRUE		1
+# define FALSE		0
+# define DELIMITERS	"\'\""
+# define OPERATORS	"|><"
+# define WHITESPACE	" \n\t"
 
 enum e_token_type
 {
@@ -124,7 +134,6 @@ enum e_token_type
 
 enum e_token_subtype
 {
-	NONE,
 	CMD,
 	SING_QUOTE,
 	DOUB_QUOTE,

@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 17:34:47 by alex              #+#    #+#             */
-/*   Updated: 2024/11/29 18:06:43 by alex             ###   ########.fr       */
+/*   Updated: 2024/11/30 00:55:19 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ t_token	*create_token(void)
 	return (token);
 }
 
-void	add_token(t_cmd_tab *cmd_tab, int type)
+void	add_token(t_cmd_tab *cmd_tab, int type, char *content)
 {
 	t_token	*new_token;
 
@@ -64,15 +64,19 @@ void	add_token(t_cmd_tab *cmd_tab, int type)
 		return ;
 	}
 	new_token->type = type;
-	append_cmd(new_token, cmd_tab);
+	new_token->content = content;
+	append_token(new_token, cmd_tab);
 }
-
 
 void	tokenize(t_cmd_tab *cmd_tab)
 {
 	cmd_tab->index = 0;
-	while (cmd_tab->cmd_line[cmd_tab->index])
+	while ((size_t)cmd_tab->index < ft_strlen(cmd_tab->cmd_line))
 	{
-		id_separator(cmd_tab);
+		id_delimiter(cmd_tab);
+		id_operator(cmd_tab);
+		id_word(cmd_tab);
+		id_whitespace(cmd_tab);
 	}
+	add_token(cmd_tab, END, NULL);
 }

@@ -1,26 +1,35 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   cleanup.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/28 14:09:43 by mkling            #+#    #+#             */
-/*   Updated: 2024/11/30 00:10:29 by alex             ###   ########.fr       */
+/*   Created: 2024/11/30 00:22:21 by alex              #+#    #+#             */
+/*   Updated: 2024/11/30 00:30:15 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-
-int	main(int argc, char **env)
+void	free_token(t_token *token)
 {
-	t_cmd_tab	*cmd_tab;
+	if (token->content != NULL)
+		free(token->content);
+	free(token);
+}
 
-	if (argc != 1)
-		return (1);
-	cmd_tab = create_cmd_tab(env);
-	init_readline(cmd_tab);
-	free_cmd_tab(cmd_tab);
-	return (0);
+void	free_token_list(t_cmd_tab *cmd_tab)
+{
+	t_token	*current;
+	t_token	*next;
+
+	current = cmd_tab->token_list;
+	while (current != NULL)
+	{
+		next = current->next;
+		free_token(current);
+		current = next;
+	}
+	cmd_tab->token_list = NULL;
 }

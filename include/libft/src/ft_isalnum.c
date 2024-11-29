@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_isalnum.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 14:47:23 by mkling            #+#    #+#             */
-/*   Updated: 2024/10/15 10:52:24 by mkling           ###   ########.fr       */
+/*   Updated: 2024/11/30 00:02:50 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,10 +41,10 @@ int	ft_isalnum(int c)
 	return (0);
 }
 
-int	ft_isdigit_or_hexa(int c)
+int	ft_ishexa(int c)
 {
-	if ((c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')
+	if (((c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))
 		|| (c >= '0' && c <= '9'))
-		return (2048);
+		return (1);
 	return (0);
 }
