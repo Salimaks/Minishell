@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 13:51:38 by mkling            #+#    #+#             */
-/*   Updated: 2024/11/30 00:56:44 by alex             ###   ########.fr       */
+/*   Updated: 2024/11/30 20:41:25 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,10 @@ void	print_tokens(t_token *first)
 	current = first;
 	while (current)
 	{
-		printf("TOKEN %d : %s\n", current->type, current->content);
+		printf("TOKEN %d : %c", current->lexem, current->character);
+		if (current->content != NULL)
+			printf(" with content : %s", current->content);
+		printf("\n\n");
 		current = current->next;
 	}
 }

@@ -6,61 +6,74 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 18:04:03 by alex              #+#    #+#             */
-/*   Updated: 2024/11/30 01:32:38 by alex             ###   ########.fr       */
+/*   Updated: 2024/11/30 15:52:56 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	is_special_char(int c)
+t_token	*create_token(void)
 {
-	if (ft_strchr(DELIMITERS, c) || ft_strchr(OPERATORS, c)
-		|| ft_strchr(WHITESPACE, c))
-		return (1);
-	return (0);
+	t_token	*token;
+
+	token = (t_token *)malloc(sizeof(t_token));
+	if (!token)
+		return (NULL);
+	token->prev = NULL;
+	token->next = NULL;
+	token->content = NULL;
+	token->lexem = NONE;
+	token->type = UNKNOWN;
+	return (token);
 }
 
-void	id_delimiter(t_cmd_tab *cmd_tab)
+t_token	*get_last_token(t_cmd_tab *cmd_tab)
 {
-	char	*content;
+	t_token	*current;
 
-	content = ft_substr(cmd_tab->cmd_line, cmd_tab->index, 1);
-	add_token(cmd_tab, DELIMITER, content);
-	cmd_tab->index++;
+	if (cmd_tab == NULL)
+		return (NULL);
+	current = cmd_tab->token_list;
+	while (current->next != NULL)
+		current = current->next;
+	return (current);
 }
 
-void	id_operator(t_cmd_tab *cmd_tab)
+void	append_token(t_token *token, t_cmd_tab *cmd_tab)
 {
-	char	*content;
+	t_token	*last_token;
 
-	content = ft_substr(cmd_tab->cmd_line, cmd_tab->index, 1);
-	add_token(cmd_tab, OPERATOR, content);
-	cmd_tab->index++;
+	if (cmd_tab->token_list == NULL)
+		cmd_tab->token_list = token;
+	else
+	{
+		last_token = get_last_token(cmd_tab);
+		last_token->next = token;
+		token->prev = last_token;
+	}
 }
 
-void	id_whitespace(t_cmd_tab *cmd_tab)
+void	add_token(t_cmd_tab *cmd_tab, int lexem, char letter)
 {
-	int		index;
-	char	*word;
+	t_token	*new_token;
 
-	index = 0;
-	while (ft_strchr(WHITESPACE, cmd_tab->cmd_line[cmd_tab->index + index]))
-		index++;
-	word = ft_substr(cmd_tab->cmd_line, cmd_tab->index, index);
-	add_token(cmd_tab, DELIMITER, word);
-	cmd_tab->index += index;
+	new_token = create_token();
+	if (!new_token)
+	{
+		set_error_if(!new_token, MALLOC_FAIL, cmd_tab,
+			"Failed to allocate token");
+		return ;
+	}
+	new_token->lexem = lexem;
+	new_token->character = letter;
+	append_token(new_token, cmd_tab);
 }
 
-void	id_word(t_cmd_tab *cmd_tab)
+void	pop_token(t_token *token)
 {
-	int		word_index;
-	char	*word;
-
-	word_index = 0;
-	while (ft_isprint(cmd_tab->cmd_line[cmd_tab->index + word_index])
-		&& !is_special_char(cmd_tab->cmd_line[cmd_tab->index + word_index]))
-		word_index++;
-	word = ft_substr(cmd_tab->cmd_line, cmd_tab->index, word_index);
-	add_token(cmd_tab, WORD, word);
-	cmd_tab->index += word_index;
+	if (!token)
+		return ;
+	token->prev->next = token->next;
+	token->next->prev = token->prev;
+	free_token(token);
 }

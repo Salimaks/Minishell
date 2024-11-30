@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/11/30 01:34:29 by alex             ###   ########.fr       */
+/*   Updated: 2024/11/30 21:18:52 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,13 +24,14 @@
 # include <readline/history.h>
 # include "libft/inc/libft.h"
 
-typedef struct s_lexer
+typedef struct s_token
 {
+	int				lexem;
 	int				type;
-	int				subtype;
 	char			*content;
-	struct s_lexer	*next;
-	struct s_lexer	*prev;
+	char			character;
+	struct s_token	*next;
+	struct s_token	*prev;
 }	t_token;
 
 typedef struct s_cmd
@@ -67,17 +68,17 @@ typedef struct s_maman
 }	t_maman;
 
 
-/* PARSING */
+/* INPUT */
 
 void		extract_paths(t_cmd_tab *cmd_tab);
 void		init_readline(t_cmd_tab *cmd_tab);
-void		id_delimiter(t_cmd_tab *cmd_tab);
-void		id_operator(t_cmd_tab *cmd_tab);
-void		id_whitespace(t_cmd_tab *cmd_tab);
-void		id_word(t_cmd_tab *cmd_tab);
-void		add_token(t_cmd_tab *cmd_tab, int type, char *content);
+
+/* PARSING */
+
+void		scan(t_cmd_tab *cmd_tab);
 void		tokenize(t_cmd_tab *cmd_tab);
-void		free_token_list(t_cmd_tab *cmd_tab);
+void		add_token(t_cmd_tab *cmd_tab, int type, char letter);
+void		pop_token(t_token *token);
 
 /* EXECUTION */
 
@@ -109,34 +110,44 @@ int			get_last_cmd_exit_code(t_cmd_tab *cmd_tab);
 
 void		set_error_if(int condition, int err_code, t_cmd_tab *cmd_tab,
 				char *err_message);
+void		set_error(int err_code, t_cmd_tab *cmd_tab, char *err_message);
 int			catch_error(t_cmd_tab *cmd_tab);
 
 /* CLEAN UP */
 
+void		free_token(t_token *token);
 void		free_cmd_tab(t_cmd_tab *cmd_tab);
+void		free_token_list(t_cmd_tab *cmd_tab);
 
 # define TRUE		1
 # define FALSE		0
-# define DELIMITERS	"'\""
+# define DELIMITERS	"'\"()"
 # define OPERATORS	"|><"
 # define WHITESPACE	" \n\t\0"
+# define SPECIALS	"$"
+# define ESCAPES	"\\"
 
-enum e_token_type
+enum e_lexem
 {
-	NONE,
-	WORD,
-	WHITE_SPACE,
-	DELIMITER,
-	STRING,
-	OPERATOR,
-	END,
+	NONE		= 0,
+	LETTER		= 1,
+	SPACES		= 2,
+	DELIMITER	= 3,
+	OPERATOR	= 4,
+	SPECIAL		= 5,
+	ESCAPE		= 6,
+	END			= 7,
 };
 
-enum e_token_subtype
+enum e_token
 {
+	UNKNOWN,
 	CMD,
 	SING_QUOTE,
 	DOUB_QUOTE,
+	OPENPARENTH,
+	CLOSEPARENTH,
+	DOLLAR,
 	PIPE,
 	INFILE,
 	OUTFILE,

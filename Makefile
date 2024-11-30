@@ -6,7 +6,7 @@
 #    By: alex <alex@student.42.fr>                  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/14 14:56:12 by mkling            #+#    #+#              #
-#    Updated: 2024/11/30 00:25:33 by alex             ###   ########.fr        #
+#    Updated: 2024/11/30 19:59:01 by alex             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -35,6 +35,7 @@ FUNC_EXEC	= 	execution.c \
 FUNC_PARS	=	readline.c \
 				token.c \
 				lexer.c \
+				parser.c \
 				cleanup.c
 
 FUNC		= 	$(addprefix $(DIR_EXEC)/, $(FUNC_EXEC)) \

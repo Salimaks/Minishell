@@ -6,81 +6,96 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 17:34:47 by alex              #+#    #+#             */
-/*   Updated: 2024/11/30 01:35:02 by alex             ###   ########.fr       */
+/*   Updated: 2024/11/30 22:02:08 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-t_token	*get_last_token(t_cmd_tab *cmd_tab)
-{
-	t_token	*current;
-
-	if (cmd_tab == NULL)
-		return (NULL);
-	current = cmd_tab->token_list;
-	while (current->next != NULL)
-		current = current->next;
-	return (current);
-}
-
-void	append_token(t_token *token, t_cmd_tab *cmd_tab)
-{
-	t_token	*last_token;
-
-	if (cmd_tab->token_list == NULL)
-		cmd_tab->token_list = token;
-	else
-	{
-		last_token = get_last_token(cmd_tab);
-		last_token->next = token;
-		token->prev = last_token;
-	}
-}
-
-t_token	*create_token(void)
-{
-	t_token	*token;
-
-	token = (t_token *)malloc(sizeof(t_token));
-	if (!token)
-		return (NULL);
-	token->prev = NULL;
-	token->next = NULL;
-	token->type = NONE;
-	token->subtype = NONE;
-	return (token);
-}
-
-void	add_token(t_cmd_tab *cmd_tab, int type, char *content)
-{
-	t_token	*new_token;
-
-	new_token = create_token();
-	if (!new_token)
-	{
-		set_error_if(!new_token, MALLOC_FAIL, cmd_tab,
-			"Failed to allocate token");
-		return ;
-	}
-	new_token->type = type;
-	new_token->content = content;
-	append_token(new_token, cmd_tab);
-}
-
-void	tokenize(t_cmd_tab *cmd_tab)
+void	scan(t_cmd_tab *cmd_tab)
 {
 	cmd_tab->index = 0;
 	while (cmd_tab->index < ft_strlen(cmd_tab->cmd_line))
 	{
-		if (ft_strchr(DELIMITERS, cmd_tab->cmd_line[cmd_tab->index]))
-			id_delimiter(cmd_tab);
+		if (ft_strchr(SPECIALS, cmd_tab->cmd_line[cmd_tab->index]))
+			add_token(cmd_tab, SPECIAL, cmd_tab->cmd_line[cmd_tab->index]);
+		else if (ft_strchr(DELIMITERS, cmd_tab->cmd_line[cmd_tab->index]))
+			add_token(cmd_tab, DELIMITER, cmd_tab->cmd_line[cmd_tab->index]);
 		else if (ft_strchr(OPERATORS, cmd_tab->cmd_line[cmd_tab->index]))
-			id_operator(cmd_tab);
+			add_token(cmd_tab, OPERATOR, cmd_tab->cmd_line[cmd_tab->index]);
 		else if (ft_strchr(WHITESPACE, cmd_tab->cmd_line[cmd_tab->index]))
-			id_whitespace(cmd_tab);
+			add_token(cmd_tab, SPACES, cmd_tab->cmd_line[cmd_tab->index]);
 		else
-			id_word(cmd_tab);
+			add_token(cmd_tab, LETTER, cmd_tab->cmd_line[cmd_tab->index]);
+		cmd_tab->index++;
 	}
-	add_token(cmd_tab, END, NULL);
+	add_token(cmd_tab, END, '\0');
+}
+
+int		get_num_token_between(t_token *start, t_token *end)
+{
+	t_token	*current;
+	int		len;
+
+	current = start;
+	len = 1;
+	while (current != end)
+	{
+		len++;
+		current = current->next;
+	}
+	return (len);
+}
+
+void	group_token(t_cmd_tab *cmd_tab, t_token *start, t_token *end)
+{
+	t_token	*current;
+	char	*content;
+	int		len;
+	int		index;
+
+	len = get_num_token_between(start, end);
+	content = (char *)malloc(sizeof(char) * (len + 1));
+	if (!content)
+		return (set_error(MALLOC_FAIL, cmd_tab, "Failed to malloc token content"));
+	current = start;
+	index = 0;
+	while (index < len)
+	{
+		content[index] = current->character;
+		current = current->next;
+		if (index > 0)
+			pop_token(current->prev);
+		index++;
+	}
+	content[index] = '\0';
+	start->content = content;
+}
+
+void	group_same_type_token(t_cmd_tab *cmd_tab, t_token *start)
+{
+	t_token	*end;
+
+	end = start;
+	while (end->next->lexem == start->lexem)
+		end = end->next;
+	group_token(cmd_tab, start, end);
+}
+
+void	tokenize(t_cmd_tab *cmd_tab)
+{
+	t_token	*current;
+
+	scan(cmd_tab);
+	current = cmd_tab->token_list;
+	while (current != NULL)
+	{
+		if (current->lexem == LETTER)
+			group_same_type_token(cmd_tab, current);
+		else if (current->lexem == SPACES)
+			group_same_type_token(cmd_tab, current);
+		else if (current->lexem == ESCAPE)
+			group_escape(cmd_tab, current);
+		current = current->next;
+	}
 }

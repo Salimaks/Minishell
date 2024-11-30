@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 14:37:02 by mkling            #+#    #+#             */
-/*   Updated: 2024/11/29 16:36:17 by alex             ###   ########.fr       */
+/*   Updated: 2024/11/30 15:56:58 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,12 @@ void	free_cmd_tab(t_cmd_tab *cmd_tab)
 	if (cmd_tab->paths)
 		ft_free_tab(cmd_tab->paths);
 	free(cmd_tab);
+}
+
+void	set_error(int err_code, t_cmd_tab *cmd_tab, char *err_message)
+{
+	perror(err_message);
+	cmd_tab->critical_er = err_code;
 }
 
 void	set_error_if(int condition, int err_code, t_cmd_tab *cmd_tab,
