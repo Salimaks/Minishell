@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/11/30 00:54:49 by alex             ###   ########.fr       */
+/*   Updated: 2024/11/30 01:34:29 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,7 @@ typedef struct s_cmd
 	char			*infile;	// filepath to which output must be redirected
 	char			*cmd_path;	// binary filepath, absolute/through PATH
 	int				exit_code;	// value returned by the execution of command
-	int				cmd_index;	// number of the command among other commands
+	size_t			cmd_index;	// number of the command among other commands
 	int				fork_pid;	// process id of fork sent to execute command
 	int				pipe_fd[2];	// array of 2 pipe fd required for the pipe()
 	struct s_cmd	*next;
@@ -52,8 +52,8 @@ typedef struct s_cmd_table
 	char	*cmd_line;		// readline return
 	t_token	*token_list;	// linked list of tokens identified from cmd line
 	t_cmd	*cmd_list;		// first commands mini structures in linked list
-	int		cmd_count;		// total of commands in commmand line
-	int		index;			// index of command currently being executed
+	size_t	cmd_count;		// total of commands in commmand line
+	size_t	index;			// index of command currently being executed
 	char	**env;			// env received at start of program
 	char	**paths;		// extracted PATH variable of the env
 	int		critical_er;	// flag if critical error in parent process
@@ -117,9 +117,9 @@ void		free_cmd_tab(t_cmd_tab *cmd_tab);
 
 # define TRUE		1
 # define FALSE		0
-# define DELIMITERS	"\'\""
+# define DELIMITERS	"'\""
 # define OPERATORS	"|><"
-# define WHITESPACE	" \n\t"
+# define WHITESPACE	" \n\t\0"
 
 enum e_token_type
 {
