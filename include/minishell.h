@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/11/30 21:18:52 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/01 18:21:12 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,12 +27,19 @@
 typedef struct s_token
 {
 	int				lexem;
-	int				type;
 	char			*content;
 	char			character;
 	struct s_token	*next;
 	struct s_token	*prev;
 }	t_token;
+
+typedef struct s_ast
+{
+	int				ast_type;
+	t_token			token;
+	struct s_ast	*left;
+	struct s_ast	*right;
+}	t_ast;
 
 typedef struct s_cmd
 {
@@ -58,6 +65,7 @@ typedef struct s_cmd_table
 	char	**env;			// env received at start of program
 	char	**paths;		// extracted PATH variable of the env
 	int		critical_er;	// flag if critical error in parent process
+	t_ast	*syntax_tree;
 }	t_cmd_tab;
 
 typedef struct s_maman
@@ -76,9 +84,11 @@ void		init_readline(t_cmd_tab *cmd_tab);
 /* PARSING */
 
 void		scan(t_cmd_tab *cmd_tab);
-void		tokenize(t_cmd_tab *cmd_tab);
 void		add_token(t_cmd_tab *cmd_tab, int type, char letter);
 void		pop_token(t_token *token);
+void		merge_token(t_cmd_tab *cmd_tab, t_token *start, t_token *end);
+int			is_token_in_list(t_token *start, int character);
+void		group_strings(t_cmd_tab *cmd_tab);
 
 /* EXECUTION */
 
@@ -122,36 +132,27 @@ void		free_token_list(t_cmd_tab *cmd_tab);
 # define TRUE		1
 # define FALSE		0
 # define DELIMITERS	"'\"()"
-# define OPERATORS	"|><"
-# define WHITESPACE	" \n\t\0"
-# define SPECIALS	"$"
-# define ESCAPES	"\\"
+# define OPERATORS	"|><$"
+# define WHITESPACES " \n\t\0"
 
 enum e_lexem
 {
 	NONE		= 0,
-	LETTER		= 1,
-	SPACES		= 2,
+	WORD		= 1,
+	WHITESPACE	= 2,
 	DELIMITER	= 3,
 	OPERATOR	= 4,
-	SPECIAL		= 5,
-	ESCAPE		= 6,
-	END			= 7,
-};
-
-enum e_token
-{
-	UNKNOWN,
+	END			= 5,
 	CMD,
-	SING_QUOTE,
-	DOUB_QUOTE,
-	OPENPARENTH,
-	CLOSEPARENTH,
-	DOLLAR,
-	PIPE,
-	INFILE,
-	OUTFILE,
+	VARIABLE,
+	STRING,
+	DOUB_QUOTE	= '"',
+	SING_QUOTE	= '\'',
+	PIPE		= '|',
+	GREATER		= '>',
+	LESSER		= '<',
 	HEREDOC,
+	END_OF_HERED,
 };
 
 enum e_exit_code

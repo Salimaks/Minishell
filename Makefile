@@ -6,7 +6,7 @@
 #    By: alex <alex@student.42.fr>                  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/14 14:56:12 by mkling            #+#    #+#              #
-#    Updated: 2024/11/30 19:59:01 by alex             ###   ########.fr        #
+#    Updated: 2024/12/01 16:53:09 by alex             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -34,6 +34,7 @@ FUNC_EXEC	= 	execution.c \
 
 FUNC_PARS	=	readline.c \
 				token.c \
+				scanner.c \
 				lexer.c \
 				parser.c \
 				cleanup.c

@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 18:04:03 by alex              #+#    #+#             */
-/*   Updated: 2024/11/30 15:52:56 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/01 17:52:01 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@ t_token	*create_token(void)
 	token->next = NULL;
 	token->content = NULL;
 	token->lexem = NONE;
-	token->type = UNKNOWN;
 	return (token);
 }
 
