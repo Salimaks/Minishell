@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 18:04:03 by alex              #+#    #+#             */
-/*   Updated: 2024/12/01 17:52:01 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/02 12:13:07 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,12 +59,21 @@ void	add_token(t_cmd_tab *cmd_tab, int lexem, char letter)
 	new_token = create_token();
 	if (!new_token)
 	{
-		set_error_if(!new_token, MALLOC_FAIL, cmd_tab,
+		set_error(MALLOC_FAIL, cmd_tab,
 			"Failed to allocate token");
 		return ;
 	}
 	new_token->lexem = lexem;
-	new_token->character = letter;
+	new_token->letter = letter;
+	new_token->content = malloc(sizeof(char) * 2);
+	if (!new_token->content)
+	{
+		set_error(MALLOC_FAIL, cmd_tab,
+			"Failed to allocate token content");
+		return ;
+	}
+	new_token->content[0] = letter;
+	new_token->content[1] = '\0';
 	append_token(new_token, cmd_tab);
 }
 

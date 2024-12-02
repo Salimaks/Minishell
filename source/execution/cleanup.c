@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cleanup.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 14:37:02 by mkling            #+#    #+#             */
-/*   Updated: 2024/11/30 15:56:58 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/02 18:37:48 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,10 @@
 void	free_cmd(t_cmd *cmd)
 {
 	if (cmd->argv != NULL)
-		free(cmd->argv);
+	{
+		ft_free_tab(cmd->argv);
+		cmd->argv = NULL;
+	}
 	if (cmd->outfile != NULL)
 		free(cmd->outfile);
 	if (cmd->outfile != NULL)
@@ -28,21 +31,24 @@ void	free_cmd(t_cmd *cmd)
 void	free_cmd_list(t_cmd_tab *cmd_tab)
 {
 	t_cmd	*current;
-	t_cmd	*next;
+	t_cmd	*prev;
 
-	current = cmd_tab->cmd_list;
+	current = get_last_cmd(cmd_tab);
 	while (current != NULL)
 	{
-		next = current->next;
+		prev = current->prev;
 		free_cmd(current);
-		current = next;
+		current = prev;
 	}
+	cmd_tab->cmd_list = NULL;
+	cmd_tab->cmd_count = 0;
 }
 
 void	free_cmd_tab(t_cmd_tab *cmd_tab)
 {
 	cmd_tab->index = 0;
-	free_cmd_list(cmd_tab);
+	if (cmd_tab->cmd_list)
+		free_cmd_list(cmd_tab);
 	if (cmd_tab->paths)
 		ft_free_tab(cmd_tab->paths);
 	free(cmd_tab);

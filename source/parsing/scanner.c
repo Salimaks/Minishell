@@ -3,63 +3,28 @@
 /*                                                        :::      ::::::::   */
 /*   scanner.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/01 16:37:27 by alex              #+#    #+#             */
-/*   Updated: 2024/12/01 18:21:28 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/02 12:14:06 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int		get_num_token_between(t_token *start, t_token *end)
-{
-	t_token	*current;
-	int		len;
-
-	current = start;
-	len = 1;
-	while (current != end)
-	{
-		len++;
-		current = current->next;
-	}
-	return (len);
-}
-
 void	merge_token(t_cmd_tab *cmd_tab, t_token *start, t_token *end)
 {
 	t_token	*current;
-	char	*content;
-	int		len;
-	int		index;
 
-	len = get_num_token_between(start, end);
-	content = (char *)malloc(sizeof(char) * (len + 1));
-	if (!content)
-		return (set_error(MALLOC_FAIL, cmd_tab, "Failed to malloc token content"));
-	current = start;
-	index = 0;
-	while (index < len)
+	current = start->next;
+	while (current != end->next)
 	{
-		content[index] = current->character;
+		start->content = ft_strjoinfree(start->content, current->content);
+		if (!start->content)
+			return (set_error(MALLOC_FAIL, cmd_tab, "Failed to malloc token"));
 		current = current->next;
-		if (index > 0)
-			pop_token(current->prev);
-		index++;
+		pop_token(current->prev);
 	}
-	content[index] = '\0';
-	start->content = content;
-}
-
-void	merge_same_type_tokens(t_cmd_tab *cmd_tab, t_token *start)
-{
-	t_token	*end;
-
-	end = start;
-	while (end->next->lexem == start->lexem)
-		end = end->next;
-	merge_token(cmd_tab, start, end);
 }
 
 void	group_tokens(t_cmd_tab *cmd_tab)
@@ -69,13 +34,14 @@ void	group_tokens(t_cmd_tab *cmd_tab)
 	current = cmd_tab->token_list;
 	while (current != NULL)
 	{
-		if (current->lexem == WORD)
-			merge_same_type_tokens(cmd_tab, current);
-		else if (current->lexem == WHITESPACE)
-			merge_same_type_tokens(cmd_tab, current);
+		while (current->lexem == WORD
+			&& current->next->lexem == WORD)
+			merge_token(cmd_tab, current, current->next);
+		while (current->lexem == WHITESPACE
+			&& current->next->lexem == WHITESPACE)
+			merge_token(cmd_tab, current, current->next);
 		current = current->next;
 	}
-	group_strings(cmd_tab);
 }
 
 void	scan(t_cmd_tab *cmd_tab)

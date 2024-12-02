@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/01 18:21:12 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/02 15:13:02 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,18 +28,10 @@ typedef struct s_token
 {
 	int				lexem;
 	char			*content;
-	char			character;
+	char			letter;
 	struct s_token	*next;
 	struct s_token	*prev;
 }	t_token;
-
-typedef struct s_ast
-{
-	int				ast_type;
-	t_token			token;
-	struct s_ast	*left;
-	struct s_ast	*right;
-}	t_ast;
 
 typedef struct s_cmd
 {
@@ -57,15 +49,14 @@ typedef struct s_cmd
 
 typedef struct s_cmd_table
 {
-	char	*cmd_line;		// readline return
-	t_token	*token_list;	// linked list of tokens identified from cmd line
-	t_cmd	*cmd_list;		// first commands mini structures in linked list
-	size_t	cmd_count;		// total of commands in commmand line
-	size_t	index;			// index of command currently being executed
-	char	**env;			// env received at start of program
-	char	**paths;		// extracted PATH variable of the env
-	int		critical_er;	// flag if critical error in parent process
-	t_ast	*syntax_tree;
+	char		*cmd_line;		// readline return
+	t_token		*token_list;	// linked list of tokens id from cmd line
+	t_cmd		*cmd_list;		// first commands structures in linked list
+	size_t		cmd_count;		// total of commands in commmand line
+	size_t		index;			// index of command currently being executed
+	char		**env;			// env received at start of program
+	char		**paths;		// extracted PATH variable of the env
+	int			critical_er;	// flag if critical error in parent process
 }	t_cmd_tab;
 
 typedef struct s_maman
@@ -87,12 +78,16 @@ void		scan(t_cmd_tab *cmd_tab);
 void		add_token(t_cmd_tab *cmd_tab, int type, char letter);
 void		pop_token(t_token *token);
 void		merge_token(t_cmd_tab *cmd_tab, t_token *start, t_token *end);
-int			is_token_in_list(t_token *start, int character);
-void		group_strings(t_cmd_tab *cmd_tab);
+t_token		*find_token_in_list(t_token *start, int letter);
+void		lexer(t_cmd_tab *cmd_tab);
+t_cmd_tab	*create_cmd_tab(char **env);
+t_cmd		*create_cmd(void);
+void		append_cmd(t_cmd *cmd, t_cmd_tab *cmd_tab);
+void		load_cmd(t_cmd_tab *cmd_tab, t_token *token);
+void		parse(t_cmd_tab *cmd_tab, t_token *start);
 
 /* EXECUTION */
 
-t_cmd_tab	*create_cmd_tab(char **env);
 void		create_pipe(t_cmd_tab *cmd_tab);
 void		create_fork(t_cmd_tab *cmd_tab);
 void		get_cmd_path(t_cmd *cmd, t_cmd_tab *cmd_tab);
@@ -128,6 +123,7 @@ int			catch_error(t_cmd_tab *cmd_tab);
 void		free_token(t_token *token);
 void		free_cmd_tab(t_cmd_tab *cmd_tab);
 void		free_token_list(t_cmd_tab *cmd_tab);
+void		free_cmd_list(t_cmd_tab *cmd_tab);
 
 # define TRUE		1
 # define FALSE		0

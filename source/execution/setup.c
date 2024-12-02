@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   setup.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 12:37:12 by alex              #+#    #+#             */
-/*   Updated: 2024/11/29 17:29:07 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/02 18:16:06 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,21 +24,29 @@ t_cmd	*get_last_cmd(t_cmd_tab *cmd_tab)
 	return (current);
 }
 
+void	increment_all_cmd_index(t_cmd *start)
+{
+	t_cmd	*current;
+
+	current = start;
+	while (current != NULL)
+	{
+		current->cmd_index++;
+		current = current->next;
+	}
+}
+
 void	append_cmd(t_cmd *cmd, t_cmd_tab *cmd_tab)
 {
-	t_cmd	*last_cmd;
-
+	cmd->cmd_index = 0;
 	if (cmd_tab->cmd_list == NULL)
-	{
 		cmd_tab->cmd_list = cmd;
-		cmd->cmd_index = 0;
-	}
 	else
 	{
-		last_cmd = get_last_cmd(cmd_tab);
-		last_cmd->next = cmd;
-		cmd->prev = last_cmd;
-		cmd->cmd_index = last_cmd->cmd_index + 1;
+		cmd_tab->cmd_list->prev = cmd;
+		cmd->next = cmd_tab->cmd_list;
+		cmd_tab->cmd_list = cmd;
+		increment_all_cmd_index(cmd->next);
 	}
 }
 
@@ -54,25 +62,6 @@ t_cmd	*create_cmd(void)
 	cmd->exit_code = 0;
 	cmd->fork_pid = -1;
 	return (cmd);
-}
-
-void	load_cmd(t_cmd_tab *cmd_tab, char **cmd_argv,
-			char *outfile, char *infile)
-{
-	t_cmd	*new_cmd;
-
-	new_cmd = create_cmd();
-	if (!new_cmd)
-	{
-		set_error_if(!new_cmd, MALLOC_FAIL, cmd_tab,
-			"Failed to allocate command structure");
-		return ;
-	}
-	append_cmd(new_cmd, cmd_tab);
-	new_cmd->argv = cmd_argv;
-	new_cmd->outfile = outfile;
-	new_cmd->infile = infile;
-	cmd_tab->cmd_count = 1;
 }
 
 t_cmd_tab	*create_cmd_tab(char **env)

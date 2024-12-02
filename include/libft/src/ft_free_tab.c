@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/10 13:53:31 by mkling            #+#    #+#             */
-/*   Updated: 2024/10/16 12:43:58 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/02 18:01:23 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ void	ft_free_tab(char **array)
 		i++;
 	}
 	free(array);
+	array = NULL;
 }
 
 void	ft_free_matrix(int	**matrix)
