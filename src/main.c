@@ -1,46 +1,43 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   minishell.h                                        :+:      :+:    :+:   */
+/*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: skassimi <skassimi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/11/29 11:01:47 by skassimi         ###   ########.fr       */
+/*   Created: 2024/11/29 09:47:55 by skassimi          #+#    #+#             */
+/*   Updated: 2024/12/03 08:32:31 by skassimi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef MINISHELL_H
-# define MINISHELL_H
-
-#include <signal.h>
-#include <time.h>
-#include <unistd.h>
+#include "../include/minishell.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <readline/readline.h>
+#include <readline/history.h>
 
-typedef struct s_cmd
+int exit_error()
 {
-	char	**argv;
-	int		argc;
-	char	*outfile;
-	char	*infile;
-	struct s_cmd	*next;
-}	t_cmd;
+}
 
-typedef struct s_command_table
+int main(int agc, char **argv)
 {
-    t_cmd *first;
-    int cmd_count;
-}    t_command_table;
+	t_command_table command_table;
+	char *input;
+	if(agc >1)
+	{
+		while(1)
+		{
+			command_table.first->infile = readline("minishell>");
+			input = command_table.first->infile;
 
-typedef struct s_maman
-{
-    t_command_table *cmd;
-    char **line;
-    char **env;
-}    t_maman;
-
-//signals
-void signals(void);
-#endif
+			if(!input)
+				exit_error();/*a coder*/
+			if(*input)
+				add_history(input);
+			free(input);
+		}
+	}
+	clear_history();
+	return(0);
+}
