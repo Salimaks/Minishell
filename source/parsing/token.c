@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 18:04:03 by alex              #+#    #+#             */
-/*   Updated: 2024/12/02 12:13:07 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/03 11:20:27 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,7 @@ void	pop_token(t_token *token)
 	if (!token)
 		return ;
 	token->prev->next = token->next;
-	token->next->prev = token->prev;
+	if (token->next != NULL)
+		token->next->prev = token->prev;
 	free_token(token);
 }

@@ -6,7 +6,7 @@
 #    By: mkling <mkling@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/14 14:56:12 by mkling            #+#    #+#              #
-#    Updated: 2024/12/03 09:46:07 by mkling           ###   ########.fr        #
+#    Updated: 2024/12/03 10:17:18 by mkling           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -30,7 +30,7 @@ FUNC_EXEC	= 	execution.c \
 				redirection.c \
 				path.c \
 				setup.c \
-				cleanup.c
+				errors.c
 
 FUNC_PARS	=	readline.c \
 				token.c \
