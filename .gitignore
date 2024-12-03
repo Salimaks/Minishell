@@ -1,0 +1,4 @@
+object/
+include/libft/obj
+include/libft/libft.a
+minishell

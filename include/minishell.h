@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/03 10:13:06 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/03 12:11:08 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,7 @@ typedef struct s_cmd_table
 	size_t		index;			// index of command currently being executed
 	char		**env;			// env received at start of program
 	char		**paths;		// extracted PATH variable of the env
+	int			stdin_fd;
 	int			critical_er;	// flag if critical error in parent process
 }	t_cmd_tab;
 

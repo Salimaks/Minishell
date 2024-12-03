@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 15:37:36 by mkling            #+#    #+#             */
-/*   Updated: 2024/11/29 16:44:08 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/03 12:46:36 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,9 +43,23 @@ void	wait_on_all_forks(t_cmd_tab *cmd_tab)
 	}
 }
 
+void	save_stdin(t_cmd_tab *cmd_tab)
+{
+	cmd_tab->stdin_fd = dup(STDIN_FILENO);
+	set_error_if(cmd_tab->stdin_fd == -1,
+		DUP_ERROR, cmd_tab, "Failed to save stdin");
+}
+
+void	reopen_stdin(t_cmd_tab *cmd_tab)
+{
+	set_error_if(dup2(cmd_tab->stdin_fd, STDIN_FILENO),
+		DUP_ERROR, cmd_tab, "Failed to redirect stdin");
+}
+
 /* */
 int	execute_all_cmd(t_cmd_tab *cmd_tab)
 {
+	save_stdin(cmd_tab);
 	cmd_tab->index = 0;
 	while (cmd_tab->index < cmd_tab->cmd_count)
 	{
@@ -56,5 +70,6 @@ int	execute_all_cmd(t_cmd_tab *cmd_tab)
 		cmd_tab->index++;
 	}
 	wait_on_all_forks(cmd_tab);
+	reopen_stdin(cmd_tab);
 	return (get_last_cmd_exit_code(cmd_tab));
 }
