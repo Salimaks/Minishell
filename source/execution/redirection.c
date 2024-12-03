@@ -6,11 +6,27 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 17:34:05 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/03 20:10:49 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/03 21:33:53 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+int	open_file(char *filepath, int mode)
+{
+	int	file_fd;
+
+	file_fd = 0;
+	if (mode == READ)
+		file_fd = open(filepath, O_RDONLY);
+	if (mode == WRITE)
+		file_fd = open(filepath, O_WRONLY | O_TRUNC | O_CREAT, 0666);
+	if (mode == APPEND)
+		file_fd = open(filepath, O_RDWR | O_APPEND | O_CREAT, 0666);
+	if (file_fd == -1)
+		return (OPEN_ERROR);
+	return (file_fd);
+}
 
 int	get_infile_fd(t_cmd_tab *cmd_tab)
 {

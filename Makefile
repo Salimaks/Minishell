@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: mkling <mkling@student.42.fr>              +#+  +:+       +#+         #
+#    By: alex <alex@student.42.fr>                  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/14 14:56:12 by mkling            #+#    #+#              #
-#    Updated: 2024/12/03 10:17:18 by mkling           ###   ########.fr        #
+#    Updated: 2024/12/03 21:17:54 by alex             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -25,7 +25,6 @@ DIR_LIB		= $(DIR_INC)/libft
 HEADER		= $(DIR_INC)/minishell.h
 
 FUNC_EXEC	= 	execution.c \
-				pipefork.c \
 				readability.c \
 				redirection.c \
 				path.c \

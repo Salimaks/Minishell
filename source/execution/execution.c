@@ -6,12 +6,33 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 15:37:36 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/03 20:05:17 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/03 21:11:18 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+/*open all required pipes*/
+void	open_pipes(t_cmd_tab *cmd_tab)
+{
+	t_cmd	*cmd;
+
+	if (catch_error(cmd_tab))
+		return ;
+	cmd = cmd_tab->cmd_list;
+	while (cmd->next != NULL)
+	{
+		set_error_if(pipe(cmd->pipe_fd) == -1, PIPE_ERROR, cmd_tab,
+			"Error while creating pipe");
+		cmd = cmd->next;
+	}
+}
+
+/* If fork,
+Redirect stdout and stdin,
+Check absolute then relative command path,
+Sends fork to execve the command
+Sets error if execve fails */
 void	send_fork_exec_cmd(t_cmd_tab *cmd_tab)
 {
 	t_cmd	*cmd;
@@ -24,6 +45,20 @@ void	send_fork_exec_cmd(t_cmd_tab *cmd_tab)
 	execve(cmd->cmd_path, cmd->argv, cmd_tab->env);
 	fork_exit_if(1, CANT_EXECUTE_CMD, cmd,
 		"Failed to execute command");
+}
+
+/*closes all opened pipes*/
+void	close_pipes(t_cmd_tab *cmd_tab)
+{
+	t_cmd	*cmd;
+
+	cmd = cmd_tab->cmd_list;
+	while (cmd->next != NULL)
+	{
+		close(cmd->pipe_fd[READ]);
+		close(cmd->pipe_fd[WRITE]);
+		cmd = cmd->next;
+	}
 }
 
 /* Reset command table index,
@@ -43,23 +78,8 @@ void	wait_on_all_forks(t_cmd_tab *cmd_tab)
 	}
 }
 
-void	save_stdin(t_cmd_tab *cmd_tab)
-{
-	cmd_tab->stdin_fd = dup(STDIN_FILENO);
-	set_error_if(cmd_tab->stdin_fd == -1,
-		DUP_ERROR, cmd_tab, "Failed to save stdin");
-}
-
-void	reopen_stdin(t_cmd_tab *cmd_tab)
-{
-	set_error_if(dup2(cmd_tab->stdin_fd, STDIN_FILENO),
-		DUP_ERROR, cmd_tab, "Failed to redirect stdin");
-}
-
-/* */
 int	execute_all_cmd(t_cmd_tab *cmd_tab)
 {
-	save_stdin(cmd_tab);
 	cmd_tab->index = 0;
 	open_pipes(cmd_tab);
 	while (cmd_tab->index < cmd_tab->cmd_count)
@@ -70,6 +90,5 @@ int	execute_all_cmd(t_cmd_tab *cmd_tab)
 	}
 	close_pipes(cmd_tab);
 	wait_on_all_forks(cmd_tab);
-	reopen_stdin(cmd_tab);
 	return (get_last_cmd_exit_code(cmd_tab));
 }

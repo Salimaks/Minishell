@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   setup.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 12:37:12 by alex              #+#    #+#             */
-/*   Updated: 2024/12/02 18:16:06 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/03 22:21:18 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,17 +50,19 @@ void	append_cmd(t_cmd *cmd, t_cmd_tab *cmd_tab)
 	}
 }
 
-t_cmd	*create_cmd(void)
+t_cmd	*create_cmd(t_cmd_tab *cmd_tab)
 {
 	t_cmd	*cmd;
 
-	cmd = (t_cmd *)malloc(sizeof(t_cmd));
+	cmd = (t_cmd *)ft_calloc(sizeof(t_cmd), 1);
 	if (!cmd)
 		return (NULL);
 	cmd->prev = NULL;
 	cmd->next = NULL;
 	cmd->exit_code = 0;
 	cmd->fork_pid = -1;
+	cmd->argv = NULL;
+	append_cmd(cmd, cmd_tab);
 	return (cmd);
 }
 

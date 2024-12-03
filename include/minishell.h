@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/03 20:09:34 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/03 22:28:55 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,13 +60,6 @@ typedef struct s_cmd_table
 	int			critical_er;	// flag if critical error in parent process
 }	t_cmd_tab;
 
-typedef struct s_maman
-{
-	char		**line;
-	t_cmd_tab	cmd_tab;	// struct organizing and keeping count of cmds
-	char		**env;		// env received at start of program
-}	t_maman;
-
 
 /* INPUT */
 
@@ -83,25 +76,24 @@ void		merge_token(t_cmd_tab *cmd_tab, t_token *start, t_token *end);
 t_token		*find_token_in_list(t_token *start, int letter);
 void		lexer(t_cmd_tab *cmd_tab);
 t_cmd_tab	*create_cmd_tab(char **env);
-t_cmd		*create_cmd(void);
+t_cmd		*create_cmd(t_cmd_tab *cmd_tab);
 void		append_cmd(t_cmd *cmd, t_cmd_tab *cmd_tab);
 void		load_cmd(t_cmd_tab *cmd_tab, t_token *token);
 void		parse(t_cmd_tab *cmd_tab, t_token *start);
 
 /* EXECUTION */
 
-void		open_pipes(t_cmd_tab *cmd_tab);
 void		create_fork(t_cmd_tab *cmd_tab);
 void		get_cmd_path(t_cmd *cmd, t_cmd_tab *cmd_tab);
-void		close_pipes(t_cmd_tab *cmd_tab);
 void		fork_exit_if(int condition, int error_code, t_cmd *cmd,
 				char *error_message);
 int			execute_all_cmd(t_cmd_tab *cmd_tab);
 
 /* REDIRECTION */
 
+void		open_pipes(t_cmd_tab *cmd_tab);
 void		connect_pipe(t_cmd_tab *cmd_tab);
-int			open_file(char *filepath, int mode);
+void		close_pipes(t_cmd_tab *cmd_tab);
 
 /* READABILITY */
 
@@ -109,14 +101,12 @@ int			is_last_cmd(t_cmd_tab *cmd_tab);
 int			is_first_cmd(t_cmd_tab *cmd_tab);
 t_cmd		*get_current_cmd(t_cmd_tab *cmd_tab);
 t_cmd		*get_last_cmd(t_cmd_tab *cmd_tab);
-int			catch_error(t_cmd_tab *cmd_tab);
-int			open_file(char *filepath, int mode);
 int			get_last_cmd_exit_code(t_cmd_tab *cmd_tab);
 
 /* ERROR HANDLING */
 
 void		set_error_if(int condition, int err_code, t_cmd_tab *cmd_tab,
-				char *err_message);
+				char *message);
 void		set_error(int err_code, t_cmd_tab *cmd_tab, char *err_message);
 int			catch_error(t_cmd_tab *cmd_tab);
 
