@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipefork.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 17:41:32 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/03 12:16:41 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/03 20:09:27 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,34 +37,32 @@ void	create_fork(t_cmd_tab *cmd_tab)
 	}
 }
 
-void	create_pipe(t_cmd_tab *cmd_tab)
+void	open_pipes(t_cmd_tab *cmd_tab)
 {
 	t_cmd	*cmd;
 
-	cmd = get_current_cmd(cmd_tab);
-	if (is_last_cmd(cmd_tab) || catch_error(cmd_tab))
+	if (catch_error(cmd_tab))
 		return ;
-	if (pipe(cmd->pipe_fd) == -1)
+	cmd = cmd_tab->cmd_list;
+	while (cmd->next != NULL)
 	{
-		perror("Error while creating pipe");
-		cmd->exit_code = PIPE_ERROR;
+		set_error_if(pipe(cmd->pipe_fd) == -1, PIPE_ERROR, cmd_tab,
+			"Error while creating pipe");
+		cmd = cmd->next;
 	}
 }
 
-void	close_pipe(t_cmd_tab *cmd_tab)
+void	close_pipes(t_cmd_tab *cmd_tab)
 {
 	t_cmd	*cmd;
 
-	cmd = get_current_cmd(cmd_tab);
-	if (is_last_cmd(cmd_tab) || catch_error(cmd_tab))
-		return ;
-	close(cmd->pipe_fd[WRITE]);
-	if (dup2(cmd->pipe_fd[READ], STDIN_FILENO) == -1)
+	cmd = cmd_tab->cmd_list;
+	while (cmd->next != NULL)
 	{
-		perror("Error while redirecting pipe to stdin");
-		cmd->exit_code = DUP_ERROR;
+		close(cmd->pipe_fd[READ]);
+		close(cmd->pipe_fd[WRITE]);
+		cmd = cmd->next;
 	}
-	close(cmd->pipe_fd[READ]);
 }
 
 int	open_file(char *filepath, int mode)

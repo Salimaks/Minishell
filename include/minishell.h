@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/03 12:11:08 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/03 20:09:34 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,10 +90,10 @@ void		parse(t_cmd_tab *cmd_tab, t_token *start);
 
 /* EXECUTION */
 
-void		create_pipe(t_cmd_tab *cmd_tab);
+void		open_pipes(t_cmd_tab *cmd_tab);
 void		create_fork(t_cmd_tab *cmd_tab);
 void		get_cmd_path(t_cmd *cmd, t_cmd_tab *cmd_tab);
-void		close_pipe(t_cmd_tab *cmd_tab);
+void		close_pipes(t_cmd_tab *cmd_tab);
 void		fork_exit_if(int condition, int error_code, t_cmd *cmd,
 				char *error_message);
 int			execute_all_cmd(t_cmd_tab *cmd_tab);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 15:37:36 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/03 12:46:36 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/03 20:05:17 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,14 +61,14 @@ int	execute_all_cmd(t_cmd_tab *cmd_tab)
 {
 	save_stdin(cmd_tab);
 	cmd_tab->index = 0;
+	open_pipes(cmd_tab);
 	while (cmd_tab->index < cmd_tab->cmd_count)
 	{
-		create_pipe(cmd_tab);
 		create_fork(cmd_tab);
 		send_fork_exec_cmd(cmd_tab);
-		close_pipe(cmd_tab);
 		cmd_tab->index++;
 	}
+	close_pipes(cmd_tab);
 	wait_on_all_forks(cmd_tab);
 	reopen_stdin(cmd_tab);
 	return (get_last_cmd_exit_code(cmd_tab));
