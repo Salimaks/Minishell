@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/02 15:13:02 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/03 09:47:07 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,6 +71,7 @@ typedef struct s_maman
 
 void		extract_paths(t_cmd_tab *cmd_tab);
 void		init_readline(t_cmd_tab *cmd_tab);
+void		signals(void);
 
 /* PARSING */
 

@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 13:51:38 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/02 18:41:12 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/03 09:47:17 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ void	init_readline(t_cmd_tab *cmd_tab)
 {
 	char	*input;
 
+	signals();
 	while (1)
 	{
 		input = readline("Minishell> ");
@@ -48,6 +49,7 @@ void	init_readline(t_cmd_tab *cmd_tab)
 				execute_all_cmd(cmd_tab);
 				free_cmd_list(cmd_tab);
 			}
+			printf("in readline\n");
 			free(input);
 		}
 	}

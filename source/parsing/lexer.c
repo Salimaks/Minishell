@@ -6,13 +6,13 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 17:34:47 by alex              #+#    #+#             */
-/*   Updated: 2024/12/02 18:31:59 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/03 08:25:22 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-t_token		*find_token_in_list(t_token *start, int letter)
+t_token	*find_token_in_list(t_token *start, int letter)
 {
 	t_token	*current;
 

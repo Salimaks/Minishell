@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipefork.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 17:41:32 by mkling            #+#    #+#             */
-/*   Updated: 2024/11/29 16:46:24 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/03 08:26:38 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ void	create_pipe(t_cmd_tab *cmd_tab)
 	t_cmd	*cmd;
 
 	cmd = get_current_cmd(cmd_tab);
-	if (is_last_cmd(cmd_tab) | catch_error(cmd_tab))
+	if (is_last_cmd(cmd_tab) || catch_error(cmd_tab))
 		return ;
 	if (pipe(cmd->pipe_fd) == -1)
 	{
@@ -56,7 +56,7 @@ void	close_pipe(t_cmd_tab *cmd_tab)
 	t_cmd	*cmd;
 
 	cmd = get_current_cmd(cmd_tab);
-	if (is_last_cmd(cmd_tab))
+	if (is_last_cmd(cmd_tab) || catch_error(cmd_tab))
 		return ;
 	close(cmd->pipe_fd[WRITE]);
 	if (dup2(cmd->pipe_fd[READ], STDIN_FILENO) == -1)
