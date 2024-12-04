@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   path.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 14:12:32 by alex              #+#    #+#             */
-/*   Updated: 2024/11/29 16:46:25 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/04 15:41:04 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,5 +101,3 @@ void	get_cmd_path(t_cmd *cmd, t_cmd_tab *cmd_tab)
 	find_accessible_path(cmd_tab);
 	return (check_cmd(cmd));
 }
-
-

@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 17:34:47 by alex              #+#    #+#             */
-/*   Updated: 2024/12/03 08:25:22 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/04 15:41:45 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,9 +75,3 @@ void	lexer(t_cmd_tab *cmd_tab)
 	group_strings(cmd_tab);
 	remove_space(cmd_tab);
 }
-
-
-
-
-
-

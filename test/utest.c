@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/20 15:58:43 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/04 15:30:06 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/04 15:42:50 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,16 +104,12 @@ Test(Parsing, string)
 // 	// fprintf(stderr, "%s", cmd_tab.cmd_list->cmd_path);
 // 	// cr_assert_stderr_eq_str("hello");
 // }
-
-
 // /* Parser: */
 // Test(Parser, Filling)
 // {
 // 	t_cmd_tab	cmd_tab;
-
 // 	parse("llo", &cmd_tab);
 // 	cr_expect(cmd_tab.content[0] == 'l');
 // 	parse("no", &cmd_tab);
 // 	cr_expect(cmd_tab.content[0] == 'n');
 // }
-

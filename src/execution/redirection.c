@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirection.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 17:34:05 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/03 21:33:53 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/04 15:41:21 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,10 +85,13 @@ void	connect_pipe(t_cmd_tab *cmd_tab)
 
 	cmd = get_current_cmd(cmd_tab);
 	if (is_first_cmd(cmd_tab))
-		redirect_in_and_out(cmd_tab, get_infile_fd(cmd_tab), cmd->pipe_fd[WRITE]);
+		redirect_in_and_out(cmd_tab,
+			get_infile_fd(cmd_tab), cmd->pipe_fd[WRITE]);
 	else if (is_last_cmd(cmd_tab))
-		redirect_in_and_out(cmd_tab, cmd->prev->pipe_fd[READ], get_outfile_fd(cmd_tab));
+		redirect_in_and_out(cmd_tab, cmd->prev->pipe_fd[READ],
+			get_outfile_fd(cmd_tab));
 	else
-		redirect_in_and_out(cmd_tab, cmd->prev->pipe_fd[READ], cmd->pipe_fd[WRITE]);
+		redirect_in_and_out(cmd_tab, cmd->prev->pipe_fd[READ],
+			cmd->pipe_fd[WRITE]);
 	close_pipes(cmd_tab);
 }
