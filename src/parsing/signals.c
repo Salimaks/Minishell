@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   signals.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: skassimi <skassimi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 09:47:59 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/04 08:36:14 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/04 09:18:12 by skassimi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,7 +21,7 @@ void	handle_sigint(int sig)
 	(void) sig;
 }
 
-void	handle_siguit(int sig)
+void	handle_sigtstp(int sig)
 {
 	(void)sig;
 }
@@ -29,8 +29,8 @@ void	handle_siguit(int sig)
 void	signals(void)
 {
 	signal(SIGINT, &handle_sigint);
-	signal(SIGQUIT, &handle_siguit);
-	signal(SIGTSTP, SIG_IGN);
+	signal(SIGQUIT, SIG_IGN);
+	signal(SIGTSTP, &handle_sigtstp);
 }
 
 /*int main(void)
