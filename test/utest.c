@@ -3,17 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   utest.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/20 15:58:43 by mkling            #+#    #+#             */
-/*   Updated: 2024/11/29 12:23:13 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/04 11:57:27 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
-#include "../include/libft/inc/libft.h"
-#include "criterion/criterion.h"
-#include "criterion/redirect.h"
+#include "minishell.h"
+#include "libft/inc/libft.h"
+#include "/home/mkling/Criterion/include/criterion/criterion.h"
+#include "/home/mkling/Criterion/include/criterion/redirect.h"
 #include <stdio.h>
 
 // void	*ft_calloc(size_t nbr, size_t size);
@@ -23,28 +23,6 @@
 // 	cr_redirect_stdout();
 // 	cr_redirect_stderr();
 // }
-
-void	ft_bzero(void *ptr, unsigned long len)
-{
-	unsigned char	*str;
-
-	str = ptr;
-	while (len--)
-		*str++ = 0;
-}
-
-void	*ft_calloc(size_t nbr, size_t size)
-{
-	void	*result;
-
-	if (nbr == 0 || size == 0 || ((size_t) - 1 / nbr) < size)
-		return (cr_malloc(0));
-	result = cr_malloc(nbr * size);
-	if (!result)
-		return (NULL);
-	ft_bzero(result, nbr * size);
-	return (result);
-}
 
 // t_cmd_tab	*create_cmd_tab(int cmd_count)
 // {
@@ -62,7 +40,7 @@ void	*ft_calloc(size_t nbr, size_t size)
 
 Test(Criterion, Setup)
 {
-	cr_assert_eq("meow", "meow");
+	cr_assert_eq("meow", 0);
 }
 
 

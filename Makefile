@@ -6,7 +6,7 @@
 #    By: mkling <mkling@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/14 14:56:12 by mkling            #+#    #+#              #
-#    Updated: 2024/12/04 08:20:48 by mkling           ###   ########.fr        #
+#    Updated: 2024/12/04 11:56:36 by mkling           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,8 +15,10 @@ NAME		= minishell
 DIR_SRC		= src
 DIR_EXEC	= execution
 DIR_PARS	= parsing
+DIR_BUTI	= builtins
 
 DIR_OBJ		= obj
+DIR_OBJS	= $(DIR_OBJ) $(DIR_OBJ)/$(DIR_EXEC) $(DIR_OBJ)/$(DIR_PARS) $(DIR_OBJ)/$(DIR_BUTI)
 
 DIR_INC		= inc
 
@@ -39,16 +41,28 @@ FUNC_PARS	=	readline.c \
 				signals.c \
 				cleanup.c
 
+FUNC_BUTI	=	cd.c \
+				echo.c \
+				env.c \
+				exit.c \
+				export.c \
+				pwd.c \
+				unset.c
+
 FUNC		= 	$(addprefix $(DIR_EXEC)/, $(FUNC_EXEC)) \
 				$(addprefix $(DIR_PARS)/, $(FUNC_PARS)) \
+				$(addprefix $(DIR_BUTI)/, $(FUNC_BUTI)) \
 
 MAIN		= main.c
 
-SRC			= $(FUNC) $(MAIN)
+SRC			= 	$(addprefix $(DIR_SRC)/, $(FUNC)) \
+				$(addprefix $(DIR_SRC)/, $(MAIN))
 
-OBJ			= $(SRC:%.c=/%.o)
+OBJ			= $(SRC:$(DIR_SRC)/%.c=$(DIR_OBJ)/%.o)
 
-LIB			= -L$(DIR_LIB) -lft -lreadline
+LIB			= $(DIR_LIB)/libft.a
+
+DEP			= $(LIB) $(DIR_OBJS) $(HEADER)
 
 INC			= -I$(DIR_INC) -I$(DIR_LIB)
 
@@ -75,9 +89,11 @@ T_INC		= 	-I$(HOME)/Criterion/include/criterion \
 
 T_LIB		= 	-Wl,-rpath=$(HOME)/Criterion/build/src \
 				-L$(HOME)/Criterion/build/src \
+				-L$(HOME)/Criterion \
 				-lcriterion \
+				-L$(DIR_LIB) -lft -lreadline
 
-T_CC		= cc $(CFLAGS) $(T_INC) $(T_LIB) $(LIB) -g
+T_CC		= $(CC) $(CFLAGS) $(T_INC) -g
 
 T_EXCL		= ./obj/main.o
 
@@ -90,20 +106,18 @@ T_EXCL		= ./obj/main.o
 
 all:				$(NAME)
 
-$(NAME):			$(HEADER) $(LIB)
-					$(CC) $(CFLAGS) $(INC) -o $(NAME) $(addprefix $(DIR_SRC)/, $(SRC)) $(LIB)
+$(NAME):			$(DEP) $(OBJ)
+					$(CC) $(CFLAGS) $(INC) -o $(NAME) $(OBJ)
 
-$(OBJ_DIR)/%.o:		$(DIR_SRC)/%.c $(DIR_OBJ)
-					@echo "Compiling object files $@"
-					$(CC) $(CFLAGS) $(INC) -c $< -o  $(addprefix $(DIR_OBJ), $@)
+$(DIR_OBJ)/%.o:		$(DIR_SRC)/%.c
+					$(CC) $(CFLAGS) $(INC) -c $< -o  $@
 
-$(DIR_OBJ):
-					mkdir -p $(DIR_OBJ)
-					mkdir -p $(DIR_OBJ)/$(DIR_EXEC)
-					mkdir -p $(DIR_OBJ)/$(DIR_PARS)
+$(DIR_OBJS) :
+					mkdir -p $@
 
 $(LIB):
 					make -C $(DIR_LIB)
+
 
 #############################
 #							#
@@ -111,14 +125,13 @@ $(LIB):
 #							#
 #############################
 
-debug:		$(OBJ) $(HEADER)
+debug:		$(OBJ) $(DEP)
 			@echo "Compiling with debug flag"
-			$(CC) $(CFLAGS) -g $(INC) -o $(NAME) $(addprefix $(DIR_SRC)/, $(SRC)) $(LIB)
+			$(CC) $(CFLAGS) -g $(INC) -o $(NAME) $(SRC) -L$(DIR_LIB) -lft -lreadline
 
-$(T_NAME):	$(OBJ)
+$(T_NAME):	$(OBJ) $(DEP)
 			@echo "Compiling unit test"
-			$(T_CC) $(filter-out $(DIR_OBJ)/$(T_EXCL), $(addprefix $(DIR_OBJ), $(OBJ))) \
-			$(addprefix $(T_DIR)/, $(T_SRC)) -o $(T_DIR)/$(T_NAME) $(LIB)
+			$(T_CC) $(LIB)  $(T_LIB) $(filter-out $(T_EXCL), $(OBJ)) $(addprefix $(T_DIR)/, $(T_SRC)) -o $(T_DIR)/$(T_NAME) -L$(DIR_LIB) -lft -lreadline
 
 test:		$(T_NAME)
 			@echo "Running unit tests :"

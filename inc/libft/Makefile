@@ -6,7 +6,7 @@
 #    By: mkling <mkling@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/05/20 10:20:10 by mkling            #+#    #+#              #
-#    Updated: 2024/12/02 11:46:54 by mkling           ###   ########.fr        #
+#    Updated: 2024/12/04 11:25:20 by mkling           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -40,12 +40,14 @@ CFLAGS	= -Wall -Wextra -Werror -g
 # General rules
 all:		$(NAME)
 
-$(NAME):	$(OBJS)
+$(NAME):	$(OBJ_DIR) $(OBJS)
 			ar rcs $(NAME) $(OBJS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-				mkdir -p $(OBJ_DIR)
 				$(CC) $(CFLAGS) $(INC) -c $< -o $@
+
+$(OBJ_DIR):
+				mkdir -p $@
 
 clean:
 			rm -f $(OBJS)
