@@ -6,11 +6,11 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 09:47:59 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/03 10:13:25 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/04 08:27:58 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/minishell.h"
+#include "minishell.h"
 #include <signal.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -18,7 +18,8 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
-void	handle_sigint(int sig)
+
+void handle_sigint(int sig)
 {
 	printf("\n");
 	rl_on_new_line();
@@ -27,12 +28,11 @@ void	handle_sigint(int sig)
 	(void) sig;
 }
 
-void	handle_siguit(int sig)
+void handle_siguit(int sig)
 {
 	(void)sig;
 }
-
-void	signals(void)
+void signals(void)
 {
 	signal(SIGINT, &handle_sigint);
 	signal(SIGQUIT, &handle_siguit);
