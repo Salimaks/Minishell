@@ -3,22 +3,22 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: alex <alex@student.42.fr>                  +#+  +:+       +#+         #
+#    By: mkling <mkling@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/14 14:56:12 by mkling            #+#    #+#              #
-#    Updated: 2024/12/03 21:17:54 by alex             ###   ########.fr        #
+#    Updated: 2024/12/04 08:18:33 by mkling           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 NAME		= minishell
 
-DIR_SRC		= source
+DIR_SRC		= src
 DIR_EXEC	= execution
 DIR_PARS	= parsing
 
-DIR_OBJ		= object
+DIR_OBJ		= obj
 
-DIR_INC		= include
+DIR_INC		= inc
 
 DIR_LIB		= $(DIR_INC)/libft
 
