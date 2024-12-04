@@ -6,7 +6,7 @@
 #    By: mkling <mkling@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/14 14:56:12 by mkling            #+#    #+#              #
-#    Updated: 2024/12/04 11:56:36 by mkling           ###   ########.fr        #
+#    Updated: 2024/12/04 13:38:38 by mkling           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -83,7 +83,7 @@ T_SRC		= utest.c
 
 T_OBJ		= utest.o
 
-T_INC		= 	-I$(HOME)/Criterion/include/criterion \
+T_INC		= 	-I$(HOME)/Criterion/include/ \
 				-I$(HOME)/Criterion/ \
 				$(INC)
 
@@ -95,7 +95,7 @@ T_LIB		= 	-Wl,-rpath=$(HOME)/Criterion/build/src \
 
 T_CC		= $(CC) $(CFLAGS) $(T_INC) -g
 
-T_EXCL		= ./obj/main.o
+T_EXCL		= obj/main.o
 
 
 #############################
@@ -107,7 +107,7 @@ T_EXCL		= ./obj/main.o
 all:				$(NAME)
 
 $(NAME):			$(DEP) $(OBJ)
-					$(CC) $(CFLAGS) $(INC) -o $(NAME) $(OBJ)
+					$(CC) $(CFLAGS) $(INC) -o $(NAME) $(OBJ) -L$(DIR_LIB) -lft -lreadline
 
 $(DIR_OBJ)/%.o:		$(DIR_SRC)/%.c
 					$(CC) $(CFLAGS) $(INC) -c $< -o  $@
