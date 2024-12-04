@@ -6,7 +6,7 @@
 /*   By: skassimi <skassimi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 09:47:59 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/03 09:09:02 by skassimi         ###   ########.fr       */
+/*   Updated: 2024/12/03 09:12:26 by skassimi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ void signals(void)
 	signal(SIGTSTP, SIG_IGN);
 }
 
-/*int main(void)
+int main(void)
 {
 	char *infile;
 	signals();
@@ -56,4 +56,4 @@ void signals(void)
 		free(infile);
 	}
 	return(0);
-}*/
+}

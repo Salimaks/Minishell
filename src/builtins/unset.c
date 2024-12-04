@@ -1,23 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   unset.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: skassimi <skassimi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/28 14:09:43 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/04 08:22:00 by mkling           ###   ########.fr       */
+/*   Created: 2024/12/03 09:19:57 by skassimi          #+#    #+#             */
+/*   Updated: 2024/12/03 09:19:58 by skassimi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
-
-
-int	main(int argc, char **argv, char *envp[])
-{
-	if (argc != 1)
-		return (1);
-	(void)argv;
-	init_readline(envp);
-	return (0);
-}
