@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 13:51:38 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/04 11:56:57 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/04 15:37:08 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,26 @@ void	print_tokens(t_token *first)
 	}
 }
 
+void	parse_and_exec_cmd(char *input, char **env)
+{
+	t_cmd_tab	*cmd_tab;
+
+	cmd_tab = create_cmd_tab(env);
+	cmd_tab->cmd_line = input;
+	lexer(cmd_tab);
+	parse(cmd_tab, cmd_tab->token_list);
+	free_token_list(cmd_tab);
+	if (cmd_tab->cmd_count > 0)
+	{
+		execute_all_cmd(cmd_tab);
+		free_cmd_list(cmd_tab);
+	}
+	free_cmd_tab(cmd_tab);
+}
+
 void	init_readline(char **envp)
 {
 	char		*input;
-	t_cmd_tab	*cmd_tab;
 
 	signals();
 	while (1)
@@ -41,22 +57,9 @@ void	init_readline(char **envp)
 		if (input)
 		{
 			add_history(input);
-			cmd_tab = create_cmd_tab(envp);
-			cmd_tab->cmd_line = input;
-			lexer(cmd_tab);
+			parse_and_exec_cmd(input, envp);
 			free(input);
-			parse(cmd_tab, cmd_tab->token_list);
-			free_token_list(cmd_tab);
-			if (cmd_tab->cmd_count > 0)
-			{
-				execute_all_cmd(cmd_tab);
-				free_cmd_list(cmd_tab);
-			}
-			free_cmd_tab(cmd_tab);
 		}
 	}
+	rl_clear_history();
 }
-
-
-// theory why more than one command quits readline
-// > readline reads a EOF because the stdin is closed ?

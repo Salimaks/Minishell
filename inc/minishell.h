@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/04 13:35:04 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/04 15:08:59 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,7 @@ typedef struct s_cmd_table
 
 /* INPUT */
 
+void		parse_and_exec_cmd(char *input, char **env);
 void		extract_paths(t_cmd_tab *cmd_tab);
 void		init_readline(char **env);
 void		signals(void);
