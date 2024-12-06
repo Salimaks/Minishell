@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirection.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: akling <akling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 17:34:05 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/04 15:41:21 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/06 14:51:51 by akling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,20 +31,25 @@ int	open_file(char *filepath, int mode)
 int	get_infile_fd(t_cmd_tab *cmd_tab)
 {
 	int		infile_fd;
+	int		index;
 	t_cmd	*cmd;
 
 	cmd = get_current_cmd(cmd_tab);
 	if (cmd->infile == NULL)
-		infile_fd = STDIN_FILENO;
-	else
+		return (STDIN_FILENO);
+	index = 0;
+	while (cmd->infile[index])
 	{
-		fork_exit_if((access(cmd->infile, F_OK) == -1), NO_FILE,
+		fork_exit_if((access(cmd->infile[index], F_OK) == -1), NO_FILE,
 			cmd, "Input file does not exist");
-		fork_exit_if((access(cmd->infile, R_OK) == -1), READ_ERROR,
+		fork_exit_if((access(cmd->infile[index], R_OK) == -1), READ_ERROR,
 			cmd, "Input file cannot be read");
-		infile_fd = open_file(cmd->infile, READ);
+		infile_fd = open_file(cmd->infile[index], READ);
 		fork_exit_if((infile_fd == -1), OPEN_ERROR,
 			cmd, "Error while opening input file");
+		if (cmd->infile[index + 1])
+			close(infile_fd);
+		index++;
 	}
 	return (infile_fd);
 }
@@ -52,18 +57,23 @@ int	get_infile_fd(t_cmd_tab *cmd_tab)
 int	get_outfile_fd(t_cmd_tab *cmd_tab)
 {
 	int		outfile_fd;
+	int		index;
 	t_cmd	*cmd;
 
 	cmd = get_current_cmd(cmd_tab);
 	if (cmd->outfile == NULL)
-		outfile_fd = STDOUT_FILENO;
-	else
+		return (STDOUT_FILENO);
+	index = 0;
+	while (cmd->outfile[index])
 	{
-		fork_exit_if((access(cmd->infile, R_OK) == -1), READ_ERROR,
+		fork_exit_if((access(cmd->infile[index], R_OK) == -1), READ_ERROR,
 			cmd, "Forbidden input file");
-		outfile_fd = open_file(cmd->infile, WRITE);
+		outfile_fd = open_file(cmd->infile[index], WRITE);
 		fork_exit_if((outfile_fd < 0), OPEN_ERROR,
 			cmd, "Error while opening output file");
+		if (cmd->outfile[index + 1])
+			close(outfile_fd);
+		index++;
 	}
 	return (outfile_fd);
 }
@@ -84,7 +94,10 @@ void	connect_pipe(t_cmd_tab *cmd_tab)
 	t_cmd	*cmd;
 
 	cmd = get_current_cmd(cmd_tab);
-	if (is_first_cmd(cmd_tab))
+	if (is_first_cmd(cmd_tab) && is_last_cmd(cmd_tab))
+		redirect_in_and_out(cmd_tab,
+			get_infile_fd(cmd_tab), get_outfile_fd(cmd_tab));
+	else if (is_first_cmd(cmd_tab))
 		redirect_in_and_out(cmd_tab,
 			get_infile_fd(cmd_tab), cmd->pipe_fd[WRITE]);
 	else if (is_last_cmd(cmd_tab))

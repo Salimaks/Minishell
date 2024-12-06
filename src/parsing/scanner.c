@@ -3,37 +3,23 @@
 /*                                                        :::      ::::::::   */
 /*   scanner.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: akling <akling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/01 16:37:27 by alex              #+#    #+#             */
-/*   Updated: 2024/12/03 11:29:39 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/06 14:13:19 by akling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	merge_token(t_cmd_tab *cmd_tab, t_token *start, t_token *end)
+void	merge_token(t_cmd_tab *cmd_tab, t_token *start, int condition)
 {
-	start->content = ft_strjoinfree(start->content, end->content);
-	if (!start->content)
-		return (set_error(MALLOC_FAIL, cmd_tab, "Failed to malloc token"));
-	pop_token(end);
-}
-
-void	group_tokens(t_cmd_tab *cmd_tab)
-{
-	t_token	*current;
-
-	current = cmd_tab->token_list;
-	while (current != NULL)
+	if (condition)
 	{
-		while (current->lexem == WORD
-			&& current->next->lexem == WORD)
-			merge_token(cmd_tab, current, current->next);
-		while (current->lexem == WHITESPACE
-			&& current->next->lexem == WHITESPACE)
-			merge_token(cmd_tab, current, current->next);
-		current = current->next;
+		start->content = ft_strjoinfree(start->content, start->next->content);
+		if (!start->content)
+			return (set_error(MALLOC_FAIL, cmd_tab, "Failed to malloc token"));
+		pop_token(start->next);
 	}
 }
 
@@ -53,5 +39,4 @@ void	scan(t_cmd_tab *cmd_tab)
 		cmd_tab->index++;
 	}
 	add_token(cmd_tab, END, '\0');
-	group_tokens(cmd_tab);
 }

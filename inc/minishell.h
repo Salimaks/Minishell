@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: akling <akling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/04 15:08:59 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/06 14:43:07 by akling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,8 +37,8 @@ typedef struct s_token
 typedef struct s_cmd
 {
 	char			**argv;		// array created with cmd_path, then arguments
-	char			*outfile;	// filepath from which input must be redirected
-	char			*infile;	// filepath to which output must be redirected
+	char			**outfile;	// filepath from which input must be redirected
+	char			**infile;	// filepath to which output must be redirected
 	char			*cmd_path;	// binary filepath, absolute/through PATH
 	int				exit_code;	// value returned by the execution of command
 	size_t			cmd_index;	// number of the command among other commands
@@ -73,7 +73,7 @@ void		signals(void);
 void		scan(t_cmd_tab *cmd_tab);
 void		add_token(t_cmd_tab *cmd_tab, int type, char letter);
 void		pop_token(t_token *token);
-void		merge_token(t_cmd_tab *cmd_tab, t_token *start, t_token *end);
+void		merge_token(t_cmd_tab *cmd_tab, t_token *start, int condii);
 t_token		*find_token_in_list(t_token *start, int letter);
 void		lexer(t_cmd_tab *cmd_tab);
 t_cmd_tab	*create_cmd_tab(char **env);
@@ -81,6 +81,9 @@ t_cmd		*create_cmd(t_cmd_tab *cmd_tab);
 void		append_cmd(t_cmd *cmd, t_cmd_tab *cmd_tab);
 void		load_cmd(t_cmd_tab *cmd_tab, t_token *token);
 void		parse(t_cmd_tab *cmd_tab, t_token *start);
+void		apply_to_token_list(t_cmd_tab *cmd_tab, t_token *token,
+				void function(t_cmd_tab*, t_token*));
+
 
 /* EXECUTION */
 
