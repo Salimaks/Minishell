@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/10 17:03:58 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/10 19:57:45 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -136,8 +136,8 @@ enum e_lexem
 	OPERATOR	= 4,
 	END			= 5,
 	START		= 6,
-	CMD,
 	VARIABLE,
+	CMD,
 	STRING,
 	DOUB_QUOTE	= '"',
 	SING_QUOTE	= '\'',

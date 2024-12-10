@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 17:34:47 by alex              #+#    #+#             */
-/*   Updated: 2024/12/10 17:51:58 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/10 18:52:18 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,3 +80,9 @@ void	lexer(t_cmd_tab *cmd_tab)
 	apply_to_token_list(cmd_tab, cmd_tab->token_list, remove_space);
 	apply_to_token_list(cmd_tab, cmd_tab->token_list, id_operators);
 }
+
+// TO DO
+// escape character
+// when to expand variables
+// id variables
+

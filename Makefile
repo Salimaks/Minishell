@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: mkling <mkling@student.42.fr>              +#+  +:+       +#+         #
+#    By: alex <alex@student.42.fr>                  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/14 14:56:12 by mkling            #+#    #+#              #
-#    Updated: 2024/12/04 13:38:38 by mkling           ###   ########.fr        #
+#    Updated: 2024/12/10 20:39:41 by alex             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -112,7 +112,7 @@ $(NAME):			$(DEP) $(OBJ)
 $(DIR_OBJ)/%.o:		$(DIR_SRC)/%.c
 					$(CC) $(CFLAGS) $(INC) -c $< -o  $@
 
-$(DIR_OBJS) :
+$(DIR_OBJS):
 					mkdir -p $@
 
 $(LIB):
@@ -125,11 +125,11 @@ $(LIB):
 #							#
 #############################
 
-debug:		$(OBJ) $(DEP)
+debug:		$(DEP) $(OBJ)
 			@echo "Compiling with debug flag"
 			$(CC) $(CFLAGS) -g $(INC) -o $(NAME) $(SRC) -L$(DIR_LIB) -lft -lreadline
 
-$(T_NAME):	$(OBJ) $(DEP)
+$(T_NAME):	$(DEP) $(OBJ)
 			@echo "Compiling unit test"
 			$(T_CC) $(LIB)  $(T_LIB) $(filter-out $(T_EXCL), $(OBJ)) $(addprefix $(T_DIR)/, $(T_SRC)) -o $(T_DIR)/$(T_NAME) -L$(DIR_LIB) -lft -lreadline
 

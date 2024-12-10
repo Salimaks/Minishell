@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirection.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: akling <akling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 17:34:05 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/06 14:51:51 by akling           ###   ########.fr       */
+/*   Updated: 2024/12/10 20:56:46 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ int	open_file(char *filepath, int mode)
 	int	file_fd;
 
 	file_fd = 0;
+	fprintf(stderr, "in open file");
 	if (mode == READ)
 		file_fd = open(filepath, O_RDONLY);
 	if (mode == WRITE)
@@ -66,9 +67,7 @@ int	get_outfile_fd(t_cmd_tab *cmd_tab)
 	index = 0;
 	while (cmd->outfile[index])
 	{
-		fork_exit_if((access(cmd->infile[index], R_OK) == -1), READ_ERROR,
-			cmd, "Forbidden input file");
-		outfile_fd = open_file(cmd->infile[index], WRITE);
+		outfile_fd = open_file(cmd->outfile[index], WRITE);
 		fork_exit_if((outfile_fd < 0), OPEN_ERROR,
 			cmd, "Error while opening output file");
 		if (cmd->outfile[index + 1])
