@@ -3,28 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   lexer.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: akling <akling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 17:34:47 by alex              #+#    #+#             */
-/*   Updated: 2024/12/06 14:39:02 by akling           ###   ########.fr       */
+/*   Updated: 2024/12/10 17:51:58 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-t_token	*find_token_in_list(t_token *start, int letter)
-{
-	t_token	*current;
-
-	current = start;
-	while (current)
-	{
-		if (current->letter == letter)
-			return (current);
-		current = current->next;
-	}
-	return (NULL);
-}
 
 void	group_words(t_cmd_tab *cmd_tab, t_token *token)
 {
@@ -69,10 +55,28 @@ void	remove_space(t_cmd_tab *cmd_tab, t_token *current)
 	}
 }
 
+void	id_operators(t_cmd_tab *cmd_tab, t_token *current)
+{
+	if (catch_error(cmd_tab))
+		return ;
+	if (current->lexem == OPERATOR)
+	{
+		current->lexem = current->letter;
+		if (current->letter == current->next->letter
+			&& current->letter ==  '<')
+		{
+			current->lexem = HEREDOC;
+			pop_token(current->next);
+			current->next->lexem = END_OF_HERED;
+		}
+	}
+}
+
 void	lexer(t_cmd_tab *cmd_tab)
 {
 	scan(cmd_tab);
 	apply_to_token_list(cmd_tab, cmd_tab->token_list, group_words);
 	apply_to_token_list(cmd_tab, cmd_tab->token_list, group_strings);
 	apply_to_token_list(cmd_tab, cmd_tab->token_list, remove_space);
+	apply_to_token_list(cmd_tab, cmd_tab->token_list, id_operators);
 }

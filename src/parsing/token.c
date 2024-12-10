@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   token.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: akling <akling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 18:04:03 by alex              #+#    #+#             */
-/*   Updated: 2024/12/06 10:51:10 by akling           ###   ########.fr       */
+/*   Updated: 2024/12/10 17:13:07 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,9 +64,7 @@ void	pop_token(t_token *token)
 	tmp = token;
 	if (!token)
 		return ;
-	if (token->prev == NULL)
-		token = token->next;
-	else
+	if (token->prev != NULL)
 		token->prev->next = token->next;
 	if (token->next != NULL)
 		token->next->prev = token->prev;
