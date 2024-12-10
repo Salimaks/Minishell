@@ -1,4 +1,4 @@
-object/
-include/libft/obj
-include/libft/libft.a
+obj/
+inc/libft/obj
+inc/libft/libft.a
 minishell
