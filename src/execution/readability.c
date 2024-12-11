@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   readability.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 18:37:37 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/03 21:17:30 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/11 19:51:32 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,14 +22,14 @@ int	is_first_cmd(t_cmd_tab *cmd_tab)
 	return (cmd_tab->index == 0);
 }
 
-t_cmd	*get_current_cmd(t_cmd_tab *cmd_tab)
+t_list	*get_current_cmd_node(t_cmd_tab *cmd_tab)
 {
-	t_cmd	*cmd;
+	t_list	*node;
 
-	cmd = cmd_tab->cmd_list;
-	while (cmd->cmd_index != cmd_tab->index)
-		cmd = cmd->next;
-	return (cmd);
+	node = cmd_tab->cmd_list;
+	while (((t_cmd *)node->content)->cmd_index != cmd_tab->index)
+		node = node->next;
+	return (node);
 }
 
 int	get_last_cmd_exit_code(t_cmd_tab *cmd_tab)
@@ -39,11 +39,13 @@ int	get_last_cmd_exit_code(t_cmd_tab *cmd_tab)
 
 void	create_fork(t_cmd_tab *cmd_tab)
 {
+	t_list	*node;
 	t_cmd	*cmd;
 
 	if (catch_error(cmd_tab))
 		return ;
-	cmd = get_current_cmd(cmd_tab);
+	node = get_current_cmd_node(cmd_tab);
+	cmd = ((t_cmd *)node->content);
 	cmd->fork_pid = fork();
 	if (cmd->fork_pid == -1)
 	{

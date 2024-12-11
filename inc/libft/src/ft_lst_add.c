@@ -6,12 +6,25 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/31 19:29:36 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/11 18:12:27 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/11 19:09:14 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdlib.h>
 #include "../inc/libft.h"
+
+t_list	*ft_lstnew(void *content)
+{
+	t_list	*node;
+
+	node = malloc(sizeof(t_list));
+	if (!node)
+		return (NULL);
+	node->content = content;
+	node->next = NULL;
+	node->prev = NULL;
+	return (node);
+}
 
 void	ft_lstadd_front(t_list **lst, t_list *new)
 {
@@ -37,6 +50,12 @@ void	ft_lstadd_back(t_list **lst, t_list *new)
 	new->prev = last;
 }
 
+void	ft_lstdelone(t_list *lst, void (*del)(void *))
+{
+	(*del)(lst->content);
+	free(lst);
+}
+
 void	ft_lstclear(t_list **lst, void (*del)(void *))
 {
 	t_list	*p_next;
@@ -50,23 +69,4 @@ void	ft_lstclear(t_list **lst, void (*del)(void *))
 		p_current = p_next;
 	}
 	*lst = NULL;
-}
-
-void	ft_lstdelone(t_list *lst, void (*del)(void *))
-{
-	(*del)(lst->content);
-	free(lst);
-}
-
-t_list	*ft_lstnew(void *content)
-{
-	t_list	*node;
-
-	node = malloc(sizeof(t_list));
-	if (!node)
-		return (NULL);
-	node->content = content;
-	node->next = NULL;
-	node->prev = NULL;
-	return (node);
 }

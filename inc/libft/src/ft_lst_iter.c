@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/31 19:32:09 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/11 18:13:09 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/11 19:12:14 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,13 +25,22 @@ void	ft_lstiter(t_list *lst, void (*f)(void *))
 	}
 }
 
-// void	ft_lstiterr(t_list *lst, void (*f)(void *))
-// {
-// 	if (!lst)
-// 		return ;
-// 	(*f)(lst->content);
-// 		return (ft_lstiterr(lst->next, f));
-// }
+int	ft_lstsize(t_list *lst)
+{
+	int		i;
+	t_list	*iteri;
+
+	i = 0;
+	if (lst == NULL)
+		return (0);
+	iteri = lst;
+	while (iteri != NULL)
+	{
+		iteri = iteri->next;
+		i++;
+	}
+	return (i);
+}
 
 t_list	*ft_lstlast(t_list *lst)
 {
@@ -68,26 +77,13 @@ t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *))
 	return (new_list);
 }
 
-int	ft_lstsize(t_list *lst)
+void	ft_lstpop(t_list *node, void (*del)(void *))
 {
-	int		i;
-	t_list	*iteri;
-
-	i = 0;
-	if (lst == NULL)
-		return (0);
-	iteri = lst;
-	while (iteri != NULL)
-	{
-		iteri = iteri->next;
-		i++;
-	}
-	return (i);
+	if (!node)
+		return ;
+	if (node->prev != NULL)
+		node->prev->next = node->next;
+	if (node->next != NULL)
+		node->next->prev = node->prev;
+	ft_lstdelone(node, del);
 }
-
-// int ft_lstsizer(t_list *lst)
-// {
-// 	if (!lst)
-// 		return 0;
-// 	return 1 + ft_lstsizer(lst->next);
-// }

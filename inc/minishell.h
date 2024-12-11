@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/11 18:15:22 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/11 19:44:53 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,39 +31,32 @@ typedef struct s_token
 	int				lexem;
 	char			letter;
 	char			*content;
-	struct s_token	*next;
-	struct s_token	*prev;
 }	t_token;
 
 typedef struct s_files
 {
-	int				type;
+	int				mode;
 	char			*filepath;
 	char			*delimiter;
 	bool			is_quoted;
-	struct s_files	*next;
-	struct s_files	*prev;
 }	t_files;
 
 typedef struct s_cmd
 {
 	char			**argv;		// array created with cmd_path, then arguments
-	char			**outfile;	// filepath from which input must be redirected
-	char			**infile;	// filepath to which output must be redirected
 	char			*cmd_path;	// binary filepath, absolute/through PATH
+	t_list			*redirect;	// linked list of redirection files
 	int				exit_code;	// value returned by the execution of command
 	size_t			cmd_index;	// number of the command among other commands
 	int				fork_pid;	// process id of fork sent to execute command
 	int				pipe_fd[2];	// array of 2 pipe fd required for the pipe()
-	struct s_cmd	*next;
-	struct s_cmd	*prev;
 }	t_cmd;
 
 typedef struct s_cmd_table
 {
 	char		*cmd_line;		// readline return
-	t_token		*token_list;	// linked list of tokens id from cmd line
-	t_cmd		*cmd_list;		// first commands structures in linked list
+	t_list		*token_list;	// linked list of tokens id from cmd line
+	t_list		*cmd_list;		// first commands structures in linked list
 	size_t		cmd_count;		// total of commands in commmand line
 	size_t		index;			// index of command currently being executed
 	char		**env;			// env received at start of program
@@ -119,7 +112,7 @@ void		close_pipes(t_cmd_tab *cmd_tab);
 
 int			is_last_cmd(t_cmd_tab *cmd_tab);
 int			is_first_cmd(t_cmd_tab *cmd_tab);
-t_cmd		*get_current_cmd(t_cmd_tab *cmd_tab);
+t_list		*get_current_cmd_node(t_cmd_tab *cmd_tab);
 t_cmd		*get_last_cmd(t_cmd_tab *cmd_tab);
 int			get_last_cmd_exit_code(t_cmd_tab *cmd_tab);
 
@@ -134,8 +127,6 @@ int			catch_error(t_cmd_tab *cmd_tab);
 
 void		free_token(t_token *token);
 void		free_cmd_tab(t_cmd_tab *cmd_tab);
-void		free_token_list(t_cmd_tab *cmd_tab);
-void		free_cmd_list(t_cmd_tab *cmd_tab);
 
 # define TRUE			1
 # define FALSE			0

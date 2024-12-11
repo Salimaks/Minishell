@@ -6,26 +6,26 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 13:51:38 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/04 15:37:08 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/11 18:38:58 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	print_tokens(t_token *first)
-{
-	t_token	*current;
+// void	print_tokens(t_token *first)
+// {
+// 	t_token	*current;
 
-	current = first;
-	while (current)
-	{
-		printf("TOKEN %d :", current->lexem);
-		if (current->content != NULL)
-			printf("%s", current->content);
-		printf("\n");
-		current = current->next;
-	}
-}
+// 	current = first;
+// 	while (current)
+// 	{
+// 		printf("TOKEN %d :", current->lexem);
+// 		if (current->content != NULL)
+// 			printf("%s", current->content);
+// 		printf("\n");
+// 		current = current->next;
+// 	}
+// }
 
 void	parse_and_exec_cmd(char *input, char **env)
 {

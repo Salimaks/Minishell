@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/30 00:22:21 by alex              #+#    #+#             */
-/*   Updated: 2024/12/11 17:43:31 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/11 19:38:27 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,59 +21,35 @@ void	free_token(t_token *token)
 	free(token);
 }
 
-void	free_token_list(t_cmd_tab *cmd_tab)
+void	free_file(t_files *file)
 {
-	t_token	*current;
-	t_token	*next;
-
-	current = cmd_tab->token_list;
-	while (current != NULL)
-	{
-		next = current->next;
-		free_token(current);
-		current = next;
-	}
-	cmd_tab->token_list = NULL;
+	if (file == NULL)
+		return ;
+	if (file->filepath != NULL)
+		free(file->filepath);
+	if (file->delimiter != NULL)
+		free(file->delimiter);
+	free(file);
 }
 
 void	free_cmd(t_cmd *cmd)
 {
 	if (cmd->argv != NULL)
-	{
 		ft_free_tab(cmd->argv);
-		cmd->argv = NULL;
-	}
-	if (cmd->outfile != NULL)
-		free(cmd->outfile);
-	if (cmd->outfile != NULL)
-		free(cmd->infile);
 	if (cmd->cmd_path != NULL)
 		free(cmd->cmd_path);
+	ft_lstclear(cmd->redirect, free_file);
 	free(cmd);
-}
-
-void	free_cmd_list(t_cmd_tab *cmd_tab)
-{
-	t_cmd	*current;
-	t_cmd	*prev;
-
-	current = get_last_cmd(cmd_tab);
-	while (current != NULL)
-	{
-		prev = current->prev;
-		free_cmd(current);
-		current = prev;
-	}
-	cmd_tab->cmd_list = NULL;
-	cmd_tab->cmd_count = 0;
 }
 
 void	free_cmd_tab(t_cmd_tab *cmd_tab)
 {
 	cmd_tab->index = 0;
 	if (cmd_tab->cmd_list)
-		free_cmd_list(cmd_tab);
+		ft_lstclear(cmd_tab->cmd_list, free_cmd);
 	if (cmd_tab->paths)
 		ft_free_tab(cmd_tab->paths);
+	if (cmd_tab->token_list)
+		ft_lstclear(cmd_tab->token_list, free_token);
 	free(cmd_tab);
 }

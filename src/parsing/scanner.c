@@ -3,30 +3,30 @@
 /*                                                        :::      ::::::::   */
 /*   scanner.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/01 16:37:27 by alex              #+#    #+#             */
-/*   Updated: 2024/12/10 17:38:49 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/11 19:21:08 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-t_token	*find_token_in_list(t_token *start, int letter)
+t_list	*find_token_in_list(t_list *start, int letter)
 {
-	t_token	*current;
+	t_list	*current;
 
 	current = start;
 	while (current)
 	{
-		if (current->letter == letter)
+		if (((t_token *)current->content)->letter == letter)
 			return (current);
 		current = current->next;
 	}
 	return (NULL);
 }
 
-void	merge_token(t_cmd_tab *cmd_tab, t_token *start, int condition)
+void	merge_token(t_cmd_tab *cmd_tab, t_list *start, int condition)
 {
 	if (condition)
 	{
