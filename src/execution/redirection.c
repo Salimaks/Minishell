@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 17:34:05 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/11 19:44:50 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/11 23:56:44 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,63 +28,67 @@ int	open_file(char *filepath, int mode)
 	return (file_fd);
 }
 
-// int	get_infile_fd(t_cmd_tab *cmd_tab)
-// {
-// 	int		infile_fd;
-// 	int		index;
-// 	t_cmd	*cmd;
+int	get_infile_fd(t_cmd_tab *cmd_tab)
+{
+	int		index;
+	t_cmd	*cmd;
+	t_file	*file;
 
-// 	cmd = get_current_cmd_node(cmd_tab);
-// 	if (cmd->infile == NULL)
-// 		return (STDIN_FILENO);
-// 	index = 0;
-// 	while (cmd->infile[index])
-// 	{
-// 		fork_exit_if((access(cmd->infile[index], F_OK) == -1), NO_FILE,
-// 			cmd, "Input file does not exist");
-// 		fork_exit_if((access(cmd->infile[index], R_OK) == -1), READ_ERROR,
-// 			cmd, "Input file cannot be read");
-// 		infile_fd = open_file(cmd->infile[index], READ);
-// 		fork_exit_if((infile_fd == -1), OPEN_ERROR,
-// 			cmd, "Error while opening input file");
-// 		if (cmd->infile[index + 1])
-// 			close(infile_fd);
-// 		index++;
-// 	}
-// 	return (infile_fd);
-// }
+	cmd = get_current_cmd(cmd_tab);
+	if (cmd->infiles == NULL)
+		return (STDIN_FILENO);
+	index = 0;
+	while (cmd->infiles)
+	{
+		file = (t_file *)cmd->infiles->content;
+		fork_exit_if(access(file->path, F_OK) == -1, NO_FILE, cmd,
+			"Input file does not exist");
+		fork_exit_if(access(file->path, R_OK) == -1, READ_ERROR, cmd,
+			"Input file cannot be read");
+		file->fd = open_file(file->path, READ);
+		fork_exit_if((file->fd == -1), OPEN_ERROR, cmd,
+			"Error while opening input file");
+		if (cmd->infiles->next)
+			close(file->fd);
+		cmd->infiles = cmd->infiles->next;
+	}
+	return (file->fd);
+}
 
-// int	get_outfile_fd(t_cmd_tab *cmd_tab)
-// {
-// 	int		outfile_fd;
-// 	int		index;
-// 	t_cmd	*cmd;
+int	get_outfile_fd(t_cmd_tab *cmd_tab)
+{
+	int		index;
+	t_cmd	*cmd;
+	t_file	*file;
 
-// 	cmd = get_current_cmd_node(cmd_tab);
-// 	if (cmd->outfile == NULL)
-// 		return (STDOUT_FILENO);
-// 	index = 0;
-// 	while (cmd->outfile[index])
-// 	{
-// 		outfile_fd = open_file(cmd->outfile[index], WRITE);
-// 		fork_exit_if((outfile_fd < 0), OPEN_ERROR,
-// 			cmd, "Error while opening output file");
-// 		if (cmd->outfile[index + 1])
-// 			close(outfile_fd);
-// 		index++;
-// 	}
-// 	return (outfile_fd);
-// }
+	cmd = get_current_cmd(cmd_tab);
+	if (cmd->outfiles == NULL)
+		return (STDOUT_FILENO);
+	index = 0;
+	while (cmd->outfiles)
+	{
+		file = (t_file *)cmd->outfiles->content;
+		file->fd = open_file(file->path, WRITE);
+		fork_exit_if((file->fd < 0), OPEN_ERROR,
+			cmd, "Error while opening output file");
+		if (cmd->outfiles->next)
+			close(file->fd);
+		cmd->outfiles = cmd->outfiles->next;
+	}
+	return (file->fd);
+}
 
 void	redirect_in_and_out(t_cmd_tab *cmd_tab, int input, int output)
 {
 	t_cmd	*cmd;
 
-	cmd = get_current_cmd_node(cmd_tab);
+	cmd = get_current_cmd(cmd_tab);
+	fprintf(stderr, "input is %d, output is %d\n", input, output);
 	fork_exit_if((dup2(input, STDIN_FILENO) == -1), DUP_ERROR,
 		cmd, "Error while redirecting stdin");
 	fork_exit_if((dup2(output, STDOUT_FILENO) == -1), DUP_ERROR,
 		cmd, "Error while redirecting stdout");
+	fprintf(stderr, "input is %d, output is %d\n", input, output);
 }
 
 void	connect_pipe(t_cmd_tab *cmd_tab)
@@ -94,7 +98,8 @@ void	connect_pipe(t_cmd_tab *cmd_tab)
 	node = get_current_cmd_node(cmd_tab);
 	if (is_first_cmd(cmd_tab) && is_last_cmd(cmd_tab))
 		redirect_in_and_out(cmd_tab,
-			get_infile_fd(cmd_tab), get_outfile_fd(cmd_tab));
+			get_infile_fd(cmd_tab),
+			get_outfile_fd(cmd_tab));
 	else if (is_first_cmd(cmd_tab))
 		redirect_in_and_out(cmd_tab,
 			get_infile_fd(cmd_tab),

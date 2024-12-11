@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 14:15:08 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/11 18:08:09 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/11 21:03:10 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,5 +86,6 @@ int		ft_abs(int num);
 int		ft_isdigit_or_hexa(int c);
 void	ft_free_matrix(int	**matrix);
 int		ft_atoi_base(char *str, char *base);
+void	ft_lstpop(t_list *node, void (*del)(void *));
 
 #endif

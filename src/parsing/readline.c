@@ -6,26 +6,26 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 13:51:38 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/11 18:38:58 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/11 21:26:24 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-// void	print_tokens(t_token *first)
-// {
-// 	t_token	*current;
+void	print_tokens(t_list *first)
+{
+	t_list	*current;
 
-// 	current = first;
-// 	while (current)
-// 	{
-// 		printf("TOKEN %d :", current->lexem);
-// 		if (current->content != NULL)
-// 			printf("%s", current->content);
-// 		printf("\n");
-// 		current = current->next;
-// 	}
-// }
+	current = first;
+	while (current != NULL)
+	{
+		printf("TOKEN %d :", ((t_token *)current->content)->lexem);
+		if (current->content != NULL)
+			printf("%s", ((t_token *)current->content)->content);
+		printf("\n");
+		current = current->next;
+	}
+}
 
 void	parse_and_exec_cmd(char *input, char **env)
 {
@@ -35,12 +35,9 @@ void	parse_and_exec_cmd(char *input, char **env)
 	cmd_tab->cmd_line = input;
 	lexer(cmd_tab);
 	parse(cmd_tab, cmd_tab->token_list);
-	free_token_list(cmd_tab);
+	ft_lstclear(&cmd_tab->token_list, free_token);
 	if (cmd_tab->cmd_count > 0)
-	{
 		execute_all_cmd(cmd_tab);
-		free_cmd_list(cmd_tab);
-	}
 	free_cmd_tab(cmd_tab);
 }
 

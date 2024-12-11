@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 14:37:02 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/11 19:44:07 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/12 00:01:28 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,10 +22,7 @@ void	set_error_if(int condition, int err_code, t_cmd_tab *cmd_tab,
 		char *err_message)
 {
 	if (condition)
-	{
-		perror(err_message);
-		cmd_tab->critical_er = err_code;
-	}
+		set_error(err_code, cmd_tab, err_message);
 }
 
 int	catch_error(t_cmd_tab *cmd_tab)

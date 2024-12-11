@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 14:12:32 by alex              #+#    #+#             */
-/*   Updated: 2024/12/11 19:44:50 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/11 20:46:50 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ void	find_accessible_path(t_cmd_tab *cmd_tab)
 	size_t	i;
 
 	i = 0;
-	cmd = get_current_cmd_node(cmd_tab);
+	cmd = get_current_cmd(cmd_tab);
 	while (cmd_tab->paths[i])
 	{
 		tested_path = ft_strjoin(cmd_tab->paths[i++], cmd->cmd_path);

@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/30 13:06:39 by alex              #+#    #+#             */
-/*   Updated: 2024/12/11 19:18:21 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/11 22:56:04 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ size_t	get_token_count(t_list *start, t_list *end)
 	return (count);
 }
 
-size_t	count_tokens_of_type(t_token *start, int lexem)
+size_t	count_tokens_of_type(t_list *start, int lexem)
 {
 	t_list	*current;
 	size_t	count;
@@ -62,14 +62,30 @@ char	**extract_as_array(t_cmd_tab *cmd_tab, t_list *start, int type)
 	while (((t_token *)current->content)->lexem != END)
 	{
 		if (((t_token *)current->content)->lexem == type)
-			result[index++] = ft_strdup(current->content);
+			result[index++] = ft_strdup(((t_token *)current->content)->content);
 		current = current->next;
 	}
 	result[index] = NULL;
 	return (result);
 }
 
-void	parse_cmd(t_cmd_tab *cmd_tab, t_token *start)
+void	extract_files_as_linklist(t_cmd_tab *cmd_tab, t_cmd *cmd, t_list *start)
+{
+	t_list	*current;
+	t_token	*curr_token;
+
+	current = start;
+	while (current)
+	{
+		curr_token = ((t_token *)current->content);
+		if (curr_token->lexem == INFILE || curr_token->lexem == HEREDOC
+			|| curr_token->lexem == OUTFILE || curr_token->lexem == APPEND)
+			add_file(cmd_tab, cmd, curr_token);
+		current = current->next;
+	}
+}
+
+void	parse_cmd(t_cmd_tab *cmd_tab, t_list *start)
 {
 	t_cmd	*new_cmd;
 
@@ -77,8 +93,7 @@ void	parse_cmd(t_cmd_tab *cmd_tab, t_token *start)
 	if (!new_cmd)
 		return (set_error(MALLOC_FAIL, cmd_tab,
 				"Failed to allocate command structure"));
-	// new_cmd->outfile = extract_as_array(cmd_tab, start, OUTFILE);
-	// new_cmd->infile = extract_as_array(cmd_tab, start, INFILE);
+	extract_files_as_linklist(cmd_tab, new_cmd, start);
 	new_cmd->argv = extract_as_array(cmd_tab, start, WORD);
 	cmd_tab->cmd_count++;
 }
@@ -93,6 +108,6 @@ void	parse(t_cmd_tab *cmd_tab, t_list *start)
 		parse(cmd_tab, pipe->next);
 		((t_token *)pipe->content)->lexem = END;
 	}
-	if (((t_token *)pipe->content)->lexem != END)
+	if (((t_token *)start->content)->lexem != END)
 		parse_cmd(cmd_tab, start);
 }

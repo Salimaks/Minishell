@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/01 16:37:27 by alex              #+#    #+#             */
-/*   Updated: 2024/12/11 19:21:08 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/11 21:45:54 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,15 +26,17 @@ t_list	*find_token_in_list(t_list *start, int letter)
 	return (NULL);
 }
 
-void	merge_token(t_cmd_tab *cmd_tab, t_list *start, int condition)
+void	merge_token(t_cmd_tab *cmd_tab, t_list *start)
 {
-	if (condition)
-	{
-		start->content = ft_strjoinfree(start->content, start->next->content);
-		if (!start->content)
-			return (set_error(MALLOC_FAIL, cmd_tab, "Failed to malloc token"));
-		pop_token(start->next);
-	}
+	t_token	*current;
+	t_token	*next;
+
+	current = ((t_token *)start->content);
+	next = ((t_token *)start->next->content);
+	current->content = ft_strjoinfree(current->content, next->content);
+	if (!current->content)
+		return (set_error(MALLOC_FAIL, cmd_tab, "Failed to malloc token"));
+	ft_lstpop(start->next, free_token);
 }
 
 void	scan(t_cmd_tab *cmd_tab)

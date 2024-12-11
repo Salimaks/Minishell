@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/11 19:44:53 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/11 23:29:21 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,16 +36,18 @@ typedef struct s_token
 typedef struct s_files
 {
 	int				mode;
-	char			*filepath;
+	char			*path;
 	char			*delimiter;
+	int				fd;
 	bool			is_quoted;
-}	t_files;
+}	t_file;
 
 typedef struct s_cmd
 {
 	char			**argv;		// array created with cmd_path, then arguments
 	char			*cmd_path;	// binary filepath, absolute/through PATH
-	t_list			*redirect;	// linked list of redirection files
+	t_list			*infiles;	// linked list of input files
+	t_list			*outfiles;	// linked list of output files
 	int				exit_code;	// value returned by the execution of command
 	size_t			cmd_index;	// number of the command among other commands
 	int				fork_pid;	// process id of fork sent to execute command
@@ -76,16 +78,15 @@ void		signals(void);
 
 void		scan(t_cmd_tab *cmd_tab);
 void		add_token(t_cmd_tab *cmd_tab, int type, char letter);
-void		pop_token(t_token *token);
-void		merge_token(t_cmd_tab *cmd_tab, t_token *start, int condii);
-t_token		*find_token_in_list(t_token *start, int letter);
+void		merge_token(t_cmd_tab *cmd_tab, t_list *start);
+t_list		*find_token_in_list(t_list *start, int letter);
 void		lexer(t_cmd_tab *cmd_tab);
 t_cmd_tab	*create_cmd_tab(char **env);
 t_cmd		*create_cmd(t_cmd_tab *cmd_tab);
-void		append_cmd(t_cmd *cmd, t_cmd_tab *cmd_tab);
-void		parse(t_cmd_tab *cmd_tab, t_token *start);
-void		apply_to_token_list(t_cmd_tab *cmd_tab, t_token *token,
-				void function(t_cmd_tab*, t_token*));
+void		parse(t_cmd_tab *cmd_tab, t_list *start);
+void		apply_to_list(t_cmd_tab *cmd_tab, t_list *token,
+				void function(t_cmd_tab *, t_list *));
+void		add_file(t_cmd_tab *cmd_tab, t_cmd *cmd, t_token *token);
 
 /* HEREDOC */
 
@@ -113,7 +114,7 @@ void		close_pipes(t_cmd_tab *cmd_tab);
 int			is_last_cmd(t_cmd_tab *cmd_tab);
 int			is_first_cmd(t_cmd_tab *cmd_tab);
 t_list		*get_current_cmd_node(t_cmd_tab *cmd_tab);
-t_cmd		*get_last_cmd(t_cmd_tab *cmd_tab);
+t_cmd		*get_current_cmd(t_cmd_tab *cnd_tab);
 int			get_last_cmd_exit_code(t_cmd_tab *cmd_tab);
 
 /* ERROR HANDLING */
@@ -125,8 +126,14 @@ int			catch_error(t_cmd_tab *cmd_tab);
 
 /* CLEAN UP */
 
-void		free_token(t_token *token);
+void		free_token(void *token);
+void		free_cmd(void *cmd);
+void		free_file(void *file);
 void		free_cmd_tab(t_cmd_tab *cmd_tab);
+
+/* DEBUG */
+
+void		print_tokens(t_list *first);
 
 # define TRUE			1
 # define FALSE			0
@@ -181,6 +188,5 @@ enum e_pipe_fd
 	WRITE = 1,
 	APPEND = 2,
 };
-
 
 #endif

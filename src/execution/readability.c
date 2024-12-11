@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 18:37:37 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/11 19:51:32 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/11 23:52:13 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,24 +32,17 @@ t_list	*get_current_cmd_node(t_cmd_tab *cmd_tab)
 	return (node);
 }
 
-int	get_last_cmd_exit_code(t_cmd_tab *cmd_tab)
-{
-	return (get_last_cmd(cmd_tab)->exit_code);
-}
-
-void	create_fork(t_cmd_tab *cmd_tab)
+t_cmd	*get_current_cmd(t_cmd_tab *cmd_tab)
 {
 	t_list	*node;
-	t_cmd	*cmd;
 
-	if (catch_error(cmd_tab))
-		return ;
-	node = get_current_cmd_node(cmd_tab);
-	cmd = ((t_cmd *)node->content);
-	cmd->fork_pid = fork();
-	if (cmd->fork_pid == -1)
-	{
-		perror("Error while forking");
-		cmd->exit_code = FORK_ERROR;
-	}
+	node = cmd_tab->cmd_list;
+	while (((t_cmd *)node->content)->cmd_index != cmd_tab->index)
+		node = node->next;
+	return (((t_cmd *)node->content));
+}
+
+int	get_last_cmd_exit_code(t_cmd_tab *cmd_tab)
+{
+	return (((t_cmd *)ft_lstlast(cmd_tab->cmd_list)->content)->exit_code);
 }

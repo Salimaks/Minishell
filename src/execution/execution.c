@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 15:37:36 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/11 19:49:57 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/11 23:43:38 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,13 +16,15 @@
 void	open_pipes(t_cmd_tab *cmd_tab)
 {
 	t_list	*node;
+	t_cmd	*cmd;
 
 	if (catch_error(cmd_tab) || cmd_tab->cmd_count <= 1)
 		return ;
 	node = cmd_tab->cmd_list;
-	while (node->next->content != NULL)
+	while (node->next != NULL)
 	{
-		set_error_if(pipe(((t_cmd *)node->content)->pipe_fd) == -1, PIPE_ERROR,
+		cmd = ((t_cmd *)node->content);
+		set_error_if(pipe(cmd->pipe_fd) == -1, PIPE_ERROR,
 			cmd_tab, "Error while creating pipe");
 		node = node->next;
 	}
@@ -35,11 +37,9 @@ Sends fork to execve the command
 Sets error if execve fails */
 void	send_fork_exec_cmd(t_cmd_tab *cmd_tab)
 {
-	t_list	*node;
 	t_cmd	*cmd;
 
-	node = get_current_cmd_node(cmd_tab);
-	cmd = ((t_cmd *)node->content);
+	cmd = get_current_cmd(cmd_tab);
 	if (cmd->fork_pid != 0 || catch_error(cmd_tab))
 		return ;
 	connect_pipe(cmd_tab);
@@ -52,14 +52,14 @@ void	send_fork_exec_cmd(t_cmd_tab *cmd_tab)
 /*closes all opened pipes*/
 void	close_pipes(t_cmd_tab *cmd_tab)
 {
-	t_list	*cmd;
+	t_list	*node;
 
-	cmd = cmd_tab->cmd_list;
-	while (cmd->next != NULL)
+	node = cmd_tab->cmd_list;
+	while (node->next != NULL)
 	{
-		close(((t_cmd *)cmd->content)->pipe_fd[READ]);
-		close(((t_cmd *)cmd->content)->pipe_fd[WRITE]);
-		cmd = cmd->next;
+		close(((t_cmd *)node->content)->pipe_fd[READ]);
+		close(((t_cmd *)node->content)->pipe_fd[WRITE]);
+		node = node->next;
 	}
 }
 
@@ -68,14 +68,12 @@ Wait on all forks with their forkpid,
 Set their exit code */
 void	wait_on_all_forks(t_cmd_tab *cmd_tab)
 {
-	t_list	*node;
 	t_cmd	*cmd;
 
 	cmd_tab->index = 0;
 	while (cmd_tab->index < cmd_tab->cmd_count)
 	{
-		node = get_current_cmd_node(cmd_tab);
-		cmd = ((t_cmd *)node->content);
+		cmd = get_current_cmd(cmd_tab);
 		if (!catch_error(cmd_tab))
 			waitpid(cmd->fork_pid, &cmd->exit_code, 0);
 		cmd_tab->index++;
