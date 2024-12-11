@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/10 19:57:45 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/11 18:15:22 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@
 # include <unistd.h>
 # include <fcntl.h>
 # include <stdlib.h>
+# include <stdbool.h>
 # include <sys/types.h>
 # include <sys/wait.h>
 # include <signal.h>
@@ -28,11 +29,21 @@
 typedef struct s_token
 {
 	int				lexem;
-	char			*content;
 	char			letter;
+	char			*content;
 	struct s_token	*next;
 	struct s_token	*prev;
 }	t_token;
+
+typedef struct s_files
+{
+	int				type;
+	char			*filepath;
+	char			*delimiter;
+	bool			is_quoted;
+	struct s_files	*next;
+	struct s_files	*prev;
+}	t_files;
 
 typedef struct s_cmd
 {
@@ -79,11 +90,15 @@ void		lexer(t_cmd_tab *cmd_tab);
 t_cmd_tab	*create_cmd_tab(char **env);
 t_cmd		*create_cmd(t_cmd_tab *cmd_tab);
 void		append_cmd(t_cmd *cmd, t_cmd_tab *cmd_tab);
-void		load_cmd(t_cmd_tab *cmd_tab, t_token *token);
 void		parse(t_cmd_tab *cmd_tab, t_token *start);
 void		apply_to_token_list(t_cmd_tab *cmd_tab, t_token *token,
 				void function(t_cmd_tab*, t_token*));
 
+/* HEREDOC */
+
+char		*generate_heredoc_filepath(t_cmd_tab *cmd_tab);
+void		assemble_heredoc(t_cmd_tab *cmd_tab, char *heredoc_path,
+				char *limiter);
 
 /* EXECUTION */
 
@@ -96,6 +111,7 @@ int			execute_all_cmd(t_cmd_tab *cmd_tab);
 /* REDIRECTION */
 
 void		open_pipes(t_cmd_tab *cmd_tab);
+int			open_file(char *filepath, int mode);
 void		connect_pipe(t_cmd_tab *cmd_tab);
 void		close_pipes(t_cmd_tab *cmd_tab);
 
@@ -121,11 +137,12 @@ void		free_cmd_tab(t_cmd_tab *cmd_tab);
 void		free_token_list(t_cmd_tab *cmd_tab);
 void		free_cmd_list(t_cmd_tab *cmd_tab);
 
-# define TRUE		1
-# define FALSE		0
-# define DELIMITERS	"'\"()"
-# define OPERATORS	"|><$"
-# define WHITESPACES " \n\t\0"
+# define TRUE			1
+# define FALSE			0
+# define DELIMITERS		"'\"()"
+# define OPERATORS		"|><$"
+# define WHITESPACES	" \n\t\0"
+# define HEREDOC_LOC	"tmp/"
 
 enum e_lexem
 {
@@ -138,14 +155,16 @@ enum e_lexem
 	START		= 6,
 	VARIABLE,
 	CMD,
+	OUTFILE,
+	INFILE,
+	HEREDOC,
+	END_OF_HERED,
 	STRING,
 	DOUB_QUOTE	= '"',
 	SING_QUOTE	= '\'',
 	PIPE		= '|',
 	GREATER		= '>',
 	LESSER		= '<',
-	HEREDOC,
-	END_OF_HERED,
 };
 
 enum e_exit_code

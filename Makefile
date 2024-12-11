@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: alex <alex@student.42.fr>                  +#+  +:+       +#+         #
+#    By: mkling <mkling@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/14 14:56:12 by mkling            #+#    #+#              #
-#    Updated: 2024/12/10 20:39:41 by alex             ###   ########.fr        #
+#    Updated: 2024/12/11 15:42:46 by mkling           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -31,6 +31,7 @@ FUNC_EXEC	= 	execution.c \
 				redirection.c \
 				path.c \
 				setup.c \
+				heredoc.c\
 				errors.c
 
 FUNC_PARS	=	readline.c \

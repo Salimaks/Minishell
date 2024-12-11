@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 17:34:47 by alex              #+#    #+#             */
-/*   Updated: 2024/12/10 18:52:18 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/11 16:46:50 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,20 +55,28 @@ void	remove_space(t_cmd_tab *cmd_tab, t_token *current)
 	}
 }
 
-void	id_operators(t_cmd_tab *cmd_tab, t_token *current)
+void	id_redirections(t_cmd_tab *cmd_tab, t_token *current)
 {
 	if (catch_error(cmd_tab))
 		return ;
-	if (current->lexem == OPERATOR)
+	if (current->letter == '<' && current->next->letter == '<')
 	{
-		current->lexem = current->letter;
-		if (current->letter == current->next->letter
-			&& current->letter ==  '<')
-		{
-			current->lexem = HEREDOC;
-			pop_token(current->next);
-			current->next->lexem = END_OF_HERED;
-		}
+		current->lexem = HEREDOC;
+		pop_token(current->next);
+		current = current->next;
+		current->lexem = END_OF_HERED;
+	}
+	else if (current->letter == '<')
+	{
+		current = current->next;
+		current->lexem = INFILE;
+		pop_token(current->prev);
+	}
+	else if (current->letter == '>')
+	{
+		current = current->next;
+		current->lexem = OUTFILE;
+		pop_token(current->prev);
 	}
 }
 
@@ -78,7 +86,7 @@ void	lexer(t_cmd_tab *cmd_tab)
 	apply_to_token_list(cmd_tab, cmd_tab->token_list, group_words);
 	apply_to_token_list(cmd_tab, cmd_tab->token_list, group_strings);
 	apply_to_token_list(cmd_tab, cmd_tab->token_list, remove_space);
-	apply_to_token_list(cmd_tab, cmd_tab->token_list, id_operators);
+	apply_to_token_list(cmd_tab, cmd_tab->token_list, id_redirections);
 }
 
 // TO DO

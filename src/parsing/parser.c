@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/30 13:06:39 by alex              #+#    #+#             */
-/*   Updated: 2024/12/10 20:15:06 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/11 16:49:36 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ size_t	count_tokens_of_type(t_token *start, int lexem)
 	return (count);
 }
 
-char	**id_redirection(t_cmd_tab *cmd_tab, t_token *start, int type)
+char	**extract_as_array(t_cmd_tab *cmd_tab, t_token *start, int type)
 {
 	int		index;
 	int		count;
@@ -56,48 +56,17 @@ char	**id_redirection(t_cmd_tab *cmd_tab, t_token *start, int type)
 	result = ft_calloc(sizeof(char *), count + 1);
 	if (!result)
 		return (set_error(MALLOC_FAIL, cmd_tab,
-			"Failed to allocate infile name"), NULL);
+				"Failed to allocate infile path"), NULL);
 	index = 0;
-	while (index < count)
+	current = start;
+	while (current->lexem != END)
 	{
-		current = find_token_in_list(start, type);
+		if (current->lexem == type)
+			result[index++] = ft_strdup(current->content);
 		current = current->next;
-		pop_token(current->prev);
-		result[index] = ft_strdup(current->content);
-		current = current->next;
-		pop_token(current->prev);
-		index++;
 	}
 	result[index] = NULL;
 	return (result);
-}
-
-char	**create_argv(t_cmd_tab *cmd_tab, t_token *start)
-{
-	int		index;
-	t_token	*current;
-	char	**cmd_argv;
-
-	if (start->lexem == START)
-		start = start->next;
-	cmd_argv = ft_calloc(sizeof(char *),
-			(get_token_count(start, find_token_in_list(start, '\0')) + 1));
-	if (!cmd_argv)
-	{
-		set_error(MALLOC_FAIL, cmd_tab,
-			"Failed to allocate command structure");
-		return (NULL);
-	}
-	current = start;
-	index = 0;
-	while (current->lexem != END)
-	{
-		cmd_argv[index] = ft_strdup(current->content);
-		current = current->next;
-		index++;
-	}
-	cmd_argv[index] = NULL;
-	return (cmd_argv);
 }
 
 void	parse_cmd(t_cmd_tab *cmd_tab, t_token *start)
@@ -107,10 +76,10 @@ void	parse_cmd(t_cmd_tab *cmd_tab, t_token *start)
 	new_cmd = create_cmd(cmd_tab);
 	if (!new_cmd)
 		return (set_error(MALLOC_FAIL, cmd_tab,
-			"Failed to allocate command structure"));
-	new_cmd->outfile = id_redirection(cmd_tab, start, GREATER);
-	new_cmd->infile = id_redirection(cmd_tab, start, LESSER);
-	new_cmd->argv = create_argv(cmd_tab, start);
+				"Failed to allocate command structure"));
+	new_cmd->outfile = extract_as_array(cmd_tab, start, OUTFILE);
+	new_cmd->infile = extract_as_array(cmd_tab, start, INFILE);
+	new_cmd->argv = extract_as_array(cmd_tab, start, WORD);
 	cmd_tab->cmd_count++;
 }
 
