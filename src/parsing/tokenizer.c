@@ -16,31 +16,108 @@ t_token	*create_token(const char *content)
 {
 	t_token	*new_token;
 
-	new_token = malloc(sizeof(t_token));
+	new_token =(t_token *)malloc(sizeof(t_token));
 	if (!new_token)
 		return (NULL);
 	new_token->content = ft_strdup(content);
-	new_token->next = NULL;
+	new_token->nexst = NULL;
 	return (new_token);
 }
 
 void	add_token(t_token **head, t_token *new_token)
 {
+	t_token *current;
 	if (!*head)
 	{
 		*head = new_token;
 		return;
 	}
-		
+	*current = *head;
+	while (current->next)
+		*current = current->next;
+	current->next = new_token;
 }
 
-char	**tokenizer(const char *input)
-{
-	char	**cmd_line;
-
-	cmd_line = ft_split(input, '|');
+void	free_tokens(t_token *head)
+{g
+	t_token *current;
+	t_token *next;
+	while (current)
+	{
+		next = current->next;
+		free(current->content);
+		free(current);
+		current = next;
+	}
 }
 
-char	**cmd_args(const char *argv)
+
+
+int is_special_token(const char *str)
 {
+	const char *special_tokens[] ={ "|", ">", ">>", "<", NULL};
+	int i;
+	i = 0;
+	while(special_tokens[i])
+	{
+		if(ft_strncmp(str, special_tokens[i], ft_strlen(special_tokens[i])))
+			retrun (ft_strlen(special_tokens[i]));
+		i++;
+	}
+	retrun (0);
+}
+
+t_token	*tokenizer(const char *input)
+{
+	t_token *tokens;
+	int i;
+	int start;
+	int len;
+	char quote;
+	*tokens = NULL;
+	i = 0;
+	if(!input)
+		return (NULL);
+	while(input[i])
+	{
+		while (input[i] && input[i] == " " || input[i] == "\t")
+			i++;
+		if(!input[i])
+			break;
+		if (input[i] == '\"' || input[i] == '\'')
+		{
+			quote = input[i];
+			i++;
+			start = i;
+			while(input[i] && input[i] != quote)
+				i++;
+			if(input[i] == quote)
+			{
+				len = i - start;
+				add_token(&tokens, create_token(ft_strndup(input, len, start)));
+				i++;
+			}
+			else
+			{
+				error_msg("erreur : quote non ferme") //a coder
+				free_tokens(tokens);
+				return (NULL);
+			}
+		}
+		else if (is_special_token(input + i))
+		{
+			len = is_special_token(input + i);
+			add_token(&tokens, create_token(ft_strndup(input, len, i)));
+			i = i + len;
+		}
+		else
+		{
+			start = i;
+			while(input[i] && input[i] != " " && input[i] != "\t" && !is_special_token(input[i]))
+				i++;
+			len = i - start;
+			add_token(&tokens, create_token(ft_strndup(input, len, i)));
+		}
+		return (tokens);
+	}
 }

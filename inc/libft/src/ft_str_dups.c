@@ -48,6 +48,23 @@ char	*ft_strdup(const char *src)
 	return (new);
 }
 
+char	*ft_strndup(const char *src, size_t size, int i)
+{
+	char	*new
+
+	new = malloc((size + 1) * sizeof(char));
+	if (new == NULL)
+		return (NULL);
+	i = 0;
+	while (src[i] && i <= size)
+	{
+		new[i] = src[i];
+		i++;
+	}
+	new[i] = '\0';
+	return (new);
+}
+
 size_t	ft_strlcat(char *dest, const char *src, size_t size)
 {
 	size_t	src_len;
