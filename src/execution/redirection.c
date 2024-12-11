@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 17:34:05 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/10 20:56:46 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/11 10:46:26 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@ int	open_file(char *filepath, int mode)
 	int	file_fd;
 
 	file_fd = 0;
-	fprintf(stderr, "in open file");
 	if (mode == READ)
 		file_fd = open(filepath, O_RDONLY);
 	if (mode == WRITE)

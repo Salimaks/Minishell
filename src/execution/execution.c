@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 15:37:36 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/03 21:11:18 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/11 10:40:38 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ void	open_pipes(t_cmd_tab *cmd_tab)
 {
 	t_cmd	*cmd;
 
-	if (catch_error(cmd_tab))
+	if (catch_error(cmd_tab) || cmd_tab->cmd_count <= 1)
 		return ;
 	cmd = cmd_tab->cmd_list;
 	while (cmd->next != NULL)
