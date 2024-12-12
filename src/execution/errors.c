@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 14:37:02 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/12 00:01:28 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/12 20:45:34 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,4 +38,9 @@ void	fork_exit_if(int condition, int err_code, t_cmd *cmd, char *err_message)
 		cmd->exit_code = err_code;
 		exit(err_code);
 	}
+}
+
+int	get_last_cmd_exit_code(t_cmd_tab *cmd_tab)
+{
+	return (((t_cmd *)ft_lstlast(cmd_tab->cmd_list)->content)->exit_code);
 }

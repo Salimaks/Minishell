@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/12 12:14:41 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/12 20:44:58 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,9 +35,9 @@ typedef struct s_token
 
 typedef struct s_files
 {
-	int				mode;		// infilem outfile, heredoc or append
+	int				mode;		// infile, outfile, heredoc or append
 	char			*path;		// pathfile
-	char			*delimiter;	// delimiter if heredoc, else NULL
+	char			*delim;		// delimiter if heredoc, else NULL
 	int				fd;			// resulting fd once opened
 	bool			is_quoted;	// is a quote in delimiter, meaining expand
 }	t_file;
@@ -58,7 +58,8 @@ typedef struct s_cmd_table
 {
 	char		*cmd_line;		// readline return
 	t_list		*token_list;	// linked list of tokens id from cmd line
-	t_list		*cmd_list;		// first commands structures in linked list
+	t_list		*cmd_list;		// linked list of commands as a structs
+	t_list		*env_list;		// linked list of env strings
 	size_t		cmd_count;		// total of commands in commmand line
 	size_t		index;			// index of command currently being executed
 	char		**env;			// env received at start of program
@@ -70,6 +71,7 @@ typedef struct s_cmd_table
 /* INPUT */
 
 void		parse_and_exec_cmd(char *input, char **env);
+void		extract_env_as_linked_list(t_cmd_tab *cmd_tab);
 void		extract_paths(t_cmd_tab *cmd_tab);
 void		init_readline(char **env);
 void		signals(void);
@@ -86,7 +88,7 @@ t_cmd		*create_cmd(t_cmd_tab *cmd_tab);
 void		parse(t_cmd_tab *cmd_tab, t_list *start);
 void		apply_to_list(t_cmd_tab *cmd_tab, t_list *node,
 				void function(t_cmd_tab *, t_list *));
-void		add_file(t_cmd_tab *cmd_tab, t_cmd *cmd, t_token *token);
+void		create_file(t_cmd_tab *cmd_tab, t_cmd *cmd, t_token *token);
 
 /* HEREDOC */
 
@@ -98,8 +100,7 @@ void		destroy_heredoc(t_cmd_tab *cmd_tab, t_list *file_node);
 
 void		create_fork(t_cmd_tab *cmd_tab);
 void		get_cmd_path(t_cmd *cmd, t_cmd_tab *cmd_tab);
-void		fork_exit_if(int condition, int error_code, t_cmd *cmd,
-				char *error_message);
+void		fork_exit_if(int condition, int errcode, t_cmd *cmd, char *message);
 int			execute_all_cmd(t_cmd_tab *cmd_tab);
 
 /* REDIRECTION */
@@ -140,7 +141,7 @@ void		print_tokens(t_list *first);
 # define DELIMITERS		"'\"()"
 # define OPERATORS		"|><$"
 # define WHITESPACES	" \n\t\0"
-# define HEREDOC_LOC	"tmp/"
+# define HEREDOC_LOC	"tmp/heredoc"
 
 enum e_lexem
 {
@@ -156,6 +157,7 @@ enum e_lexem
 	OUTFILE,
 	INFILE,
 	HEREDOC,
+	APPEND,
 	STRING,
 	DOUB_QUOTE	= '"',
 	SING_QUOTE	= '\'',
@@ -177,6 +179,7 @@ enum e_exit_code
 	NO_FILE = 1,
 	READ_ERROR = 1,
 	OPEN_ERROR = 1,
+	TOO_MANY_HEREDOC = 1,
 	CANT_EXECUTE_CMD = 126,
 	CANT_FIND_CMD = 127,
 };
@@ -185,7 +188,6 @@ enum e_pipe_fd
 {
 	READ = 0,
 	WRITE = 1,
-	APPEND = 2,
 };
 
 #endif

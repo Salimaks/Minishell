@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/30 13:06:39 by alex              #+#    #+#             */
-/*   Updated: 2024/12/11 22:56:04 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/12 20:47:52 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ size_t	count_tokens_of_type(t_list *start, int lexem)
 	return (count);
 }
 
-char	**extract_as_array(t_cmd_tab *cmd_tab, t_list *start, int type)
+char	**extract_token_as_array(t_cmd_tab *cmd_tab, t_list *start, int type)
 {
 	int		index;
 	int		count;
@@ -80,7 +80,7 @@ void	extract_files_as_linklist(t_cmd_tab *cmd_tab, t_cmd *cmd, t_list *start)
 		curr_token = ((t_token *)current->content);
 		if (curr_token->lexem == INFILE || curr_token->lexem == HEREDOC
 			|| curr_token->lexem == OUTFILE || curr_token->lexem == APPEND)
-			add_file(cmd_tab, cmd, curr_token);
+			create_file(cmd_tab, cmd, curr_token);
 		current = current->next;
 	}
 }
@@ -94,7 +94,7 @@ void	parse_cmd(t_cmd_tab *cmd_tab, t_list *start)
 		return (set_error(MALLOC_FAIL, cmd_tab,
 				"Failed to allocate command structure"));
 	extract_files_as_linklist(cmd_tab, new_cmd, start);
-	new_cmd->argv = extract_as_array(cmd_tab, start, WORD);
+	new_cmd->argv = extract_token_as_array(cmd_tab, start, WORD);
 	cmd_tab->cmd_count++;
 }
 

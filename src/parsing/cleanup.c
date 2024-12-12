@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/30 00:22:21 by alex              #+#    #+#             */
-/*   Updated: 2024/12/11 21:15:23 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/12 20:24:28 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,8 @@ void	free_file(void *to_be_del)
 		return ;
 	if (file->path != NULL)
 		free(file->path);
-	if (file->delimiter != NULL)
-		free(file->delimiter);
+	if (file->delim != NULL)
+		free(file->delim);
 	free(file);
 }
 
@@ -61,5 +61,7 @@ void	free_cmd_tab(t_cmd_tab *cmd_tab)
 		ft_free_tab(cmd_tab->paths);
 	if (cmd_tab->token_list)
 		ft_lstclear(&cmd_tab->token_list, free_token);
+	if (cmd_tab->env_list)
+		ft_lstclear(&cmd_tab->env_list, free);
 	free(cmd_tab);
 }

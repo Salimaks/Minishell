@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirection.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 17:34:05 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/12 11:42:57 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/12 17:31:02 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,14 +38,11 @@ int	get_infile_fd(t_cmd_tab *cmd_tab)
 		file = (t_file *)cmd->infiles->content;
 		if (file->mode == HEREDOC)
 			assemble_heredoc(cmd_tab, cmd, cmd->infiles);
-		else
-		{
-			fork_exit_if(access(file->path, F_OK) == -1, NO_FILE, cmd,
-				"Input file does not exist");
-			fork_exit_if(access(file->path, R_OK) == -1, READ_ERROR, cmd,
-				"Input file cannot be read");
-			open_file(file, cmd, READ);
-		}
+		fork_exit_if(access(file->path, F_OK) == -1, NO_FILE, cmd,
+			"Input file does not exist");
+		fork_exit_if(access(file->path, R_OK) == -1, READ_ERROR, cmd,
+			"Input file cannot be read");
+		open_file(file, cmd, READ);
 		if (cmd->infiles->next)
 			close(file->fd);
 		cmd->infiles = cmd->infiles->next;
@@ -64,7 +61,10 @@ int	get_outfile_fd(t_cmd_tab *cmd_tab)
 	while (cmd->outfiles)
 	{
 		file = (t_file *)cmd->outfiles->content;
-		open_file(file, cmd, WRITE);
+		if (file->mode == APPEND)
+			open_file(file, cmd, APPEND);
+		else
+			open_file(file, cmd, WRITE);
 		if (cmd->outfiles->next)
 			close(file->fd);
 		cmd->outfiles = cmd->outfiles->next;
