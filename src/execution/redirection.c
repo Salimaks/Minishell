@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirection.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 17:34:05 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/11 23:56:44 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/12 11:05:11 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,14 +30,12 @@ int	open_file(char *filepath, int mode)
 
 int	get_infile_fd(t_cmd_tab *cmd_tab)
 {
-	int		index;
 	t_cmd	*cmd;
 	t_file	*file;
 
 	cmd = get_current_cmd(cmd_tab);
 	if (cmd->infiles == NULL)
 		return (STDIN_FILENO);
-	index = 0;
 	while (cmd->infiles)
 	{
 		file = (t_file *)cmd->infiles->content;
@@ -57,14 +55,12 @@ int	get_infile_fd(t_cmd_tab *cmd_tab)
 
 int	get_outfile_fd(t_cmd_tab *cmd_tab)
 {
-	int		index;
 	t_cmd	*cmd;
 	t_file	*file;
 
 	cmd = get_current_cmd(cmd_tab);
 	if (cmd->outfiles == NULL)
 		return (STDOUT_FILENO);
-	index = 0;
 	while (cmd->outfiles)
 	{
 		file = (t_file *)cmd->outfiles->content;
@@ -83,12 +79,10 @@ void	redirect_in_and_out(t_cmd_tab *cmd_tab, int input, int output)
 	t_cmd	*cmd;
 
 	cmd = get_current_cmd(cmd_tab);
-	fprintf(stderr, "input is %d, output is %d\n", input, output);
 	fork_exit_if((dup2(input, STDIN_FILENO) == -1), DUP_ERROR,
 		cmd, "Error while redirecting stdin");
 	fork_exit_if((dup2(output, STDOUT_FILENO) == -1), DUP_ERROR,
 		cmd, "Error while redirecting stdout");
-	fprintf(stderr, "input is %d, output is %d\n", input, output);
 }
 
 void	connect_pipe(t_cmd_tab *cmd_tab)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_lst_add.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/31 19:29:36 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/11 19:09:14 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/12 11:04:00 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,11 @@ t_list	*ft_lstnew(void *content)
 
 void	ft_lstadd_front(t_list **lst, t_list *new)
 {
+	if (new == NULL)
+		return ;
 	new->next = *lst;
+	if (*lst != NULL)
+		(*lst)->prev = new;
 	(*lst) = new;
 }
 
