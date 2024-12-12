@@ -39,7 +39,7 @@ void	add_token(t_token **head, t_token *new_token)
 }
 
 void	free_tokens(t_token *head)
-{g
+{
 	t_token *current;
 	t_token *next;
 	while (current)
@@ -65,6 +65,33 @@ int is_special_token(const char *str)
 		i++;
 	}
 	retrun (0);
+}
+
+void	tokenize_args(const char *input,t_token *tokens, int i)
+{
+	int start;
+	int len;
+	int nbr;
+
+	start = i + 2;
+	nbr = 1;
+	i = i + 2;
+	while(input[i] && nbr > 0)
+	{
+		if(input[i] == '(')
+			nbr++;
+		else if(input[i] == ')')
+			nbr--;
+		i++;
+	}
+	if(nbr != 0)
+	{
+		error_msg("error : bracket not closed")
+		free_tokens(tokens);
+		return (NULL);
+	}
+	len = i - start - 1;
+	add_token(&tokens, create_token(ft_strndup(input, len, start)));s
 }
 
 t_token	*tokenizer(const char *input)
@@ -99,7 +126,7 @@ t_token	*tokenizer(const char *input)
 			}
 			else
 			{
-				error_msg("erreur : quote non ferme") //a coder
+				error_msg("error : quote not closed ") //a coder
 				free_tokens(tokens);
 				return (NULL);
 			}
@@ -110,6 +137,7 @@ t_token	*tokenizer(const char *input)
 			add_token(&tokens, create_token(ft_strndup(input, len, i)));
 			i = i + len;
 		}
+		else if(input[i] == '$' && input[i + 1] == '(')
 		else
 		{
 			start = i;
