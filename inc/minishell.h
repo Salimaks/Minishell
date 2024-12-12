@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/12 20:44:58 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/13 00:21:50 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,6 +46,8 @@ typedef struct s_cmd
 {
 	char			**argv;		// array created with cmd_path, then arguments
 	char			*cmd_path;	// binary filepath, absolute/through PATH
+	t_list			*arg_list;
+	t_list			*redirect;
 	t_list			*infiles;	// linked list of input files
 	t_list			*outfiles;	// linked list of output files
 	int				exit_code;	// value returned by the execution of command
@@ -53,6 +55,14 @@ typedef struct s_cmd
 	int				fork_pid;	// process id of fork sent to execute command
 	int				pipe_fd[2];	// array of 2 pipe fd required for the pipe()
 }	t_cmd;
+
+typedef struct s_ast
+{
+	int				type;
+	void			*content;
+	struct s_ast	*left;
+	struct s_ast	*right;
+}	t_ast;
 
 typedef struct s_cmd_table
 {
@@ -135,6 +145,7 @@ void		free_cmd_tab(t_cmd_tab *cmd_tab);
 /* DEBUG */
 
 void		print_tokens(t_list *first);
+void		ast_test(t_cmd_tab *cmd_tab);
 
 # define TRUE			1
 # define FALSE			0
@@ -188,6 +199,12 @@ enum e_pipe_fd
 {
 	READ = 0,
 	WRITE = 1,
+};
+
+enum e_ast
+{
+	AST_PIPE,
+	AST_CMD,
 };
 
 #endif

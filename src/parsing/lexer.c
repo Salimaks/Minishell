@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 17:34:47 by alex              #+#    #+#             */
-/*   Updated: 2024/12/12 21:06:16 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/13 00:21:43 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,6 +83,7 @@ void	lexer(t_cmd_tab *cmd_tab)
 	apply_to_list(cmd_tab, cmd_tab->token_list, id_heredoc);
 	apply_to_list(cmd_tab, cmd_tab->token_list, id_redirections);
 	print_tokens(cmd_tab->token_list);
+	ast_test(cmd_tab);
 }
 
 // TO DO
