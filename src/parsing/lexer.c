@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   lexer.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 17:34:47 by alex              #+#    #+#             */
-/*   Updated: 2024/12/11 22:26:36 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/12 12:11:12 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,6 +88,7 @@ void	lexer(t_cmd_tab *cmd_tab)
 	apply_to_list(cmd_tab, cmd_tab->token_list, group_strings);
 	apply_to_list(cmd_tab, cmd_tab->token_list, remove_space);
 	apply_to_list(cmd_tab, cmd_tab->token_list, id_redirections);
+	print_tokens(cmd_tab->token_list);
 }
 
 // TO DO

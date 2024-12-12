@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/11 15:42:30 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/11 22:43:25 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/12 12:54:25 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,37 +14,63 @@
 
 char	*generate_heredoc_filepath(t_cmd_tab *cmd_tab)
 {
-	char	*heredoc_filepath;
+	char	temp[249];
+	char	*heredoc_path;
+	int		index;
 
-	heredoc_filepath = ft_strjoin(HEREDOC_LOC, "heredoc");
-	if (!heredoc_filepath)
-		return (set_error(MALLOC_FAIL, cmd_tab,
-				"Failed to malloc heredoc"), NULL);
-	while (access(heredoc_filepath, F_OK))
+	heredoc_path = HEREDOC_LOC;
+	while (1)
 	{
-		heredoc_filepath = ft_strjoinfree(heredoc_filepath, "a");
-		if (!heredoc_filepath)
-			return (set_error(MALLOC_FAIL, cmd_tab,
-					"Failed to malloc heredoc"), NULL);
+		if (access(heredoc_path, F_OK) != 0)
+			break ;
+		heredoc_path = ft_strjoinfree(heredoc_path, temp);
+		if (!heredoc_path)
+			return (set_error(MALLOC_FAIL, cmd_tab, "Heredoc"), NULL);
+		index = 249;
+		while (index >= 0)
+		{
+			if (temp[index] == 'z')
+				temp[index--] = 'a';
+			else
+			{
+				temp[index]++;
+				break ;
+			}
+		}
 	}
-	return (heredoc_filepath);
+	return (heredoc_path);
 }
 
-void	assemble_heredoc(t_cmd_tab *cmd_tab, char *heredoc_path, char *limiter)
+void	assemble_heredoc(t_cmd_tab *cmd_tab, t_cmd *cmd, t_list *file_node)
 {
-	int		heredoc_fd;
+	t_file	*file;
 	char	*result;
 
-	heredoc_fd = open_file(heredoc_path, WRITE);
-	if (heredoc_fd < 0)
+	file = (t_file *)file_node->content;
+	if (file->mode != HEREDOC)
+		return ;
+	open_file(file, cmd, WRITE);
+	if (file->fd < 0)
 		return (set_error(READ_ERROR, cmd_tab, "Unable to create heredoc"));
 	while (1)
 	{
 		write(STDIN_FILENO, "heredoc> ", 9);
 		result = get_next_line(STDIN_FILENO);
-		if (ft_strncmp(limiter, result, ft_strlen(limiter)) == 0)
+		if (ft_strncmp(file->delimiter, result, ft_strlen(file->delimiter)) == 0)
 			break ;
-		write(heredoc_fd, result, ft_strlen(result));
+		write(file->fd, result, ft_strlen(result));
 	}
-	close(heredoc_fd);
+	close(file->fd);
+}
+
+void	destroy_heredoc(t_cmd_tab *cmd_tab, t_list *file_node)
+{
+	t_file	*file;
+
+	if (catch_error(cmd_tab))
+		return ;
+	file = (t_file *)(file_node)->content;
+	if (file->mode != HEREDOC)
+		return ;
+	unlink(file->path);
 }

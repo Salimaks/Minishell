@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   execution.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 15:37:36 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/11 23:43:38 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/12 12:05:17 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,7 @@ void	wait_on_all_forks(t_cmd_tab *cmd_tab)
 		if (!catch_error(cmd_tab))
 			waitpid(cmd->fork_pid, &cmd->exit_code, 0);
 		cmd_tab->index++;
+		apply_to_list(cmd_tab, cmd->infiles, destroy_heredoc);
 	}
 }
 

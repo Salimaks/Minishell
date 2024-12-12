@@ -6,26 +6,23 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 17:34:05 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/12 11:05:11 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/12 11:42:57 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	open_file(char *filepath, int mode)
+void	open_file(t_file *file, t_cmd *cmd, int mode)
 {
-	int	file_fd;
-
-	file_fd = 0;
+	file->fd = 0;
 	if (mode == READ)
-		file_fd = open(filepath, O_RDONLY);
+		file->fd = open(file->path, O_RDONLY);
 	if (mode == WRITE)
-		file_fd = open(filepath, O_WRONLY | O_TRUNC | O_CREAT, 0666);
+		file->fd = open(file->path, O_WRONLY | O_TRUNC | O_CREAT, 0666);
 	if (mode == APPEND)
-		file_fd = open(filepath, O_RDWR | O_APPEND | O_CREAT, 0666);
-	if (file_fd == -1)
-		return (OPEN_ERROR);
-	return (file_fd);
+		file->fd = open(file->path, O_RDWR | O_APPEND | O_CREAT, 0666);
+	fork_exit_if((file->fd == -1), OPEN_ERROR, cmd,
+		"Error while opening file");
 }
 
 int	get_infile_fd(t_cmd_tab *cmd_tab)
@@ -39,13 +36,16 @@ int	get_infile_fd(t_cmd_tab *cmd_tab)
 	while (cmd->infiles)
 	{
 		file = (t_file *)cmd->infiles->content;
-		fork_exit_if(access(file->path, F_OK) == -1, NO_FILE, cmd,
-			"Input file does not exist");
-		fork_exit_if(access(file->path, R_OK) == -1, READ_ERROR, cmd,
-			"Input file cannot be read");
-		file->fd = open_file(file->path, READ);
-		fork_exit_if((file->fd == -1), OPEN_ERROR, cmd,
-			"Error while opening input file");
+		if (file->mode == HEREDOC)
+			assemble_heredoc(cmd_tab, cmd, cmd->infiles);
+		else
+		{
+			fork_exit_if(access(file->path, F_OK) == -1, NO_FILE, cmd,
+				"Input file does not exist");
+			fork_exit_if(access(file->path, R_OK) == -1, READ_ERROR, cmd,
+				"Input file cannot be read");
+			open_file(file, cmd, READ);
+		}
 		if (cmd->infiles->next)
 			close(file->fd);
 		cmd->infiles = cmd->infiles->next;
@@ -64,9 +64,7 @@ int	get_outfile_fd(t_cmd_tab *cmd_tab)
 	while (cmd->outfiles)
 	{
 		file = (t_file *)cmd->outfiles->content;
-		file->fd = open_file(file->path, WRITE);
-		fork_exit_if((file->fd < 0), OPEN_ERROR,
-			cmd, "Error while opening output file");
+		open_file(file, cmd, WRITE);
 		if (cmd->outfiles->next)
 			close(file->fd);
 		cmd->outfiles = cmd->outfiles->next;

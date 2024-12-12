@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/11 23:29:21 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/12 12:14:41 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,18 +28,18 @@
 
 typedef struct s_token
 {
-	int				lexem;
-	char			letter;
-	char			*content;
+	int				lexem;		// type as determined by the lexer
+	char			letter;		// letter or first letter
+	char			*content;	// malloced words or letter
 }	t_token;
 
 typedef struct s_files
 {
-	int				mode;
-	char			*path;
-	char			*delimiter;
-	int				fd;
-	bool			is_quoted;
+	int				mode;		// infilem outfile, heredoc or append
+	char			*path;		// pathfile
+	char			*delimiter;	// delimiter if heredoc, else NULL
+	int				fd;			// resulting fd once opened
+	bool			is_quoted;	// is a quote in delimiter, meaining expand
 }	t_file;
 
 typedef struct s_cmd
@@ -84,15 +84,15 @@ void		lexer(t_cmd_tab *cmd_tab);
 t_cmd_tab	*create_cmd_tab(char **env);
 t_cmd		*create_cmd(t_cmd_tab *cmd_tab);
 void		parse(t_cmd_tab *cmd_tab, t_list *start);
-void		apply_to_list(t_cmd_tab *cmd_tab, t_list *token,
+void		apply_to_list(t_cmd_tab *cmd_tab, t_list *node,
 				void function(t_cmd_tab *, t_list *));
 void		add_file(t_cmd_tab *cmd_tab, t_cmd *cmd, t_token *token);
 
 /* HEREDOC */
 
 char		*generate_heredoc_filepath(t_cmd_tab *cmd_tab);
-void		assemble_heredoc(t_cmd_tab *cmd_tab, char *heredoc_path,
-				char *limiter);
+void		assemble_heredoc(t_cmd_tab *cmd_tab, t_cmd *cmd, t_list *file_node);
+void		destroy_heredoc(t_cmd_tab *cmd_tab, t_list *file_node);
 
 /* EXECUTION */
 
@@ -105,7 +105,7 @@ int			execute_all_cmd(t_cmd_tab *cmd_tab);
 /* REDIRECTION */
 
 void		open_pipes(t_cmd_tab *cmd_tab);
-int			open_file(char *filepath, int mode);
+void		open_file(t_file *file, t_cmd *cmd, int mode);
 void		connect_pipe(t_cmd_tab *cmd_tab);
 void		close_pipes(t_cmd_tab *cmd_tab);
 
@@ -156,7 +156,6 @@ enum e_lexem
 	OUTFILE,
 	INFILE,
 	HEREDOC,
-	END_OF_HERED,
 	STRING,
 	DOUB_QUOTE	= '"',
 	SING_QUOTE	= '\'',
