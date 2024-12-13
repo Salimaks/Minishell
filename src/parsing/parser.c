@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/30 13:06:39 by alex              #+#    #+#             */
-/*   Updated: 2024/12/13 12:02:53 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/13 15:57:43 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,7 @@ size_t	count_tokens_of_type(t_list *start, int lexem)
 	return (count);
 }
 
-char	**extract_token_as_array(t_cmd_tab *cmd_tab, t_list *start, int type)
+char	**extract_token_as_array(t_shell *shell, t_list *start, int type)
 {
 	int		index;
 	int		count;
@@ -54,7 +54,7 @@ char	**extract_token_as_array(t_cmd_tab *cmd_tab, t_list *start, int type)
 		return (NULL);
 	result = ft_calloc(sizeof(char *), count + 1);
 	if (!result)
-		return (set_error(MALLOC_FAIL, cmd_tab,
+		return (set_error(MALLOC_FAIL, shell,
 				"Failed to allocate infile path"), NULL);
 	index = 0;
 	while (((t_token *)start->content)->lexem != END)
@@ -65,45 +65,4 @@ char	**extract_token_as_array(t_cmd_tab *cmd_tab, t_list *start, int type)
 	}
 	result[index] = NULL;
 	return (result);
-}
-
-void	extract_files_as_linklist(t_cmd_tab *cmd_tab, t_cmd *cmd, t_list *start)
-{
-	t_token	*curr_token;
-
-	while (start)
-	{
-		curr_token = ((t_token *)start->content);
-		if (curr_token->lexem == INFILE || curr_token->lexem == HEREDOC
-			|| curr_token->lexem == OUTFILE || curr_token->lexem == APPEND)
-			create_file(cmd_tab, cmd, curr_token);
-		start = start->next;
-	}
-}
-
-void	parse_cmd(t_cmd_tab *cmd_tab, t_list *start)
-{
-	t_cmd	*new_cmd;
-
-	new_cmd = create_cmd(cmd_tab);
-	if (!new_cmd)
-		return (set_error(MALLOC_FAIL, cmd_tab,
-				"Failed to allocate command structure"));
-	extract_files_as_linklist(cmd_tab, new_cmd, start);
-	new_cmd->argv = extract_token_as_array(cmd_tab, start, WORD);
-	cmd_tab->cmd_count++;
-}
-
-void	parse(t_cmd_tab *cmd_tab, t_list *start)
-{
-	t_list	*pipe;
-
-	pipe = find_token_in_list(start, '|');
-	if (pipe != NULL)
-	{
-		parse(cmd_tab, pipe->next);
-		((t_token *)pipe->content)->lexem = END;
-	}
-	if (((t_token *)start->content)->lexem != END)
-		parse_cmd(cmd_tab, start);
 }

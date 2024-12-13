@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 17:34:05 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/12 17:31:02 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/13 15:55:39 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,19 +25,19 @@ void	open_file(t_file *file, t_cmd *cmd, int mode)
 		"Error while opening file");
 }
 
-int	get_infile_fd(t_cmd_tab *cmd_tab)
+int	get_infile_fd(t_shell *shell)
 {
 	t_cmd	*cmd;
 	t_file	*file;
 
-	cmd = get_current_cmd(cmd_tab);
+	cmd = get_current_cmd(shell);
 	if (cmd->infiles == NULL)
 		return (STDIN_FILENO);
 	while (cmd->infiles)
 	{
 		file = (t_file *)cmd->infiles->content;
 		if (file->mode == HEREDOC)
-			assemble_heredoc(cmd_tab, cmd, cmd->infiles);
+			assemble_heredoc(shell, cmd, cmd->infiles);
 		fork_exit_if(access(file->path, F_OK) == -1, NO_FILE, cmd,
 			"Input file does not exist");
 		fork_exit_if(access(file->path, R_OK) == -1, READ_ERROR, cmd,
@@ -50,12 +50,12 @@ int	get_infile_fd(t_cmd_tab *cmd_tab)
 	return (file->fd);
 }
 
-int	get_outfile_fd(t_cmd_tab *cmd_tab)
+int	get_outfile_fd(t_shell *shell)
 {
 	t_cmd	*cmd;
 	t_file	*file;
 
-	cmd = get_current_cmd(cmd_tab);
+	cmd = get_current_cmd(shell);
 	if (cmd->outfiles == NULL)
 		return (STDOUT_FILENO);
 	while (cmd->outfiles)
@@ -72,37 +72,37 @@ int	get_outfile_fd(t_cmd_tab *cmd_tab)
 	return (file->fd);
 }
 
-void	redirect_in_and_out(t_cmd_tab *cmd_tab, int input, int output)
+void	redirect_in_and_out(t_shell *shell, int input, int output)
 {
 	t_cmd	*cmd;
 
-	cmd = get_current_cmd(cmd_tab);
+	cmd = get_current_cmd(shell);
 	fork_exit_if((dup2(input, STDIN_FILENO) == -1), DUP_ERROR,
 		cmd, "Error while redirecting stdin");
 	fork_exit_if((dup2(output, STDOUT_FILENO) == -1), DUP_ERROR,
 		cmd, "Error while redirecting stdout");
 }
 
-void	connect_pipe(t_cmd_tab *cmd_tab)
+void	connect_pipe(t_shell *shell)
 {
 	t_list	*node;
 
-	node = get_current_cmd_node(cmd_tab);
-	if (is_first_cmd(cmd_tab) && is_last_cmd(cmd_tab))
-		redirect_in_and_out(cmd_tab,
-			get_infile_fd(cmd_tab),
-			get_outfile_fd(cmd_tab));
-	else if (is_first_cmd(cmd_tab))
-		redirect_in_and_out(cmd_tab,
-			get_infile_fd(cmd_tab),
+	node = get_current_cmd_node(shell);
+	if (is_first_cmd(shell) && is_last_cmd(shell))
+		redirect_in_and_out(shell,
+			get_infile_fd(shell),
+			get_outfile_fd(shell));
+	else if (is_first_cmd(shell))
+		redirect_in_and_out(shell,
+			get_infile_fd(shell),
 			((t_cmd *)node->content)->pipe_fd[WRITE]);
-	else if (is_last_cmd(cmd_tab))
-		redirect_in_and_out(cmd_tab,
+	else if (is_last_cmd(shell))
+		redirect_in_and_out(shell,
 			((t_cmd *)node->prev->content)->pipe_fd[READ],
-			get_outfile_fd(cmd_tab));
+			get_outfile_fd(shell));
 	else
-		redirect_in_and_out(cmd_tab,
+		redirect_in_and_out(shell,
 			((t_cmd *)node->prev->content)->pipe_fd[READ],
 			((t_cmd *)node->content)->pipe_fd[WRITE]);
-	close_pipes(cmd_tab);
+	close_pipes(shell);
 }

@@ -6,24 +6,22 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/01 16:37:27 by alex              #+#    #+#             */
-/*   Updated: 2024/12/13 12:15:40 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/13 15:55:39 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-t_list	*find_token_in_list(t_list *start, int letter)
+void	remove_space(t_shell *shell, t_list *current)
 {
-	while (start)
-	{
-		if (((t_token *)start->content)->letter == letter)
-			return (start);
-		start = start->next;
-	}
-	return (NULL);
+	if (catch_error(shell)
+		|| ((t_token *)current->content)->lexem != BLANK)
+		return ;
+	current = current->next;
+	ft_lstpop(current->prev, free_token);
 }
 
-void	merge_token(t_cmd_tab *cmd_tab, t_list *start)
+void	merge_token(t_shell *shell, t_list *start)
 {
 	t_token	*current;
 	t_token	*next;
@@ -32,21 +30,21 @@ void	merge_token(t_cmd_tab *cmd_tab, t_list *start)
 	next = ((t_token *)start->next->content);
 	current->content = ft_strjoinfree(current->content, next->content);
 	if (!current->content)
-		return (set_error(MALLOC_FAIL, cmd_tab, "Failed to malloc token"));
+		return (set_error(MALLOC_FAIL, shell, "Failed to malloc token"));
 	ft_lstpop(start->next, free_token);
 }
 
-void	group_words(t_cmd_tab *cmd_tab, t_list *node)
+void	group_words(t_shell *shell, t_list *node)
 {
 	while (((t_token *)node->content)->lexem == WORD
 		&& ((t_token *)node->next->content)->lexem == WORD)
-		merge_token(cmd_tab, node);
-	while (((t_token *)node->content)->lexem == WHITESPACE
-		&& ((t_token *)node->next->content)->lexem == WHITESPACE)
-		merge_token(cmd_tab, node);
+		merge_token(shell, node);
+	while (((t_token *)node->content)->lexem == BLANK
+		&& ((t_token *)node->next->content)->lexem == BLANK)
+		merge_token(shell, node);
 }
 
-void	group_strings(t_cmd_tab *cmd_tab, t_list *start)
+void	group_strings(t_shell *shell, t_list *start)
 {
 	t_token	*first_delim;
 
@@ -55,35 +53,36 @@ void	group_strings(t_cmd_tab *cmd_tab, t_list *start)
 		return ;
 	first_delim->content = ft_calloc(1, sizeof(char));
 	if (!first_delim->content)
-		return (set_error(MALLOC_FAIL, cmd_tab, "Failed to malloc string"));
+		return (set_error(MALLOC_FAIL, shell, "Failed to malloc string"));
 	start = start->next;
 	while (((t_token *)start->content)->lexem != END)
 	{
 		if (((t_token *)start->content)->letter == first_delim->letter)
 			break ;
-		merge_token(cmd_tab, start);
+		merge_token(shell, start);
 		start = start->next;
 	}
 	first_delim->lexem = STRING;
 }
 
-void	scan(t_cmd_tab *cmd_tab)
+void	scan(t_shell *shell)
 {
-	cmd_tab->index = 0;
-	add_token(cmd_tab, START, '\0');
-	while (cmd_tab->index < ft_strlen(cmd_tab->cmd_line))
+	shell->index = 0;
+	add_token(shell, START, '\0');
+	while (shell->index < ft_strlen(shell->cmd_line))
 	{
-		if (ft_strchr(DELIMITERS, cmd_tab->cmd_line[cmd_tab->index]))
-			add_token(cmd_tab, DELIMITER, cmd_tab->cmd_line[cmd_tab->index]);
-		else if (ft_strchr(OPERATORS, cmd_tab->cmd_line[cmd_tab->index]))
-			add_token(cmd_tab, OPERATOR, cmd_tab->cmd_line[cmd_tab->index]);
-		else if (ft_strchr(WHITESPACES, cmd_tab->cmd_line[cmd_tab->index]))
-			add_token(cmd_tab, WHITESPACE, cmd_tab->cmd_line[cmd_tab->index]);
+		if (ft_strchr(DELIMITERS, shell->cmd_line[shell->index]))
+			add_token(shell, DELIMITER, shell->cmd_line[shell->index]);
+		else if (ft_strchr(OPERATORS, shell->cmd_line[shell->index]))
+			add_token(shell, OPERATOR, shell->cmd_line[shell->index]);
+		else if (ft_strchr(BLANKS, shell->cmd_line[shell->index]))
+			add_token(shell, BLANK, shell->cmd_line[shell->index]);
 		else
-			add_token(cmd_tab, WORD, cmd_tab->cmd_line[cmd_tab->index]);
-		cmd_tab->index++;
+			add_token(shell, WORD, shell->cmd_line[shell->index]);
+		shell->index++;
 	}
-	add_token(cmd_tab, END, '\0');
-	apply_to_list(cmd_tab, cmd_tab->token_list, group_words);
-	apply_to_list(cmd_tab, cmd_tab->token_list, group_strings);
+	add_token(shell, END, '\0');
+	apply_to_list(shell, shell->token_list, group_words);
+	apply_to_list(shell, shell->token_list, group_strings);
+	apply_to_list(shell, shell->token_list, remove_space);
 }

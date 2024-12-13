@@ -6,28 +6,28 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 14:37:02 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/12 20:45:34 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/13 15:55:39 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	set_error(int err_code, t_cmd_tab *cmd_tab, char *err_message)
+void	set_error(int err_code, t_shell *shell, char *err_message)
 {
 	perror(err_message);
-	cmd_tab->critical_er = err_code;
+	shell->critical_er = err_code;
 }
 
-void	set_error_if(int condition, int err_code, t_cmd_tab *cmd_tab,
+void	set_error_if(int condition, int err_code, t_shell *shell,
 		char *err_message)
 {
 	if (condition)
-		set_error(err_code, cmd_tab, err_message);
+		set_error(err_code, shell, err_message);
 }
 
-int	catch_error(t_cmd_tab *cmd_tab)
+int	catch_error(t_shell *shell)
 {
-	return (cmd_tab->critical_er);
+	return (shell->critical_er);
 }
 
 void	fork_exit_if(int condition, int err_code, t_cmd *cmd, char *err_message)
@@ -40,7 +40,7 @@ void	fork_exit_if(int condition, int err_code, t_cmd *cmd, char *err_message)
 	}
 }
 
-int	get_last_cmd_exit_code(t_cmd_tab *cmd_tab)
+int	get_last_cmd_exit_code(t_shell *shell)
 {
-	return (((t_cmd *)ft_lstlast(cmd_tab->cmd_list)->content)->exit_code);
+	return (((t_cmd *)ft_lstlast(shell->cmd_list)->content)->exit_code);
 }

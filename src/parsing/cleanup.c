@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/30 00:22:21 by alex              #+#    #+#             */
-/*   Updated: 2024/12/12 20:24:28 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/13 15:58:51 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,16 +52,18 @@ void	free_cmd(void *to_be_del)
 	free(cmd);
 }
 
-void	free_cmd_tab(t_cmd_tab *cmd_tab)
+void	free_minishell(t_shell *shell)
 {
-	cmd_tab->index = 0;
-	if (cmd_tab->cmd_list)
-		ft_lstclear(&cmd_tab->cmd_list, free_cmd);
-	if (cmd_tab->paths)
-		ft_free_tab(cmd_tab->paths);
-	if (cmd_tab->token_list)
-		ft_lstclear(&cmd_tab->token_list, free_token);
-	if (cmd_tab->env_list)
-		ft_lstclear(&cmd_tab->env_list, free);
-	free(cmd_tab);
+	shell->index = 0;
+	if (shell->cmd_list)
+		ft_lstclear(&shell->cmd_list, free_cmd);
+	if (shell->paths)
+		ft_free_tab(shell->paths);
+	if (shell->token_list)
+		ft_lstclear(&shell->token_list, free_token);
+	if (shell->env_list)
+		ft_lstclear(&shell->env_list, free);
+	if (shell->ast_root)
+		ft_lstclear(&shell->ast_root, free_ast);
+	free(shell);
 }

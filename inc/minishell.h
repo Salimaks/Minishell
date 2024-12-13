@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/13 10:19:48 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/13 16:17:14 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,101 +64,102 @@ typedef struct s_ast
 	struct s_ast	*right;
 }	t_ast;
 
-typedef struct s_cmd_table
+typedef struct s_shell
 {
 	char		*cmd_line;		// readline return
 	t_list		*token_list;	// linked list of tokens id from cmd line
 	t_list		*cmd_list;		// linked list of commands as a structs
 	t_list		*env_list;		// linked list of env strings
+	t_ast		*ast_root;			// abstract syntaxic tree
 	size_t		cmd_count;		// total of commands in commmand line
 	size_t		index;			// index of command currently being executed
 	char		**env;			// env received at start of program
 	char		**paths;		// extracted PATH variable of the env
 	int			critical_er;	// flag if critical error in parent process
-}	t_cmd_tab;
+}	t_shell;
 
 
 /* INPUT */
 
 void		parse_and_exec_cmd(char *input, char **env);
-void		extract_env_as_linked_list(t_cmd_tab *cmd_tab);
-void		extract_paths(t_cmd_tab *cmd_tab);
+void		extract_env_as_linked_list(t_shell *shell);
+void		extract_paths(t_shell *shell);
 void		init_readline(char **env);
 void		signals(void);
 
 /* PARSING */
 
-void		scan(t_cmd_tab *cmd_tab);
-void		add_token(t_cmd_tab *cmd_tab, int type, char letter);
-void		merge_token(t_cmd_tab *cmd_tab, t_list *start);
-t_list		*find_token_in_list(t_list *start, int letter);
-void		lexer(t_cmd_tab *cmd_tab);
-t_cmd_tab	*create_cmd_tab(char **env);
-t_cmd		*create_cmd(t_cmd_tab *cmd_tab);
-void		parse(t_cmd_tab *cmd_tab, t_list *start);
-void		apply_to_list(t_cmd_tab *cmd_tab, t_list *node,
-				void function(t_cmd_tab *, t_list *));
-void		create_file(t_cmd_tab *cmd_tab, t_cmd *cmd, t_token *token);
+void		scan(t_shell *shell);
+void		add_token(t_shell *shell, int type, char letter);
+void		merge_token(t_shell *shell, t_list *start);
+void		lexer(t_shell *shell);
+t_shell		*create_minishell(char **env);
+t_cmd		*create_cmd(t_shell *shell);
+void		apply_to_list(t_shell *shell, t_list *node,
+				void function(t_shell *, t_list *));
+void		create_file(t_shell *shell, t_cmd *cmd, t_token *token);
 
 /* HEREDOC */
 
-char		*generate_heredoc_filepath(t_cmd_tab *cmd_tab);
-void		assemble_heredoc(t_cmd_tab *cmd_tab, t_cmd *cmd, t_list *file_node);
-void		destroy_heredoc(t_cmd_tab *cmd_tab, t_list *file_node);
+char		*generate_heredoc_filepath(t_shell *shell);
+void		assemble_heredoc(t_shell *shell, t_cmd *cmd, t_list *file_node);
+void		destroy_heredoc(t_shell *shell, t_list *file_node);
 
 /* EXECUTION */
 
-void		create_fork(t_cmd_tab *cmd_tab);
-void		get_cmd_path(t_cmd *cmd, t_cmd_tab *cmd_tab);
+void		create_fork(t_shell *shell, t_cmd *cmd);
+void		get_cmd_path(t_cmd *cmd, t_shell *shell);
 void		fork_exit_if(int condition, int errcode, t_cmd *cmd, char *message);
-int			execute_all_cmd(t_cmd_tab *cmd_tab);
+int			execute_all_cmd(t_shell *shell);
 
 /* REDIRECTION */
 
-void		open_pipes(t_cmd_tab *cmd_tab);
+void		open_pipes(t_shell *shell);
 void		open_file(t_file *file, t_cmd *cmd, int mode);
-void		connect_pipe(t_cmd_tab *cmd_tab);
-void		close_pipes(t_cmd_tab *cmd_tab);
+void		connect_pipe(t_shell *shell);
+void		close_pipes(t_shell *shell);
 
 /* READABILITY */
 
-int			is_last_cmd(t_cmd_tab *cmd_tab);
-int			is_first_cmd(t_cmd_tab *cmd_tab);
-t_list		*get_current_cmd_node(t_cmd_tab *cmd_tab);
-t_cmd		*get_current_cmd(t_cmd_tab *cnd_tab);
-int			get_last_cmd_exit_code(t_cmd_tab *cmd_tab);
+int			is_last_cmd(t_shell *shell);
+int			is_first_cmd(t_shell *shell);
+t_list		*get_current_cmd_node(t_shell *shell);
+t_cmd		*get_current_cmd(t_shell *cnd_tab);
+int			get_last_cmd_exit_code(t_shell *shell);
 
 /* ERROR HANDLING */
 
-void		set_error_if(int condition, int err_code, t_cmd_tab *cmd_tab,
+void		set_error_if(int condition, int err_code, t_shell *shell,
 				char *message);
-void		set_error(int err_code, t_cmd_tab *cmd_tab, char *err_message);
-int			catch_error(t_cmd_tab *cmd_tab);
+void		set_error(int err_code, t_shell *shell, char *err_message);
+int			catch_error(t_shell *shell);
 
 /* CLEAN UP */
 
 void		free_token(void *token);
 void		free_cmd(void *cmd);
 void		free_file(void *file);
-void		free_cmd_tab(t_cmd_tab *cmd_tab);
+void		free_ast_node(void *ast);
+void		free_minishell(t_shell *shell);
 
 /* DEBUG */
 
 void		print_tokens(t_list *first);
-void		ast_test(t_cmd_tab *cmd_tab);
+
+
 
 # define TRUE			1
 # define FALSE			0
 # define DELIMITERS		"'\"()"
 # define OPERATORS		"|><$"
-# define WHITESPACES	" \n\t"
+# define BLANKS	" \n\t"
 # define HEREDOC_LOC	"tmp/heredoc"
 
 enum e_lexem
 {
 	NONE		= 0,
 	WORD		= 1,
-	WHITESPACE	= 2,
+	BLANK	= 2,
 	DELIMITER	= 3,
 	OPERATOR	= 4,
 	END			= 5,
@@ -190,6 +191,7 @@ enum e_exit_code
 	NO_FILE = 1,
 	READ_ERROR = 1,
 	OPEN_ERROR = 1,
+	SYNTAX_ERROR = 1,
 	TOO_MANY_HEREDOC = 1,
 	CANT_EXECUTE_CMD = 126,
 	CANT_FIND_CMD = 127,

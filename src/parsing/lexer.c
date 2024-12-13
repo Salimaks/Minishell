@@ -6,66 +6,109 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 17:34:47 by alex              #+#    #+#             */
-/*   Updated: 2024/12/13 12:25:18 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/13 15:55:39 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	remove_space(t_cmd_tab *cmd_tab, t_list *current)
+void	parse_outfiles(t_shell *shell, t_cmd *cmd, t_list **current)
 {
-	if (catch_error(cmd_tab)
-		|| ((t_token *)current->content)->lexem != WHITESPACE)
+	if (catch_error(shell))
 		return ;
-	current = current->next;
-	ft_lstpop(current->prev, free_token);
+	if (((t_token *)(*current)->next->content)->letter == '>')
+	{
+		if (((t_token *)(*current)->next->next->content)->lexem != WORD)
+			return (set_error(SYNTAX_ERROR, shell, "No append outfile"));
+		*current = (*current)->next->next;
+		((t_token *)(*current)->content)->lexem = APPEND;
+	}
+	else
+	{
+		if (((t_token *)(*current)->next->content)->lexem != WORD)
+			return (set_error(SYNTAX_ERROR, shell, "No outfile"));
+		*current = (*current)->next;
+		((t_token *)(*current)->content)->lexem = INFILE;
+	}
+	create_file(shell, cmd, ((t_token *)(*current)->content));
+	(*current) = (*current)->next;
 }
 
-void	id_heredoc(t_cmd_tab *cmd_tab, t_list *current)
+void	parse_infiles(t_shell *shell, t_cmd *cmd, t_list **current)
 {
-	if (catch_error(cmd_tab)
-		|| ((t_token *)current->content)->lexem != OPERATOR)
+	if (catch_error(shell))
 		return ;
-	if (((t_token *)current->content)->letter == '<'
-		&& ((t_token *)current->next->content)->letter == '<')
+	if (((t_token *)(*current)->next->content)->letter == '<')
 	{
-		current = current->next->next;
-		((t_token *)current->content)->lexem = HEREDOC;
-		ft_lstpop(current->prev, free_token);
-		ft_lstpop(current->prev, free_token);
+		if (((t_token *)(*current)->next->next->content)->lexem != WORD)
+			return (set_error(SYNTAX_ERROR, shell, "No delimiter"));
+		*current = (*current)->next->next;
+		((t_token *)(*current)->content)->lexem = HEREDOC;
 	}
-	else if (((t_token *)current->content)->letter == '>'
-		&& ((t_token *)current->next->content)->letter == '>')
+	else
 	{
-		current = current->next->next;
-		((t_token *)current->content)->lexem = APPEND;
-		ft_lstpop(current->prev, free_token);
-		ft_lstpop(current->prev, free_token);
+		if (((t_token *)(*current)->next->content)->lexem != WORD)
+			return (set_error(SYNTAX_ERROR, shell, "No infile"));
+		*current = (*current)->next;
+		((t_token *)(*current)->content)->lexem = INFILE;
 	}
+	create_file(shell, cmd, ((t_token *)(*current)->content));
+	(*current) = (*current)->next;
 }
 
-void	id_redirections(t_cmd_tab *cmd_tab, t_list *current)
+t_ast	*parse_command(t_shell *shell, t_list **token)
 {
-	if (catch_error(cmd_tab)
-		|| ((t_token *)current->content)->lexem != OPERATOR)
-		return ;
-	else if (((t_token *)current->content)->letter == '<')
+	t_cmd	*cmd;
+
+	if (!(*token))
+		return (set_error(CANT_FIND_CMD, shell, "Missing command"), NULL);
+	cmd = ft_calloc(1, sizeof(t_cmd));
+	if (!cmd)
+		return (set_error(MALLOC_FAIL, shell, "Failed to malloc cmd"), NULL);
+	cmd->fork_pid = -1;
+	while (((t_token *)(*token)->content)->letter != PIPE
+			&& ((t_token *)(*token)->content)->lexem != END)
 	{
-		current = current->next;
-		((t_token *)current->content)->lexem = INFILE;
-		ft_lstpop(current->prev, free_token);
+		if (((t_token *)(*token)->content)->lexem == START)
+			*token = (*token)->next;
+		if (((t_token *)(*token)->content)->letter == '<')
+			parse_infiles(shell, cmd, token);
+		else if (((t_token *)(*token)->content)->letter == '>')
+			parse_outfiles(shell, cmd, token);
+		else
+			ft_lstadd_back(&cmd->arg_list,
+				ft_lstnew(ft_strdup(((t_token *)(*token)->content)->content)));
+		*token = (*token)->next;
 	}
-	else if (((t_token *)current->content)->letter == '>')
-	{
-		current = current->next;
-		((t_token *)current->content)->lexem = OUTFILE;
-		ft_lstpop(current->prev, free_token);
-	}
+	return (create_ast_node(shell, AST_CMD, cmd));
 }
 
-void	id_variables(t_cmd_tab * cmd_tab, t_list *current)
+t_ast	*parse_pipe(t_shell *shell, t_list **token)
 {
-	if (catch_error(cmd_tab)
+	t_ast	*left;
+	t_ast	*right;
+	t_ast	*pipe_node;
+
+	left = parse_command(shell, token);
+	if (!left)
+		return (NULL);
+	if (!(*token) || ((t_token *)(*token)->content)->letter != PIPE)
+		return (left);
+	*token = (*token)->next;
+	right = parse_pipe(shell, token);
+	if (!right)
+		return (free_ast_node(left), NULL);
+	pipe_node = create_ast_node(shell, AST_PIPE, NULL);
+	pipe_node->left = left;
+	pipe_node->right = right;
+	return (pipe_node);
+}
+
+
+
+void	id_variables(t_shell * shell, t_list *current)
+{
+	if (catch_error(shell)
 		|| ((t_token *)current->content)->lexem != OPERATOR)
 		return ;
 	if (((t_token *)current->content)->letter == '$')
@@ -76,14 +119,11 @@ void	id_variables(t_cmd_tab * cmd_tab, t_list *current)
 	}
 }
 
-void	lexer(t_cmd_tab *cmd_tab)
+void	lexer(t_shell *shell)
 {
-	scan(cmd_tab);
-	apply_to_list(cmd_tab, cmd_tab->token_list, remove_space);
-	apply_to_list(cmd_tab, cmd_tab->token_list, id_heredoc);
-	apply_to_list(cmd_tab, cmd_tab->token_list, id_redirections);
-	print_tokens(cmd_tab->token_list);
-	ast_test(cmd_tab);
+	scan(shell);
+	print_tokens(shell->token_list);
+	// ast_test(shell);
 }
 
 // TO DO

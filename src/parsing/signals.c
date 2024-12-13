@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 09:47:59 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/04 08:36:14 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/13 15:55:39 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ void	signals(void)
 	signals();
 	while(1)
 	{
-		infile = readline("minishell>");
+		infile = readline("shell>");
 		if(!infile)
 		{
 			write(1, "exit\n", 5);

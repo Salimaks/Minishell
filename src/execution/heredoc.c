@@ -6,13 +6,13 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/11 15:42:30 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/12 19:52:49 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/13 15:55:39 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-char	*increment_char(t_cmd_tab *cmd_tab, char *string)
+char	*increment_char(t_shell *shell, char *string)
 {
 	size_t	len;
 	char	letter;
@@ -29,11 +29,11 @@ char	*increment_char(t_cmd_tab *cmd_tab, char *string)
 	}
 	else if (len < 256)
 		return (ft_strjoinfree(string, &letter));
-	return (set_error(TOO_MANY_HEREDOC, cmd_tab,
+	return (set_error(TOO_MANY_HEREDOC, shell,
 			"reached end of posible random name"), NULL);
 }
 
-char	*generate_heredoc_filepath(t_cmd_tab *cmd_tab)
+char	*generate_heredoc_filepath(t_shell *shell)
 {
 	char	*heredoc_path;
 
@@ -42,14 +42,14 @@ char	*generate_heredoc_filepath(t_cmd_tab *cmd_tab)
 	{
 		if (access(heredoc_path, F_OK) != 0)
 			break ;
-		heredoc_path = increment_char(cmd_tab, heredoc_path);
+		heredoc_path = increment_char(shell, heredoc_path);
 		if (!heredoc_path)
-			return (set_error(MALLOC_FAIL, cmd_tab, "Heredoc"), NULL);
+			return (set_error(MALLOC_FAIL, shell, "Heredoc"), NULL);
 	}
 	return (heredoc_path);
 }
 
-void	assemble_heredoc(t_cmd_tab *cmd_tab, t_cmd *cmd, t_list *file_node)
+void	assemble_heredoc(t_shell *shell, t_cmd *cmd, t_list *file_node)
 {
 	t_file	*file;
 	char	*result;
@@ -60,7 +60,7 @@ void	assemble_heredoc(t_cmd_tab *cmd_tab, t_cmd *cmd, t_list *file_node)
 		return ;
 	open_file(file, cmd, WRITE);
 	if (file->fd < 0)
-		return (set_error(READ_ERROR, cmd_tab, "Unable to create heredoc"));
+		return (set_error(READ_ERROR, shell, "Unable to create heredoc"));
 	heredoc_index = ft_strjoinfree(ft_itoa(cmd->cmd_index + 1), " heredoc> ");
 	while (1)
 	{
@@ -73,11 +73,11 @@ void	assemble_heredoc(t_cmd_tab *cmd_tab, t_cmd *cmd, t_list *file_node)
 	close(file->fd);
 }
 
-void	destroy_heredoc(t_cmd_tab *cmd_tab, t_list *file_node)
+void	destroy_heredoc(t_shell *shell, t_list *file_node)
 {
 	t_file	*file;
 
-	if (catch_error(cmd_tab))
+	if (catch_error(shell))
 		return ;
 	file = (t_file *)(file_node)->content;
 	if (file->mode != HEREDOC)

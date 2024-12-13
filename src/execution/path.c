@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 14:12:32 by alex              #+#    #+#             */
-/*   Updated: 2024/12/11 20:46:50 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/13 15:55:39 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,24 +16,24 @@
 Extract path from env if env exists
 Splits it into an array of possible path
 Loads it into the command table */
-void	extract_paths(t_cmd_tab *cmd_tab)
+void	extract_paths(t_shell *shell)
 {
 	char	*path;
 	int		index;
 
 	path = NULL;
-	cmd_tab->paths = NULL;
+	shell->paths = NULL;
 	index = 0;
-	while (cmd_tab->env[index])
+	while (shell->env[index])
 	{
-		if (ft_strncmp(cmd_tab->env[index], "PATH=", 5) == 0)
+		if (ft_strncmp(shell->env[index], "PATH=", 5) == 0)
 		{
-			path = ft_substr(cmd_tab->env[index], 5,
-					ft_strlen(cmd_tab->env[index]));
-			set_error_if(!path, MALLOC_FAIL, cmd_tab,
+			path = ft_substr(shell->env[index], 5,
+					ft_strlen(shell->env[index]));
+			set_error_if(!path, MALLOC_FAIL, shell,
 				"Failed to allocate for path");
-			cmd_tab->paths = ft_split(path, ':');
-			set_error_if(!cmd_tab->paths, MALLOC_FAIL, cmd_tab,
+			shell->paths = ft_split(path, ':');
+			set_error_if(!shell->paths, MALLOC_FAIL, shell,
 				"Failed to split path variable");
 			free(path);
 		}
@@ -63,17 +63,17 @@ void	check_cmd(t_cmd *cmd)
 }
 
 /* */
-void	find_accessible_path(t_cmd_tab *cmd_tab)
+void	find_accessible_path(t_shell *shell)
 {
 	char	*tested_path;
 	t_cmd	*cmd;
 	size_t	i;
 
 	i = 0;
-	cmd = get_current_cmd(cmd_tab);
-	while (cmd_tab->paths[i])
+	cmd = get_current_cmd(shell);
+	while (shell->paths[i])
 	{
-		tested_path = ft_strjoin(cmd_tab->paths[i++], cmd->cmd_path);
+		tested_path = ft_strjoin(shell->paths[i++], cmd->cmd_path);
 		fork_exit_if(!tested_path, MALLOC_FAIL, cmd,
 			"Failed to allocate path");
 		if (access(tested_path, F_OK | R_OK) == 0)
@@ -89,15 +89,15 @@ void	find_accessible_path(t_cmd_tab *cmd_tab)
 /* Checks first absolute path for command
 Then paths if any were extracted from env
 Exits fork if no command is found */
-void	get_cmd_path(t_cmd *cmd, t_cmd_tab *cmd_tab)
+void	get_cmd_path(t_cmd *cmd, t_shell *shell)
 {
 	cmd->cmd_path = ft_strjoin("/", cmd->argv[0]);
 	fork_exit_if((!cmd->cmd_path), MALLOC_FAIL, cmd,
 		"Failed to allocate path");
 	if (access(cmd->cmd_path, F_OK) == 0)
 		return (check_cmd(cmd));
-	fork_exit_if(cmd_tab->paths == NULL, CANT_FIND_CMD, cmd,
+	fork_exit_if(shell->paths == NULL, CANT_FIND_CMD, cmd,
 		"No PATH variable found");
-	find_accessible_path(cmd_tab);
+	find_accessible_path(shell);
 	return (check_cmd(cmd));
 }

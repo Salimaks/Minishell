@@ -6,7 +6,7 @@
 #    By: mkling <mkling@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/05/20 10:20:10 by mkling            #+#    #+#              #
-#    Updated: 2024/12/04 11:25:20 by mkling           ###   ########.fr        #
+#    Updated: 2024/12/13 15:12:02 by mkling           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -44,7 +44,7 @@ $(NAME):	$(OBJ_DIR) $(OBJS)
 			ar rcs $(NAME) $(OBJS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
-				$(CC) $(CFLAGS) $(INC) -c $< -o $@
+				$(CC) $(CFLAGS) -g $(INC) -c $< -o $@
 
 $(OBJ_DIR):
 				mkdir -p $@

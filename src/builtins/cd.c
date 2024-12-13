@@ -3,10 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   cd.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: skassimi <skassimi@student.42.fr>          +#+  +:+       +#+        */
+/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 09:19:30 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/03 09:19:31 by skassimi         ###   ########.fr       */
+/*   Updated: 2024/12/13 15:24:50 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+
+
+
+// cd sans argument renvoie vers le home

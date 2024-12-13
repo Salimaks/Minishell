@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 12:37:12 by alex              #+#    #+#             */
-/*   Updated: 2024/12/12 20:45:42 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/13 15:55:39 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@ void	increment_all_cmd_index(t_list *start)
 	}
 }
 
-t_cmd	*create_cmd(t_cmd_tab *cmd_tab)
+t_cmd	*create_cmd(t_shell *shell)
 {
 	t_cmd	*cmd;
 	t_list	*node;
@@ -36,32 +36,32 @@ t_cmd	*create_cmd(t_cmd_tab *cmd_tab)
 		return (NULL);
 	cmd->fork_pid = -1;
 	node = ft_lstnew(cmd);
-	ft_lstadd_front(&cmd_tab->cmd_list, node);
-	increment_all_cmd_index(cmd_tab->cmd_list->next);
+	ft_lstadd_front(&shell->cmd_list, node);
+	increment_all_cmd_index(shell->cmd_list->next);
 	return (cmd);
 }
 
-void	create_file(t_cmd_tab *cmd_tab, t_cmd *cmd, t_token *token)
+void	create_file(t_shell *shell, t_cmd *cmd, t_token *token)
 {
 	t_file	*file;
 	t_list	*node;
 
 	file = (t_file *)ft_calloc(sizeof(t_file), 1);
 	if (!file)
-		return (set_error(MALLOC_FAIL, cmd_tab, "Failed to allocate filename"));
+		return (set_error(MALLOC_FAIL, shell, "Failed to allocate filename"));
 	file->mode = token->lexem;
 	file->path = ft_strdup(token->content);
 	if (!file->path)
-		return (set_error(MALLOC_FAIL, cmd_tab, "Failed to allocate filename"));
+		return (set_error(MALLOC_FAIL, shell, "Failed to allocate filename"));
 	node = ft_lstnew(file);
 	if (!node)
-		return (set_error(MALLOC_FAIL, cmd_tab, "Failed to alloc file node"));
+		return (set_error(MALLOC_FAIL, shell, "Failed to alloc file node"));
 	if (file->mode == HEREDOC)
 	{
 		file->delim = file->path;
-		file->path = generate_heredoc_filepath(cmd_tab);
+		file->path = generate_heredoc_filepath(shell);
 		if (!file->path)
-			return (set_error(MALLOC_FAIL, cmd_tab, "Failed hered generation"));
+			return (set_error(MALLOC_FAIL, shell, "Failed hered generation"));
 	}
 	if (file->mode == INFILE || file->mode == HEREDOC)
 		ft_lstadd_back(&cmd->infiles, node);
@@ -69,15 +69,15 @@ void	create_file(t_cmd_tab *cmd_tab, t_cmd *cmd, t_token *token)
 		ft_lstadd_back(&cmd->outfiles, node);
 }
 
-t_cmd_tab	*create_cmd_tab(char **env)
+t_shell	*create_minishell(char **env)
 {
-	t_cmd_tab	*cmd_tab;
+	t_shell	*shell;
 
-	cmd_tab = ft_calloc(sizeof(t_cmd_tab), 1);
-	if (!cmd_tab)
+	shell = ft_calloc(sizeof(t_shell), 1);
+	if (!shell)
 		return (NULL);
-	cmd_tab->env = env;
-	extract_paths(cmd_tab);
-	extract_env_as_linked_list(cmd_tab);
-	return (cmd_tab);
+	shell->env = env;
+	extract_paths(shell);
+	extract_env_as_linked_list(shell);
+	return (shell);
 }
