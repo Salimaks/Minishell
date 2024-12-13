@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/13 00:21:50 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/13 10:19:48 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,7 +151,7 @@ void		ast_test(t_cmd_tab *cmd_tab);
 # define FALSE			0
 # define DELIMITERS		"'\"()"
 # define OPERATORS		"|><$"
-# define WHITESPACES	" \n\t\0"
+# define WHITESPACES	" \n\t"
 # define HEREDOC_LOC	"tmp/heredoc"
 
 enum e_lexem

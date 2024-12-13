@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/12 21:51:24 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/13 00:26:57 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/13 12:28:10 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,10 +52,10 @@ void	parse_redirection(t_cmd_tab *cmd_tab, t_cmd *cmd, t_list **current)
 		((t_token *)(*current)->content)->lexem = OUTFILE;
 		(*current) = (*current)->next;
 	}
+	cmd->exit_code = 0;
 }
 
-
-t_ast	*parse_cmd(t_cmd_tab *cmd_tab, t_list **token)
+t_ast	*parse_command(t_cmd_tab *cmd_tab, t_list **token)
 {
 	t_ast	*cmd_node;
 	t_cmd	*cmd;
@@ -66,14 +66,14 @@ t_ast	*parse_cmd(t_cmd_tab *cmd_tab, t_list **token)
 	if (!cmd)
 		return (set_error(MALLOC_FAIL, cmd_tab, "Failed to malloc cmd"), NULL);
 	cmd->fork_pid = -1;
-	while (*token && ((t_token *)(*token)->content)->lexem != PIPE)
+	while ((*token) && ((t_token *)(*token)->content)->letter != PIPE)
 	{
 		if (((t_token *)(*token)->content)->lexem != WORD)
-			parse_redirection(cmd_tab,cmd, token);
+			parse_redirection(cmd_tab, cmd, token);
 		else
 			ft_lstadd_back(&cmd->arg_list,
 				ft_lstnew(ft_strdup(((t_token *)(*token)->content)->content)));
-		(*token) = (*token)->next;
+		*token = (*token)->next;
 	}
 	cmd_node = create_ast_node(cmd_tab, AST_CMD, cmd);
 	return (cmd_node);
@@ -85,12 +85,12 @@ t_ast	*parse_pipe(t_cmd_tab *cmd_tab, t_list **token)
 	t_ast	*right;
 	t_ast	*pipe_node;
 
-	left = parse_cmd(cmd_tab, token);
+	left = parse_command(cmd_tab, token);
 	if (!left)
 		return (NULL);
 	if (!(*token) || ((t_token *)(*token)->content)->lexem != PIPE)
 		return (left);
-	token = &(*token)->next;
+	*token = (*token)->next;
 	right = parse_pipe(cmd_tab, token);
 	if (!right)
 		return (free_ast_node(left), NULL);
@@ -117,6 +117,8 @@ void	ast_test(t_cmd_tab *cmd_tab)
 {
 	t_ast	*ast_root;
 
+	fprintf(stderr, "in ast test\n");
 	ast_root = parse_pipe(cmd_tab, &cmd_tab->token_list);
 	process_ast(cmd_tab, ast_root);
+	fprintf(stderr, "end of ast test\n");
 }

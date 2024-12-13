@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/30 13:06:39 by alex              #+#    #+#             */
-/*   Updated: 2024/12/12 20:47:52 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/13 12:02:53 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,6 @@ char	**extract_token_as_array(t_cmd_tab *cmd_tab, t_list *start, int type)
 {
 	int		index;
 	int		count;
-	t_list	*current;
 	char	**result;
 
 	count = count_tokens_of_type(start, type);
@@ -58,12 +57,11 @@ char	**extract_token_as_array(t_cmd_tab *cmd_tab, t_list *start, int type)
 		return (set_error(MALLOC_FAIL, cmd_tab,
 				"Failed to allocate infile path"), NULL);
 	index = 0;
-	current = start;
-	while (((t_token *)current->content)->lexem != END)
+	while (((t_token *)start->content)->lexem != END)
 	{
-		if (((t_token *)current->content)->lexem == type)
-			result[index++] = ft_strdup(((t_token *)current->content)->content);
-		current = current->next;
+		if (((t_token *)start->content)->lexem == type)
+			result[index++] = ft_strdup(((t_token *)start->content)->content);
+		start = start->next;
 	}
 	result[index] = NULL;
 	return (result);
@@ -71,17 +69,15 @@ char	**extract_token_as_array(t_cmd_tab *cmd_tab, t_list *start, int type)
 
 void	extract_files_as_linklist(t_cmd_tab *cmd_tab, t_cmd *cmd, t_list *start)
 {
-	t_list	*current;
 	t_token	*curr_token;
 
-	current = start;
-	while (current)
+	while (start)
 	{
-		curr_token = ((t_token *)current->content);
+		curr_token = ((t_token *)start->content);
 		if (curr_token->lexem == INFILE || curr_token->lexem == HEREDOC
 			|| curr_token->lexem == OUTFILE || curr_token->lexem == APPEND)
 			create_file(cmd_tab, cmd, curr_token);
-		current = current->next;
+		start = start->next;
 	}
 }
 

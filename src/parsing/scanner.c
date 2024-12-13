@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/01 16:37:27 by alex              #+#    #+#             */
-/*   Updated: 2024/12/12 20:58:13 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/13 12:15:40 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,11 @@
 
 t_list	*find_token_in_list(t_list *start, int letter)
 {
-	t_list	*current;
-
-	current = start;
-	while (current)
+	while (start)
 	{
-		if (((t_token *)current->content)->letter == letter)
-			return (current);
-		current = current->next;
+		if (((t_token *)start->content)->letter == letter)
+			return (start);
+		start = start->next;
 	}
 	return (NULL);
 }
@@ -52,7 +49,6 @@ void	group_words(t_cmd_tab *cmd_tab, t_list *node)
 void	group_strings(t_cmd_tab *cmd_tab, t_list *start)
 {
 	t_token	*first_delim;
-	t_list	*current;
 
 	first_delim = ((t_token *)start->content);
 	if (first_delim->lexem != DELIMITER)
@@ -60,13 +56,13 @@ void	group_strings(t_cmd_tab *cmd_tab, t_list *start)
 	first_delim->content = ft_calloc(1, sizeof(char));
 	if (!first_delim->content)
 		return (set_error(MALLOC_FAIL, cmd_tab, "Failed to malloc string"));
-	current = start->next;
-	while (((t_token *)current->content)->lexem != END)
+	start = start->next;
+	while (((t_token *)start->content)->lexem != END)
 	{
-		if (((t_token *)current->content)->letter == first_delim->letter)
+		if (((t_token *)start->content)->letter == first_delim->letter)
 			break ;
 		merge_token(cmd_tab, start);
-		current = current->next;
+		start = start->next;
 	}
 	first_delim->lexem = STRING;
 }

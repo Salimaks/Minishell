@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 18:04:03 by alex              #+#    #+#             */
-/*   Updated: 2024/12/11 22:36:46 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/13 12:19:38 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,12 +41,9 @@ void	add_token(t_cmd_tab *cmd_tab, int lexem, char letter)
 void	apply_to_list(t_cmd_tab *cmd_tab, t_list *node,
 			void function(t_cmd_tab *, t_list *))
 {
-	t_list	*current;
-
-	current = node;
-	while (current != NULL)
+	while (node != NULL)
 	{
-		function(cmd_tab, current);
-		current = current->next;
+		function(cmd_tab, node);
+		node = node->next;
 	}
 }

@@ -6,24 +6,21 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 13:51:38 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/11 21:26:24 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/13 12:06:37 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	print_tokens(t_list *first)
+void	print_tokens(t_list *node)
 {
-	t_list	*current;
-
-	current = first;
-	while (current != NULL)
+	while (node != NULL)
 	{
-		printf("TOKEN %d :", ((t_token *)current->content)->lexem);
-		if (current->content != NULL)
-			printf("%s", ((t_token *)current->content)->content);
+		printf("TOKEN %d :", ((t_token *)node->content)->lexem);
+		if (node->content != NULL)
+			printf("%s", ((t_token *)node->content)->content);
 		printf("\n");
-		current = current->next;
+		node = node->next;
 	}
 }
 
