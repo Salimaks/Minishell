@@ -1,26 +1,15 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   syntax.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/28 14:09:43 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/14 15:42:34 by mkling           ###   ########.fr       */
+/*   Created: 2024/12/14 16:42:40 by mkling            #+#    #+#             */
+/*   Updated: 2024/12/14 16:55:18 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "minishell.h
 
-int	main(int argc, char **argv, char *envp[])
-{
-	t_shell	*shell;
-
-	shell = create_minishell(envp);
-	if (argc > 2 && ft_strcmp(argv[1], "-c") == 0)
-		parse_and_exec_cmd(shell, argv[2]);
-	else
-		init_readline(shell);
-	free_minishell(shell);
-	return (0);
-}
+// check syntax before parsing

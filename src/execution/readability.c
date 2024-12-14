@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 18:37:37 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/13 16:16:56 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/14 16:16:04 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,34 +22,19 @@ int	is_first_cmd(t_shell *shell)
 	return (shell->index == 0);
 }
 
-t_list	*get_current_cmd_node(t_shell *shell)
-{
-	t_list	*node;
-
-	node = shell->cmd_list;
-	while (((t_cmd *)node->content)->cmd_index != shell->index)
-		node = node->next;
-	return (node);
-}
-
-t_cmd	*get_current_cmd(t_shell *shell)
-{
-	t_list	*node;
-
-	node = shell->cmd_list;
-	while (((t_cmd *)node->content)->cmd_index != shell->index)
-		node = node->next;
-	return (((t_cmd *)node->content));
-}
-
-void	create_fork(t_shell *shell, t_cmd *cmd)
+void	create_fork(t_shell *shell, int	*fork_pid)
 {
 	if (catch_error(shell))
 		return ;
-	cmd->fork_pid = fork();
-	if (cmd->fork_pid == -1)
-	{
-		perror("Error while forking");
-		cmd->exit_code = FORK_ERROR;
-	}
+	*fork_pid = fork();
+	set_error_if(*fork_pid == -1, FORK_ERROR, shell,
+		"Error while trying to fork");
 }
+
+/*opens a pipe*/
+void	open_pipe(t_shell *shell, int *pipe_fd)
+{
+	set_error_if(pipe(pipe_fd) == -1, PIPE_ERROR,
+		shell, "Error while creating pipe");
+}
+

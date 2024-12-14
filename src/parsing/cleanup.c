@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/30 00:22:21 by alex              #+#    #+#             */
-/*   Updated: 2024/12/13 15:58:51 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/14 15:40:28 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,6 +52,24 @@ void	free_cmd(void *to_be_del)
 	free(cmd);
 }
 
+void	free_ast_node(void *node)
+{
+	t_ast	*ast;
+
+	if (!node)
+		return ;
+	ast = (t_ast *)node;
+	if (ast->type == CMD)
+		free_cmd(ast->content);
+	else
+	{
+		free_ast_node(ast->left);
+		free_ast_node(ast->right);
+		free(ast->content);
+	}
+	free(ast);
+}
+
 void	free_minishell(t_shell *shell)
 {
 	shell->index = 0;
@@ -63,7 +81,7 @@ void	free_minishell(t_shell *shell)
 		ft_lstclear(&shell->token_list, free_token);
 	if (shell->env_list)
 		ft_lstclear(&shell->env_list, free);
-	if (shell->ast_root)
-		ft_lstclear(&shell->ast_root, free_ast);
+	// if (shell->ast_root)
+	// 	ft_lstclear(&shell->ast_root, free_ast_node);
 	free(shell);
 }

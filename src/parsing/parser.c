@@ -6,63 +6,106 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/30 13:06:39 by alex              #+#    #+#             */
-/*   Updated: 2024/12/13 15:57:43 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/14 15:49:11 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-size_t	get_token_count(t_list *start, t_list *end)
+void	parse_outfiles(t_shell *shell, t_cmd *cmd, t_list **current)
 {
-	t_list	*current;
-	size_t	count;
-
-	current = start;
-	count = 0;
-	while (current != end)
+	if (catch_error(shell))
+		return ;
+	if (((t_token *)(*current)->next->content)->letter == '>')
 	{
-		count++;
-		current = current->next;
+		if (((t_token *)(*current)->next->next->content)->lexem != WORD)
+			return (set_error(SYNTAX_ERROR, shell, "No append outfile"));
+		*current = (*current)->next->next;
+		((t_token *)(*current)->content)->lexem = APPEND;
 	}
-	return (count);
+	else
+	{
+		if (((t_token *)(*current)->next->content)->lexem != WORD)
+			return (set_error(SYNTAX_ERROR, shell, "No outfile"));
+		*current = (*current)->next;
+		((t_token *)(*current)->content)->lexem = INFILE;
+	}
+	create_file(shell, cmd, ((t_token *)(*current)->content));
+	(*current) = (*current)->next;
 }
 
-size_t	count_tokens_of_type(t_list *start, int lexem)
+void	parse_infiles(t_shell *shell, t_cmd *cmd, t_list **current)
 {
-	t_list	*current;
-	size_t	count;
-
-	current = start;
-	count = 0;
-	while (((t_token *)current->content)->lexem != END)
+	if (catch_error(shell))
+		return ;
+	if (((t_token *)(*current)->next->content)->letter == '<')
 	{
-		if (((t_token *)current->content)->lexem == lexem)
-			count++;
-		current = current->next;
+		if (((t_token *)(*current)->next->next->content)->lexem != WORD)
+			return (set_error(SYNTAX_ERROR, shell, "No delimiter"));
+		*current = (*current)->next->next;
+		((t_token *)(*current)->content)->lexem = HEREDOC;
 	}
-	return (count);
+	else
+	{
+		if (((t_token *)(*current)->next->content)->lexem != WORD)
+			return (set_error(SYNTAX_ERROR, shell, "No infile"));
+		*current = (*current)->next;
+		((t_token *)(*current)->content)->lexem = INFILE;
+	}
+	create_file(shell, cmd, ((t_token *)(*current)->content));
+	(*current) = (*current)->next;
 }
 
-char	**extract_token_as_array(t_shell *shell, t_list *start, int type)
+t_ast	*parse_command(t_shell *shell, t_list **token)
 {
-	int		index;
-	int		count;
-	char	**result;
+	t_cmd	*cmd;
 
-	count = count_tokens_of_type(start, type);
-	if (count == 0)
+	if (!(*token))
+		return (set_error(CANT_FIND_CMD, shell, "Missing command"), NULL);
+	cmd = ft_calloc(1, sizeof(t_cmd));
+	if (!cmd)
+		return (set_error(MALLOC_FAIL, shell, "Failed to malloc cmd"), NULL);
+	cmd->fork_pid = -1;
+	while (((t_token *)(*token)->content)->letter != PIPE
+			&& ((t_token *)(*token)->content)->lexem != END)
+	{
+		if (((t_token *)(*token)->content)->lexem == START)
+			*token = (*token)->next;
+		if (((t_token *)(*token)->content)->letter == '<')
+			parse_infiles(shell, cmd, token);
+		else if (((t_token *)(*token)->content)->letter == '>')
+			parse_outfiles(shell, cmd, token);
+		else
+			ft_lstadd_back(&cmd->arg_list,
+				ft_lstnew(ft_strdup(((t_token *)(*token)->content)->content)));
+		*token = (*token)->next;
+	}
+	return (create_ast_node(shell, AST_CMD, cmd));
+}
+
+t_ast	*parse_pipe(t_shell *shell, t_list **token)
+{
+	t_ast	*left;
+	t_ast	*right;
+	t_ast	*pipe_node;
+
+	left = parse_command(shell, token);
+	if (!left)
 		return (NULL);
-	result = ft_calloc(sizeof(char *), count + 1);
-	if (!result)
-		return (set_error(MALLOC_FAIL, shell,
-				"Failed to allocate infile path"), NULL);
-	index = 0;
-	while (((t_token *)start->content)->lexem != END)
-	{
-		if (((t_token *)start->content)->lexem == type)
-			result[index++] = ft_strdup(((t_token *)start->content)->content);
-		start = start->next;
-	}
-	result[index] = NULL;
-	return (result);
+	if (!(*token) || ((t_token *)(*token)->content)->letter != PIPE)
+		return (left);
+	*token = (*token)->next;
+	right = parse_pipe(shell, token);
+	if (!right)
+		return (free_ast_node(left), NULL);
+	pipe_node = create_ast_node(shell, AST_PIPE, NULL);
+	pipe_node->left = left;
+	pipe_node->right = right;
+	return (pipe_node);
+}
+
+void	parser(t_shell *shell)
+{
+	shell->ast_root = parse_pipe(shell, &shell->token_list);
+	ft_lstclear(&shell->token_list, free_token);
 }

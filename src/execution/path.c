@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 14:12:32 by alex              #+#    #+#             */
-/*   Updated: 2024/12/13 15:55:39 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/14 16:13:28 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,14 +63,12 @@ void	check_cmd(t_cmd *cmd)
 }
 
 /* */
-void	find_accessible_path(t_shell *shell)
+void	find_accessible_path(t_shell *shell, t_cmd *cmd)
 {
 	char	*tested_path;
-	t_cmd	*cmd;
 	size_t	i;
 
 	i = 0;
-	cmd = get_current_cmd(shell);
 	while (shell->paths[i])
 	{
 		tested_path = ft_strjoin(shell->paths[i++], cmd->cmd_path);
@@ -89,15 +87,15 @@ void	find_accessible_path(t_shell *shell)
 /* Checks first absolute path for command
 Then paths if any were extracted from env
 Exits fork if no command is found */
-void	get_cmd_path(t_cmd *cmd, t_shell *shell)
+void	get_cmd_path(t_shell *shell, t_cmd *cmd)
 {
-	cmd->cmd_path = ft_strjoin("/", cmd->argv[0]);
+	cmd->cmd_path = ft_strjoin("/", (char *)cmd->arg_list->content);
 	fork_exit_if((!cmd->cmd_path), MALLOC_FAIL, cmd,
 		"Failed to allocate path");
 	if (access(cmd->cmd_path, F_OK) == 0)
 		return (check_cmd(cmd));
 	fork_exit_if(shell->paths == NULL, CANT_FIND_CMD, cmd,
 		"No PATH variable found");
-	find_accessible_path(shell);
+	find_accessible_path(shell, cmd);
 	return (check_cmd(cmd));
 }

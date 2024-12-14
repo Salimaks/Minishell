@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/13 16:17:14 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/14 16:21:20 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,23 +81,25 @@ typedef struct s_shell
 
 /* INPUT */
 
-void		parse_and_exec_cmd(char *input, char **env);
+void		parse_and_exec_cmd(t_shell *shell, char *input);
 void		extract_env_as_linked_list(t_shell *shell);
 void		extract_paths(t_shell *shell);
-void		init_readline(char **env);
+void		init_readline(t_shell *shell);
 void		signals(void);
 
 /* PARSING */
 
+t_shell		*create_minishell(char **env);
 void		scan(t_shell *shell);
 void		add_token(t_shell *shell, int type, char letter);
 void		merge_token(t_shell *shell, t_list *start);
 void		lexer(t_shell *shell);
-t_shell		*create_minishell(char **env);
+t_ast		*create_ast_node(t_shell *shell, int type, void *content);
 t_cmd		*create_cmd(t_shell *shell);
+void		create_file(t_shell *shell, t_cmd *cmd, t_token *token);
 void		apply_to_list(t_shell *shell, t_list *node,
 				void function(t_shell *, t_list *));
-void		create_file(t_shell *shell, t_cmd *cmd, t_token *token);
+void		parser(t_shell *shell);
 
 /* HEREDOC */
 
@@ -107,24 +109,22 @@ void		destroy_heredoc(t_shell *shell, t_list *file_node);
 
 /* EXECUTION */
 
-void		create_fork(t_shell *shell, t_cmd *cmd);
-void		get_cmd_path(t_cmd *cmd, t_shell *shell);
+int			process_ast(t_shell *shell, t_ast *ast);
+void		open_pipe(t_shell *shell, int *pipe_fd);
+void		create_fork(t_shell *shell, int	*fork_pid);
+void		get_cmd_path(t_shell *shell, t_cmd *cmd);
 void		fork_exit_if(int condition, int errcode, t_cmd *cmd, char *message);
-int			execute_all_cmd(t_shell *shell);
 
 /* REDIRECTION */
 
-void		open_pipes(t_shell *shell);
 void		open_file(t_file *file, t_cmd *cmd, int mode);
-void		connect_pipe(t_shell *shell);
-void		close_pipes(t_shell *shell);
+void		connect_pipe(t_shell *shell, int *pipe_fd, int type);
+void		redirect_fork(t_shell *shell, t_cmd *cmd);
 
 /* READABILITY */
 
 int			is_last_cmd(t_shell *shell);
 int			is_first_cmd(t_shell *shell);
-t_list		*get_current_cmd_node(t_shell *shell);
-t_cmd		*get_current_cmd(t_shell *cnd_tab);
 int			get_last_cmd_exit_code(t_shell *shell);
 
 /* ERROR HANDLING */
@@ -207,6 +207,10 @@ enum e_ast
 {
 	AST_PIPE,
 	AST_CMD,
+	AST_REDIRECTION,
+	AST_AND,
+	AST_OR,
+	AST_SUB,
 };
 
 #endif

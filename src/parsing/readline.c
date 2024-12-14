@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 13:51:38 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/13 15:55:39 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/14 15:50:55 by mkling           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,19 +24,15 @@ void	print_tokens(t_list *node)
 	}
 }
 
-void	parse_and_exec_cmd(char *input, char **env)
+void	parse_and_exec_cmd(t_shell *shell, char *input)
 {
-	t_shell	*shell;
-
 	shell->cmd_line = input;
 	lexer(shell);
-	shell->ast_root = parse_pipe(shell, &shell->token_list);
-	ft_lstclear(&shell->token_list, free_token);
-	if (shell->cmd_count > 0)
-		execute_all_cmd(shell);
+	parser(shell);
+	process_ast(shell, shell->ast_root);
 }
 
-void	init_readline(char **envp)
+void	init_readline(t_shell *shell)
 {
 	char		*input;
 
@@ -49,7 +45,7 @@ void	init_readline(char **envp)
 		if (input)
 		{
 			add_history(input);
-			parse_and_exec_cmd(input, envp);
+			parse_and_exec_cmd(shell, input);
 			free(input);
 		}
 	}
