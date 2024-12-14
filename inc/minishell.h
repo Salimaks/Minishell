@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: skassimi <skassimi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/04 08:36:37 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/13 12:19:48 by skassimi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@
 # include <signal.h>
 # include <readline/readline.h>
 # include <readline/history.h>
-# include "libft/inc/libft.h"
+# include "/home/skassimi/42projects/Minishell/inc/libft/inc/libft.h"
 
 typedef struct s_token
 {
@@ -167,6 +167,5 @@ enum e_pipe_fd
 	WRITE = 1,
 	APPEND = 2,
 };
-
 
 #endif

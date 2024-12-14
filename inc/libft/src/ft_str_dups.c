@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strjoin.c                                       :+:      :+:    :+:   */
+/*   ft_str_dups.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: skassimi <skassimi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 18:03:46 by mkling            #+#    #+#             */
-/*   Updated: 2024/10/04 15:54:11 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/13 10:27:03 by skassimi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ char	*ft_strdup(const char *src)
 
 char	*ft_strndup(const char *src, size_t size, int i)
 {
-	char	*new
+	char	*new;
 
 	new = malloc((size + 1) * sizeof(char));
 	if (new == NULL)

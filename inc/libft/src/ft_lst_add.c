@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_lst_add.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: skassimi <skassimi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/31 19:29:36 by mkling            #+#    #+#             */
-/*   Updated: 2024/10/08 14:35:33 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/13 11:26:15 by skassimi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@ void	ft_lstadd_back(t_list **lst, t_list *new)
 {
 	t_list	*last;
 
-	last = *lst;
 	if (new == NULL)
 		return ;
 	if (*lst == NULL)
@@ -31,9 +30,11 @@ void	ft_lstadd_back(t_list **lst, t_list *new)
 		*lst = new;
 		return ;
 	}
+	last = *lst;
 	while (last->next != NULL)
 		last = last->next;
 	last->next = new;
+	new->prev = last;
 }
 
 void	ft_lstclear(t_list **lst, void (*del)(void *))
@@ -66,5 +67,6 @@ t_list	*ft_lstnew(void *content)
 		return (NULL);
 	node->content = content;
 	node->next = NULL;
+	node->prev = NULL;
 	return (node);
 }
