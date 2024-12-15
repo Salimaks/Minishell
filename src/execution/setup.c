@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   setup.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 12:37:12 by alex              #+#    #+#             */
-/*   Updated: 2024/12/13 15:55:39 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/15 11:50:53 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,8 @@ t_cmd	*create_cmd(t_shell *shell)
 	if (!cmd)
 		return (NULL);
 	cmd->fork_pid = -1;
+	cmd->fd_in = -1;
+	cmd->fd_out = -1;
 	node = ft_lstnew(cmd);
 	ft_lstadd_front(&shell->cmd_list, node);
 	increment_all_cmd_index(shell->cmd_list->next);

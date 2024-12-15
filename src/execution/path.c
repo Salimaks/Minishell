@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   path.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 14:12:32 by alex              #+#    #+#             */
-/*   Updated: 2024/12/14 16:13:28 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/15 18:22:47 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ Then paths if any were extracted from env
 Exits fork if no command is found */
 void	get_cmd_path(t_shell *shell, t_cmd *cmd)
 {
-	cmd->cmd_path = ft_strjoin("/", (char *)cmd->arg_list->content);
+	cmd->cmd_path = ft_strjoin("/", cmd->argv[0]);
 	fork_exit_if((!cmd->cmd_path), MALLOC_FAIL, cmd,
 		"Failed to allocate path");
 	if (access(cmd->cmd_path, F_OK) == 0)

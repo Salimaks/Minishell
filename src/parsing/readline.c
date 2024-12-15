@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   readline.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 13:51:38 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/14 15:50:55 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/15 18:16:03 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,9 @@ void	parse_and_exec_cmd(t_shell *shell, char *input)
 	lexer(shell);
 	parser(shell);
 	process_ast(shell, shell->ast_root);
+	free_ast(shell->ast_root);
+	execute_all_cmd(shell);
+	ft_lstclear(&shell->cmd_list, free_cmd);
 }
 
 void	init_readline(t_shell *shell)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/14 16:21:20 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/15 18:45:18 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,6 +50,8 @@ typedef struct s_cmd
 	t_list			*redirect;
 	t_list			*infiles;	// linked list of input files
 	t_list			*outfiles;	// linked list of output files
+	int				fd_out;
+	int				fd_in;
 	int				exit_code;	// value returned by the execution of command
 	size_t			cmd_index;	// number of the command among other commands
 	int				fork_pid;	// process id of fork sent to execute command
@@ -70,7 +72,8 @@ typedef struct s_shell
 	t_list		*token_list;	// linked list of tokens id from cmd line
 	t_list		*cmd_list;		// linked list of commands as a structs
 	t_list		*env_list;		// linked list of env strings
-	t_ast		*ast_root;			// abstract syntaxic tree
+	t_ast		*ast_root;		// abstract syntaxic tree
+	int			pipe_fd[2][2];	// two pair of pipe fd for all pipe execution
 	size_t		cmd_count;		// total of commands in commmand line
 	size_t		index;			// index of command currently being executed
 	char		**env;			// env received at start of program
@@ -109,8 +112,9 @@ void		destroy_heredoc(t_shell *shell, t_list *file_node);
 
 /* EXECUTION */
 
-int			process_ast(t_shell *shell, t_ast *ast);
-void		open_pipe(t_shell *shell, int *pipe_fd);
+void		process_ast(t_shell *shell, t_ast *ast);
+int			execute_all_cmd(t_shell *shell);
+void		open_pipe(t_shell *shell, t_list *);
 void		create_fork(t_shell *shell, int	*fork_pid);
 void		get_cmd_path(t_shell *shell, t_cmd *cmd);
 void		fork_exit_if(int condition, int errcode, t_cmd *cmd, char *message);
@@ -118,13 +122,13 @@ void		fork_exit_if(int condition, int errcode, t_cmd *cmd, char *message);
 /* REDIRECTION */
 
 void		open_file(t_file *file, t_cmd *cmd, int mode);
-void		connect_pipe(t_shell *shell, int *pipe_fd, int type);
-void		redirect_fork(t_shell *shell, t_cmd *cmd);
+void		redirect_fork(t_shell *shell, t_list *node);
+void		close_pipe(t_shell *shell, t_list *node);
 
 /* READABILITY */
 
-int			is_last_cmd(t_shell *shell);
-int			is_first_cmd(t_shell *shell);
+int			is_last_cmd(t_shell *shell, t_list *node);
+int			is_first_cmd(t_shell *shell, t_list *node);
 int			get_last_cmd_exit_code(t_shell *shell);
 
 /* ERROR HANDLING */
@@ -139,7 +143,7 @@ int			catch_error(t_shell *shell);
 void		free_token(void *token);
 void		free_cmd(void *cmd);
 void		free_file(void *file);
-void		free_ast_node(void *ast);
+void		free_ast(void *ast);
 void		free_minishell(t_shell *shell);
 
 /* DEBUG */

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/30 13:06:39 by alex              #+#    #+#             */
-/*   Updated: 2024/12/14 15:49:11 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/15 18:01:07 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,7 @@ t_ast	*parse_pipe(t_shell *shell, t_list **token)
 	*token = (*token)->next;
 	right = parse_pipe(shell, token);
 	if (!right)
-		return (free_ast_node(left), NULL);
+		return (free_ast(left), NULL);
 	pipe_node = create_ast_node(shell, AST_PIPE, NULL);
 	pipe_node->left = left;
 	pipe_node->right = right;

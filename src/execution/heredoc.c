@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/11 15:42:30 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/13 15:55:39 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/15 12:40:50 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ char	*increment_char(t_shell *shell, char *string)
 	if (len > ft_strlen(HEREDOC_LOC)
 		|| string[len - 1] != 'z' || string[len - 1] != 'Z')
 	{
-		string[len - 1] = string[len - 1]++;
+		string[len - 1] = string[len - 1] + 1;
 		return (string);
 	}
 	else if (len < 256)

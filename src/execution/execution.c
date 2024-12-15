@@ -3,32 +3,22 @@
 /*                                                        :::      ::::::::   */
 /*   execution.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 15:37:36 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/14 16:24:49 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/15 18:54:01 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-/* connect pipe for a fork */
-void	connect_pipe(t_shell *shell, int *pipe_fd, int type)
+/* if not the last cmd, open pipe */
+void	open_pipe(t_shell *shell, t_list *node)
 {
-	if (catch_error(shell))
+	if (catch_error(shell) || !node->next)
 		return ;
-	if (type == WRITE)
-	{
-		close(pipe_fd[0]);
-		dup2(pipe_fd[1], STDOUT_FILENO);
-		close(pipe_fd[1]);
-	}
-	if (type == READ)
-	{
-		close(pipe_fd[1]);
-		dup2(pipe_fd[0], STDIN_FILENO);
-		close(pipe_fd[0]);
-	}
+	set_error_if(pipe(((t_cmd *)node->content)->pipe_fd) == -1, PIPE_ERROR, shell,
+		"Failed to pipe");
 }
 
 void	put_arg_in_array(t_cmd *cmd)
@@ -48,88 +38,43 @@ void	put_arg_in_array(t_cmd *cmd)
 	}
 }
 
-/* If fork, get command path and execve the cmd or send error */
+/* If fork, check command path, sends fork to execve, sets error if fail */
 void	send_fork_exec_cmd(t_shell *shell, t_cmd *cmd)
 {
-	if (cmd->fork_pid != 0)
+	if (cmd->fork_pid != 0 || catch_error(shell))
 		return ;
-	get_cmd_path(shell, cmd);
 	put_arg_in_array(cmd);
+	get_cmd_path(shell, cmd);
 	execve(cmd->cmd_path, cmd->argv, shell->env);
 	fork_exit_if(1, CANT_EXECUTE_CMD, cmd, "Failed to execute command");
 }
 
-/* closes pipe and redirects to stdin */
-void	close_pipe(t_shell *shell, int *pipe_fd)
+/* Wait on fork with forkpid, sets exit code */
+void	wait_on_fork(t_shell *shell, t_list *cmd_list)
 {
-	if (catch_error(shell))
-		return ;
-	close(pipe_fd[WRITE]);
-	dup2(pipe_fd[READ], STDIN_FILENO);
-	close(pipe_fd[READ]);
-}
+	t_cmd	*cmd;
 
-/* Wait on fork with its forkpid, Set exit code in cmd struct*/
-void	wait_on_fork(t_shell *shell, t_cmd *cmd)
-{
-	if (!cmd->exit_code)
-		waitpid(cmd->fork_pid, &cmd->exit_code, 0);
+	cmd = (t_cmd *)cmd_list->content;
+	waitpid(cmd->fork_pid, &cmd->exit_code, 0);
 	apply_to_list(shell, cmd->infiles, destroy_heredoc);
 }
 
-int	execute_cmd(t_shell *shell, t_cmd *cmd)
+int	execute_all_cmd(t_shell *shell)
 {
-	create_fork(shell, &cmd->fork_pid);
-	redirect_fork(shell, cmd);
-	send_fork_exec_cmd(shell, cmd);
-	wait_on_fork(shell, cmd);
-	return (cmd->exit_code);
-}
+	t_cmd	*cmd;
+	t_list	*node;
 
-int	execute_pipe(t_shell *shell, t_ast *ast)
-{
-	int	pipe_fd[2];
-	int	fork_pid[2];
-	int	last_exit_code;
-
-	last_exit_code = 0;
-	open_pipe(shell, pipe_fd);
-	create_fork(shell, &fork_pid[0]);
-	if (fork_pid[0] == 0)
+	node = shell->cmd_list;
+	apply_to_list(shell, shell->cmd_list, open_pipe);
+	while (node)
 	{
-		connect_pipe(shell, pipe_fd, WRITE);
-		exit(process_ast(shell, ast->left));
+		cmd = (t_cmd *)node->content;
+		create_fork(shell, &cmd->fork_pid);
+		redirect_fork(shell, node);
+		send_fork_exec_cmd(shell, cmd);
+		node = node->next;
 	}
-	create_fork(shell, &fork_pid[1]);
-	if (fork_pid[1] == 0)
-	{
-		connect_pipe(shell, pipe_fd, READ);
-		exit(process_ast(shell, ast->left));
-	}
-	close_pipe(shell, pipe_fd);
-	waitpid(fork_pid[0], NULL, 0);
-	waitpid(fork_pid[1], &last_exit_code, 0);
-	return (last_exit_code);
-}
-
-int	process_ast(t_shell *shell, t_ast *ast)
-{
-	if (ast->type == AST_CMD)
-		return (execute_cmd(shell, ((t_cmd *)ast->content)));
-	if (ast->type == AST_PIPE)
-		return (execute_pipe(shell, ast));
-	if (ast->type == AST_AND)
-	{
-		if (process_ast(shell, ast->left) == 0)
-			return (process_ast(shell, ast->right));
-		return (-1);
-	}
-	if (ast->type == AST_OR)
-	{
-		if (process_ast(shell, ast->left) != 0)
-			return (process_ast(shell, ast->right));
-		return (-1);
-	}
-	else
-		return (EXIT_FAILURE);
+	apply_to_list(shell, shell->cmd_list, close_pipe);
+	apply_to_list(shell, shell->cmd_list, wait_on_fork);
+	return (get_last_cmd_exit_code(shell));
 }

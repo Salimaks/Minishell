@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cleanup.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/30 00:22:21 by alex              #+#    #+#             */
-/*   Updated: 2024/12/14 15:40:28 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/15 18:00:48 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ void	free_cmd(void *to_be_del)
 	free(cmd);
 }
 
-void	free_ast_node(void *node)
+void	free_ast(void *node)
 {
 	t_ast	*ast;
 
@@ -63,9 +63,8 @@ void	free_ast_node(void *node)
 		free_cmd(ast->content);
 	else
 	{
-		free_ast_node(ast->left);
-		free_ast_node(ast->right);
-		free(ast->content);
+		free_ast(ast->left);
+		free_ast(ast->right);
 	}
 	free(ast);
 }

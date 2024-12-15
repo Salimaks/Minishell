@@ -3,23 +3,23 @@
 /*                                                        :::      ::::::::   */
 /*   readability.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 18:37:37 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/14 16:16:04 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/15 18:52:41 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	is_last_cmd(t_shell *shell)
+int	is_last_cmd(t_shell *shell, t_list *node)
 {
-	return (shell->index == shell->cmd_count - 1);
+	return (((t_cmd *)node->content)->cmd_index == (size_t)ft_lstsize(shell->cmd_list) - 1);
 }
 
-int	is_first_cmd(t_shell *shell)
+int	is_first_cmd(t_shell *shell, t_list *node)
 {
-	return (shell->index == 0);
+	return (node == shell->cmd_list);
 }
 
 void	create_fork(t_shell *shell, int	*fork_pid)
@@ -27,14 +27,15 @@ void	create_fork(t_shell *shell, int	*fork_pid)
 	if (catch_error(shell))
 		return ;
 	*fork_pid = fork();
-	set_error_if(*fork_pid == -1, FORK_ERROR, shell,
-		"Error while trying to fork");
+	set_error_if(*fork_pid == -1, FORK_ERROR, shell, "Error while trying to fork");
 }
 
-/*opens a pipe*/
-void	open_pipe(t_shell *shell, int *pipe_fd)
+/* close opened pipes*/
+void	close_pipe(t_shell *shell, t_list *node)
 {
-	set_error_if(pipe(pipe_fd) == -1, PIPE_ERROR,
-		shell, "Error while creating pipe");
+	if (catch_error(shell) || !node->next)
+		return ;
+	close(((t_cmd *)node->content)->pipe_fd[READ]);
+	close(((t_cmd *)node->content)->pipe_fd[WRITE]);
 }
 

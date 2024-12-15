@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirection.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 17:34:05 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/14 16:26:04 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/15 18:51:41 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,18 +74,36 @@ void	redirect_io(t_shell *shell, t_cmd *cmd, int input, int output)
 {
 	if (catch_error(shell))
 		return ;
-	fprintf(stderr, "input is %d and output is %d\n", input, output);
 	if (input != STDIN_FILENO)
 		fork_exit_if((dup2(input, STDIN_FILENO) == -1), DUP_ERROR,
 			cmd, "Error while redirecting stdin");
 	if (output != STDOUT_FILENO)
 		fork_exit_if((dup2(output, STDOUT_FILENO) == -1), DUP_ERROR,
 			cmd, "Error while redirecting stdout");
-	fprintf(stderr, "redirection done\n");
 }
 
-void	redirect_fork(t_shell *shell, t_cmd *cmd)
+void	redirect_fork(t_shell *shell, t_list *node)
 {
-	if (cmd->fork_pid == 0)
-		redirect_io(shell, cmd, get_infile_fd(shell, cmd), get_outfile_fd(cmd));
+	t_cmd	*cmd;
+
+	cmd = (t_cmd *)node->content;
+	if (catch_error(shell) || cmd->fork_pid != 0)
+		return ;
+	if (is_first_cmd(shell, node) && is_last_cmd(shell, node))
+		redirect_io(shell, cmd,
+			get_infile_fd(shell, cmd),
+			get_outfile_fd(cmd));
+	else if (is_first_cmd(shell, node))
+		redirect_io(shell, cmd,
+			get_infile_fd(shell, cmd),
+			((t_cmd *)node->content)->pipe_fd[WRITE]);
+	else if (is_last_cmd(shell, node))
+		redirect_io(shell, cmd,
+			((t_cmd *)node->prev->content)->pipe_fd[READ],
+			get_outfile_fd(cmd));
+	else
+		redirect_io(shell, cmd,
+			((t_cmd *)node->prev->content)->pipe_fd[READ],
+			((t_cmd *)node->content)->pipe_fd[WRITE]);
+	apply_to_list(shell, shell->cmd_list, close_pipe);
 }
