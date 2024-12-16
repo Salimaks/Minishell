@@ -69,22 +69,21 @@ t_list	*ft_lstnew(void *content)
 	return (node);
 }
 
-void	tokenize_args(const char *input, t_list *tokens, int i)
+void	tokenize_args(const char **input, t_list **tokens)
 {
-	int	start;
-	int	len;
+	const  char *start;
 	int	nbr;
 
-	start = i + 2;
+	start = *input + 2;
+	*input += 2;
 	nbr = 1;
-	i = i + 2;
-	while (input[i] && nbr > 0)
+	while (**input && nbr > 0)
 	{
-		if (input[i] == '(')
+		if (**input == '(')
 			nbr++;
-		else if (input[i] == ')')
+		else if (**input == ')')
 			nbr--;
-		i++;
+		(*input)++;
 	}
 	if (nbr != 0)
 	{
@@ -92,28 +91,22 @@ void	tokenize_args(const char *input, t_list *tokens, int i)
 		free_tokens(tokens);
 		return ;
 	}
-	len = i - start - 1;
-	ft_lstadd_back(&tokens, ft_lstnew(ft_strndup(input, len, start)));
+	ft_lstadd_back(&tokens, ft_lstnew(ft_strndup(start, *input - start)));
 }
 
-void	tokenize_quotes(const char *input, t_list *tokens, int i)
+void	tokenize_quotes(const char **input, t_list **tokens)
 {
 	char	quote;
-	int		start;
-	int		len;
+	const char *start;
 
-	len = 0;
-	start = 0;
-	quote = input[i];
-	i++;
-	start = i;
-	while (input[i] && input[i] != quote)
-		i++;
-	if (input[i] == quote)
+	*start = ++(*input);
+	quote = **input;
+	while (**input && **input != quote)
+		(*input)++;
+	if (**input == quote)
 	{
-		len = i - start;
-		ft_lstadd_back(&tokens, ft_lstnew(ft_strndup(input, len, start)));
-		i++;
+		ft_lstadd_back(&tokens, ft_lstnew(ft_strndup(start, *input - start)));
+		(*input)++;
 	}
 	else
 	{
@@ -125,38 +118,37 @@ void	tokenize_quotes(const char *input, t_list *tokens, int i)
 
 t_list	*tokenizer(const char *input)
 {
-	t_list	*tokens;
-	int		i;
-	int		start;
-	int		len;
+	t_list	*tokens;;
+	const char	start;
+	int len;
 
-	tokens = NULL;
+	len = 0;
+	*tokens = NULL;
 	i = 0;
 	if (!input)
 		return (NULL);
-	while (input[i])
+	while (*input)
 	{
-		while (input[i] && input[i] == ' ' || input[i] == '\t')
-			i++;
-		if (!input[i])
+		while (*input && *input == ' ' || *input == '\t')
+			*input++;
+		if (!*input)
 			break ;
-		if (input[i] == '"' || input[i] == '\'')
-			tokenize_quotes(input, tokens, i);
-		else if (is_special_token(input + i))
+		if (*input == '"' || *input == '\'')
+			tokenize_quotes(&input, &tokens);
+		else if (is_special_token(input))
 		{
-			len = is_special_token(input + i);
-			ft_lstadd_back(&tokens, ft_lstnew(ft_strndup(input, len, start)));
-			i = i + len;
+			len = is_special_token(input);
+			ft_lstadd_back(&tokens, ft_lstnew(ft_strndup(input, len)));
+			*input += len;
 		}
-		else if (input[i] == '$' && input[i + 1] == '(')
-			tokenize_args(input, tokens, i);
+		else if (*input == '$' && *(input + 1) == '(')
+			tokenize_args(&input, tokens);
 		else
 		{
-			start = i;
-			while (input[i] && input[i] != ' ' && input[i] != '\t' && !is_special_token(input))
-				i++;
-			len = i - start;
-			ft_lstadd_back(&tokens, ft_lstnew(ft_strndup(input, len, start)));
+			*start = input;
+			while (*input && *input != ' ' && *input != '\t' && !is_special_token(input))
+				*input++;
+			ft_lstadd_back(&tokens, ft_lstnew(ft_strndup(start, input - start)));
 		}
 	}
 	return (tokens);
