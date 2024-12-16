@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 14:37:02 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/16 15:47:37 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/16 17:21:28 by mkling           ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -14,6 +14,7 @@
 
 void	set_error(int err_code, t_shell *shell, char *err_message)
 {
+	print_error();
 	ft_putstr_fd(err_message, STDERR_FILENO);
 	ft_putstr_fd("\n", STDERR_FILENO);
 	shell->critical_er = err_code;
@@ -35,7 +36,8 @@ void	fork_exit_if(int condition, int err_code, t_cmd *cmd, char *err_message)
 {
 	if (condition)
 	{
-		perror(err_message);
+		print_error();
+		ft_putstr_fd(err_message, STDERR_FILENO);
 		cmd->exit_code = err_code;
 		exit(err_code);
 	}

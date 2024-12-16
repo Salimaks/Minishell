@@ -6,7 +6,7 @@
 #    By: mkling <mkling@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/14 14:56:12 by mkling            #+#    #+#              #
-#    Updated: 2024/12/16 15:46:20 by mkling           ###   ########.fr        #
+#    Updated: 2024/12/16 17:13:20 by mkling           ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -41,6 +41,7 @@ FUNC_PARS	=	readline.c \
 				parser.c \
 				signals.c \
 				ast.c \
+				syntax.c \
 				cleanup.c
 
 FUNC_BUTI	=	cd.c \

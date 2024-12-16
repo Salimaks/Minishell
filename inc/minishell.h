@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/16 15:47:24 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/16 17:16:16 by mkling           ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -97,6 +97,7 @@ void		scan(t_shell *shell);
 void		add_token(t_shell *shell, int type, char letter);
 void		merge_token(t_shell *shell, t_list *start);
 void		lexer(t_shell *shell);
+int			check_syntax(t_shell *shell, t_list *token_list);
 t_ast		*create_ast_node(t_shell *shell, int type, void *content);
 t_cmd		*create_cmd(void);
 void		create_file(t_shell *shell, t_cmd *cmd, t_token *token);
@@ -133,10 +134,10 @@ int			get_last_cmd_exit_code(t_shell *shell);
 
 /* ERROR HANDLING */
 
-void		set_error_if(int condition, int err_code, t_shell *shell,
-				char *message);
+void		set_error_if(int cond, int err_code, t_shell *shell, char *message);
 void		set_error(int err_code, t_shell *shell, char *err_message);
 int			catch_error(t_shell *shell);
+void		print_error(void);
 
 /* CLEAN UP */
 
@@ -151,13 +152,13 @@ void		free_minishell(t_shell *shell);
 void		print_tokens(t_list *first);
 
 
-
 # define TRUE			1
 # define FALSE			0
 # define DELIMITERS		"'\"()"
 # define OPERATORS		"|><$"
 # define BLANKS	" \n\t"
 # define HEREDOC_LOC	"tmp/heredoc"
+# define SHELL_NAME		"shell"
 
 enum e_lexem
 {
