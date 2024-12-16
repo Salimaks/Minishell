@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 13:51:38 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/16 17:42:09 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/16 18:41:19 by mkling           ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -50,8 +50,8 @@ void	init_readline(t_shell *shell)
 			break ;
 		if (input)
 		{
-			add_history(input);
 			parse_and_exec_cmd(shell, input);
+			add_history(input);
 			free(input);
 		}
 	}

@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/16 17:16:16 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/16 18:32:21 by mkling           ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -130,7 +130,6 @@ void		close_pipe(t_shell *shell, t_list *node);
 
 int			is_last_cmd(t_list *node);
 int			is_first_cmd(t_list *node);
-int			get_last_cmd_exit_code(t_shell *shell);
 
 /* ERROR HANDLING */
 

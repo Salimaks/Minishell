@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 15:37:36 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/16 16:40:23 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/16 18:41:18 by mkling           ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -78,5 +78,5 @@ int	execute_all_cmd(t_shell *shell)
 	}
 	apply_to_list(shell, shell->cmd_list, close_pipe);
 	apply_to_list(shell, shell->cmd_list, wait_on_fork);
-	return (get_last_cmd_exit_code(shell));
+	return (((t_cmd *)ft_lstlast(shell->cmd_list)->content)->exit_code);
 }

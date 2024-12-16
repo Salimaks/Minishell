@@ -6,17 +6,11 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/14 16:42:40 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/16 18:12:55 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/16 18:51:27 by mkling           ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
 #include "minishell.h"
-
-void	print_error(void)
-{
-	ft_putstr_fd(SHELL_NAME, STDERR_FILENO);
-	ft_putstr_fd(": ", STDERR_FILENO);
-}
 
 void	syntax_error(char *token_content)
 {
@@ -24,6 +18,35 @@ void	syntax_error(char *token_content)
 	ft_putstr_fd("syntax error near unexpected token '", STDERR_FILENO);
 	ft_putstr_fd(token_content, STDERR_FILENO);
 	ft_putstr_fd("'\n", STDERR_FILENO);
+}
+
+void	add_to_input(t_shell *shell, char delim)
+{
+	char	*result;
+
+	while (1)
+	{
+		write(STDIN_FILENO, ">", 2);
+		result = get_next_line(STDIN_FILENO);
+		shell->cmd_line = ft_strjoinfree(shell->cmd_line, result);
+		if (ft_strchr(result, delim) == 0)
+			break ;
+	}
+	lexer(shell);
+}
+
+int	is_missing_delimiter(t_list *node)
+{
+	t_token	*delim;
+
+	delim = (t_token *)node->content;
+	while ((t_token *)node->content)
+	{
+		if (((t_token *)node->content)->letter == delim->letter)
+			return (0);
+		node = node->next;
+	}
+	return (1);
 }
 
 int	is_missing_redirection(t_shell *shell, t_list *node)
@@ -74,6 +97,8 @@ int	check_syntax(t_shell *shell, t_list *node)
 		if ((token->letter == '<' || token->letter == '>')
 			&& is_missing_redirection(shell, node))
 			return (SYNTAX_ERROR);
+		if (token->lexem == DELIMITER && is_missing_delimiter(node))
+			return (add_to_input(shell, token->letter), 0);
 		node = node->next;
 	}
 	return (0);

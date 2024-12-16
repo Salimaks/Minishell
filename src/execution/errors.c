@@ -6,11 +6,17 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 14:37:02 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/16 17:21:28 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/16 18:33:04 by mkling           ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
 #include "minishell.h"
+
+void	print_error(void)
+{
+	ft_putstr_fd(SHELL_NAME, STDERR_FILENO);
+	ft_putstr_fd(": ", STDERR_FILENO);
+}
 
 void	set_error(int err_code, t_shell *shell, char *err_message)
 {
@@ -41,9 +47,4 @@ void	fork_exit_if(int condition, int err_code, t_cmd *cmd, char *err_message)
 		cmd->exit_code = err_code;
 		exit(err_code);
 	}
-}
-
-int	get_last_cmd_exit_code(t_shell *shell)
-{
-	return (((t_cmd *)ft_lstlast(shell->cmd_list)->content)->exit_code);
 }
