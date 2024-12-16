@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/30 00:22:21 by alex              #+#    #+#             */
-/*   Updated: 2024/12/16 15:53:42 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/16 16:06:24 by mkling           ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -43,7 +43,7 @@ void	free_cmd(void *to_be_del)
 	t_cmd	*cmd;
 
 	cmd = (t_cmd *)to_be_del;
-	if (cmd->argv != NULL || cmd->argv[0] != NULL)
+	if (cmd->argv != NULL && cmd->argv[0] != NULL)
 		ft_free_tab(cmd->argv);
 	if (cmd->cmd_path != NULL)
 		free(cmd->cmd_path);
@@ -57,14 +57,13 @@ void	free_ast(t_ast **ast)
 {
 	if (!(*ast))
 		return ;
-	if ((*ast)->type == CMD)
+	if ((*ast)->type == CMD || (*ast)->content)
 		free_cmd((*ast)->content);
 	else
 	{
 		free_ast(&(*ast)->left);
 		free_ast(&(*ast)->right);
 	}
-	free(*ast);
 	(*ast) = NULL;
 }
 

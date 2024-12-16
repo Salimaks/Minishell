@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/12 21:51:24 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/16 15:50:52 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/16 16:06:57 by mkling           ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -33,7 +33,8 @@ void	process_ast(t_shell *shell, t_ast *ast)
 	if (ast->type == AST_CMD)
 	{
 		ft_lstadd_back(&shell->cmd_list, ft_lstnew(ast->content));
-		return (ast->content = NULL);
+		ast->content = NULL;
+		return ;
 	}
 	if (ast->type == AST_PIPE)
 	{
