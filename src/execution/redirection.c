@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 17:34:05 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/16 16:07:11 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/16 15:49:37 by mkling           ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -74,7 +74,6 @@ void	redirect_io(t_shell *shell, t_cmd *cmd, int input, int output)
 {
 	if (catch_error(shell))
 		return ;
-	fprintf(stderr, "redirecting io to %d and %d\n", input, output);
 	if (input != STDIN_FILENO)
 		fork_exit_if((dup2(input, STDIN_FILENO) == -1), DUP_ERROR,
 			cmd, "Error while redirecting stdin");

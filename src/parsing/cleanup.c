@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/30 00:22:21 by alex              #+#    #+#             */
-/*   Updated: 2024/12/16 16:06:24 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/16 16:21:54 by mkling           ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -57,13 +57,14 @@ void	free_ast(t_ast **ast)
 {
 	if (!(*ast))
 		return ;
-	if ((*ast)->type == CMD || (*ast)->content)
+	if ((*ast)->type == CMD)
 		free_cmd((*ast)->content);
 	else
 	{
 		free_ast(&(*ast)->left);
 		free_ast(&(*ast)->right);
 	}
+	free(*ast);
 	(*ast) = NULL;
 }
 

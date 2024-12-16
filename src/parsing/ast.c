@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/12 21:51:24 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/16 16:06:57 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/16 16:17:44 by mkling           ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -29,7 +29,7 @@ t_ast	*create_ast_node(t_shell *shell, int type, void *content)
 void	process_ast(t_shell *shell, t_ast *ast)
 {
 	if (ast == NULL)
-		return set_error(SYNTAX_ERROR, shell, "Empty ast");
+		return (set_error(SYNTAX_ERROR, shell, "Empty ast"));
 	if (ast->type == AST_CMD)
 	{
 		ft_lstadd_back(&shell->cmd_list, ft_lstnew(ast->content));

@@ -6,7 +6,7 @@
 #    By: mkling <mkling@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/14 14:56:12 by mkling            #+#    #+#              #
-#    Updated: 2024/12/16 16:07:26 by mkling           ###   ########.fr        #
+#    Updated: 2024/12/16 15:46:20 by mkling           ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -100,7 +100,8 @@ T_CC		= $(CC) $(CFLAGS) $(T_INC) -g
 
 T_EXCL		= obj/main.o
 
-V_FLAG		= valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --trace-children=yes --track-fds=yes --suppressions=readline.supp
+V_FLAG		= valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes \
+				--trace-children=yes --track-fds=yes --suppressions=readline.supp
 
 
 #############################

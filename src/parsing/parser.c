@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/30 13:06:39 by alex              #+#    #+#             */
-/*   Updated: 2024/12/16 16:06:50 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/16 15:57:29 by mkling           ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -59,12 +59,10 @@ t_ast	*parse_command(t_shell *shell, t_list **node)
 	t_cmd	*cmd;
 	t_token	*token;
 
-	if (!(*node) || catch_error(shell))
+	if (!(*node))
 		return (set_error(CANT_FIND_CMD, shell, "Missing command"), NULL);
 	cmd = create_cmd();
-	if (!cmd)
-		return (set_error(MALLOC_FAIL, shell, "Failed to allocate cmd"), NULL);
-	token = (t_token *)(*node)->content;
+	token = ((t_token *)(*node)->content);
 	while (token->letter != PIPE && token->lexem != END)
 	{
 		if (token->letter == '<')
@@ -75,7 +73,7 @@ t_ast	*parse_command(t_shell *shell, t_list **node)
 			ft_lstadd_back(&cmd->arg_list,
 				ft_lstnew(ft_strdup(token->content)));
 		*node = (*node)->next;
-		token = (t_token *)(*node)->content;
+		token = ((t_token *)(*node)->content);
 	}
 	return (create_ast_node(shell, AST_CMD, cmd));
 }
