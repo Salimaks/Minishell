@@ -1,14 +1,14 @@
-/* ************************************************************************** */
+/******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   readline.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 13:51:38 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/15 18:16:03 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/16 15:09:21 by mkling           ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
+/******************************************************************************/
 
 #include "minishell.h"
 
@@ -30,7 +30,7 @@ void	parse_and_exec_cmd(t_shell *shell, char *input)
 	lexer(shell);
 	parser(shell);
 	process_ast(shell, shell->ast_root);
-	free_ast(shell->ast_root);
+	free_ast(&shell->ast_root);
 	execute_all_cmd(shell);
 	ft_lstclear(&shell->cmd_list, free_cmd);
 }
