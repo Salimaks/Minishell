@@ -1,14 +1,14 @@
-/* ************************************************************************** */
+/******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   setup.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 12:37:12 by alex              #+#    #+#             */
-/*   Updated: 2024/12/15 11:50:53 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/16 15:50:01 by mkling           ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
+/******************************************************************************/
 
 #include "minishell.h"
 
@@ -26,10 +26,9 @@ void	increment_all_cmd_index(t_list *start)
 	}
 }
 
-t_cmd	*create_cmd(t_shell *shell)
+t_cmd	*create_cmd(void)
 {
 	t_cmd	*cmd;
-	t_list	*node;
 
 	cmd = (t_cmd *)ft_calloc(sizeof(t_cmd), 1);
 	if (!cmd)
@@ -37,9 +36,6 @@ t_cmd	*create_cmd(t_shell *shell)
 	cmd->fork_pid = -1;
 	cmd->fd_in = -1;
 	cmd->fd_out = -1;
-	node = ft_lstnew(cmd);
-	ft_lstadd_front(&shell->cmd_list, node);
-	increment_all_cmd_index(shell->cmd_list->next);
 	return (cmd);
 }
 

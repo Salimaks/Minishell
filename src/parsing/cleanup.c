@@ -1,14 +1,14 @@
-/* ************************************************************************** */
+/******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   cleanup.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/30 00:22:21 by alex              #+#    #+#             */
-/*   Updated: 2024/12/15 18:00:48 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/16 15:53:42 by mkling           ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
+/******************************************************************************/
 
 #include "minishell.h"
 
@@ -43,30 +43,29 @@ void	free_cmd(void *to_be_del)
 	t_cmd	*cmd;
 
 	cmd = (t_cmd *)to_be_del;
-	if (cmd->argv != NULL)
+	if (cmd->argv != NULL || cmd->argv[0] != NULL)
 		ft_free_tab(cmd->argv);
 	if (cmd->cmd_path != NULL)
 		free(cmd->cmd_path);
 	ft_lstclear(&cmd->outfiles, free_file);
 	ft_lstclear(&cmd->infiles, free_file);
+	ft_lstclear(&cmd->arg_list, free);
 	free(cmd);
 }
 
-void	free_ast(void *node)
+void	free_ast(t_ast **ast)
 {
-	t_ast	*ast;
-
-	if (!node)
+	if (!(*ast))
 		return ;
-	ast = (t_ast *)node;
-	if (ast->type == CMD)
-		free_cmd(ast->content);
+	if ((*ast)->type == CMD)
+		free_cmd((*ast)->content);
 	else
 	{
-		free_ast(ast->left);
-		free_ast(ast->right);
+		free_ast(&(*ast)->left);
+		free_ast(&(*ast)->right);
 	}
-	free(ast);
+	free(*ast);
+	(*ast) = NULL;
 }
 
 void	free_minishell(t_shell *shell)
@@ -80,7 +79,7 @@ void	free_minishell(t_shell *shell)
 		ft_lstclear(&shell->token_list, free_token);
 	if (shell->env_list)
 		ft_lstclear(&shell->env_list, free);
-	// if (shell->ast_root)
-	// 	ft_lstclear(&shell->ast_root, free_ast_node);
+	if (shell->ast_root)
+		free_ast(&shell->ast_root);
 	free(shell);
 }

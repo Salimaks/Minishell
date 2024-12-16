@@ -1,14 +1,14 @@
-/* ************************************************************************** */
+/******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/15 18:45:18 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/16 15:47:24 by mkling           ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
+/******************************************************************************/
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
@@ -98,7 +98,7 @@ void		add_token(t_shell *shell, int type, char letter);
 void		merge_token(t_shell *shell, t_list *start);
 void		lexer(t_shell *shell);
 t_ast		*create_ast_node(t_shell *shell, int type, void *content);
-t_cmd		*create_cmd(t_shell *shell);
+t_cmd		*create_cmd(void);
 void		create_file(t_shell *shell, t_cmd *cmd, t_token *token);
 void		apply_to_list(t_shell *shell, t_list *node,
 				void function(t_shell *, t_list *));
@@ -114,7 +114,7 @@ void		destroy_heredoc(t_shell *shell, t_list *file_node);
 
 void		process_ast(t_shell *shell, t_ast *ast);
 int			execute_all_cmd(t_shell *shell);
-void		open_pipe(t_shell *shell, t_list *);
+void		open_pipe(t_shell *shell, t_list *node);
 void		create_fork(t_shell *shell, int	*fork_pid);
 void		get_cmd_path(t_shell *shell, t_cmd *cmd);
 void		fork_exit_if(int condition, int errcode, t_cmd *cmd, char *message);
@@ -127,8 +127,8 @@ void		close_pipe(t_shell *shell, t_list *node);
 
 /* READABILITY */
 
-int			is_last_cmd(t_shell *shell, t_list *node);
-int			is_first_cmd(t_shell *shell, t_list *node);
+int			is_last_cmd(t_list *node);
+int			is_first_cmd(t_list *node);
 int			get_last_cmd_exit_code(t_shell *shell);
 
 /* ERROR HANDLING */
@@ -143,7 +143,7 @@ int			catch_error(t_shell *shell);
 void		free_token(void *token);
 void		free_cmd(void *cmd);
 void		free_file(void *file);
-void		free_ast(void *ast);
+void		free_ast(t_ast **ast);
 void		free_minishell(t_shell *shell);
 
 /* DEBUG */
@@ -163,7 +163,7 @@ enum e_lexem
 {
 	NONE		= 0,
 	WORD		= 1,
-	BLANK	= 2,
+	BLANK		= 2,
 	DELIMITER	= 3,
 	OPERATOR	= 4,
 	END			= 5,

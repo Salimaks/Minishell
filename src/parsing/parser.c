@@ -1,14 +1,14 @@
-/* ************************************************************************** */
+/******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/30 13:06:39 by alex              #+#    #+#             */
-/*   Updated: 2024/12/15 18:01:07 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/16 15:57:29 by mkling           ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
+/******************************************************************************/
 
 #include "minishell.h"
 
@@ -31,7 +31,6 @@ void	parse_outfiles(t_shell *shell, t_cmd *cmd, t_list **current)
 		((t_token *)(*current)->content)->lexem = INFILE;
 	}
 	create_file(shell, cmd, ((t_token *)(*current)->content));
-	(*current) = (*current)->next;
 }
 
 void	parse_infiles(t_shell *shell, t_cmd *cmd, t_list **current)
@@ -53,32 +52,28 @@ void	parse_infiles(t_shell *shell, t_cmd *cmd, t_list **current)
 		((t_token *)(*current)->content)->lexem = INFILE;
 	}
 	create_file(shell, cmd, ((t_token *)(*current)->content));
-	(*current) = (*current)->next;
 }
 
-t_ast	*parse_command(t_shell *shell, t_list **token)
+t_ast	*parse_command(t_shell *shell, t_list **node)
 {
 	t_cmd	*cmd;
+	t_token	*token;
 
-	if (!(*token))
+	if (!(*node))
 		return (set_error(CANT_FIND_CMD, shell, "Missing command"), NULL);
-	cmd = ft_calloc(1, sizeof(t_cmd));
-	if (!cmd)
-		return (set_error(MALLOC_FAIL, shell, "Failed to malloc cmd"), NULL);
-	cmd->fork_pid = -1;
-	while (((t_token *)(*token)->content)->letter != PIPE
-			&& ((t_token *)(*token)->content)->lexem != END)
+	cmd = create_cmd();
+	token = ((t_token *)(*node)->content);
+	while (token->letter != PIPE && token->lexem != END)
 	{
-		if (((t_token *)(*token)->content)->lexem == START)
-			*token = (*token)->next;
-		if (((t_token *)(*token)->content)->letter == '<')
-			parse_infiles(shell, cmd, token);
-		else if (((t_token *)(*token)->content)->letter == '>')
-			parse_outfiles(shell, cmd, token);
-		else
+		if (token->letter == '<')
+			parse_infiles(shell, cmd, node);
+		else if (token->letter == '>')
+			parse_outfiles(shell, cmd, node);
+		else if (token->lexem == WORD)
 			ft_lstadd_back(&cmd->arg_list,
-				ft_lstnew(ft_strdup(((t_token *)(*token)->content)->content)));
-		*token = (*token)->next;
+				ft_lstnew(ft_strdup(token->content)));
+		*node = (*node)->next;
+		token = ((t_token *)(*node)->content);
 	}
 	return (create_ast_node(shell, AST_CMD, cmd));
 }
@@ -97,7 +92,7 @@ t_ast	*parse_pipe(t_shell *shell, t_list **token)
 	*token = (*token)->next;
 	right = parse_pipe(shell, token);
 	if (!right)
-		return (free_ast(left), NULL);
+		return (free_ast(&left), NULL);
 	pipe_node = create_ast_node(shell, AST_PIPE, NULL);
 	pipe_node->left = left;
 	pipe_node->right = right;

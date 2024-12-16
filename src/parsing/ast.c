@@ -1,14 +1,14 @@
-/* ************************************************************************** */
+/******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   ast.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/12 21:51:24 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/15 18:28:15 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/16 15:50:52 by mkling           ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
+/******************************************************************************/
 
 #include "minishell.h"
 
@@ -28,10 +28,12 @@ t_ast	*create_ast_node(t_shell *shell, int type, void *content)
 
 void	process_ast(t_shell *shell, t_ast *ast)
 {
+	if (ast == NULL)
+		return set_error(SYNTAX_ERROR, shell, "Empty ast");
 	if (ast->type == AST_CMD)
 	{
 		ft_lstadd_back(&shell->cmd_list, ft_lstnew(ast->content));
-		ast->content = NULL;
+		return (ast->content = NULL);
 	}
 	if (ast->type == AST_PIPE)
 	{

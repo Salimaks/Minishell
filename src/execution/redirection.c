@@ -1,14 +1,14 @@
-/* ************************************************************************** */
+/******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   redirection.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 17:34:05 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/15 18:51:41 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/16 15:49:37 by mkling           ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
+/******************************************************************************/
 
 #include "minishell.h"
 
@@ -89,15 +89,15 @@ void	redirect_fork(t_shell *shell, t_list *node)
 	cmd = (t_cmd *)node->content;
 	if (catch_error(shell) || cmd->fork_pid != 0)
 		return ;
-	if (is_first_cmd(shell, node) && is_last_cmd(shell, node))
+	if (is_first_cmd(node) && is_last_cmd(node))
 		redirect_io(shell, cmd,
 			get_infile_fd(shell, cmd),
 			get_outfile_fd(cmd));
-	else if (is_first_cmd(shell, node))
+	else if (is_first_cmd(node))
 		redirect_io(shell, cmd,
 			get_infile_fd(shell, cmd),
 			((t_cmd *)node->content)->pipe_fd[WRITE]);
-	else if (is_last_cmd(shell, node))
+	else if (is_last_cmd(node))
 		redirect_io(shell, cmd,
 			((t_cmd *)node->prev->content)->pipe_fd[READ],
 			get_outfile_fd(cmd));

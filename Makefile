@@ -1,4 +1,4 @@
-# **************************************************************************** #
+#******************************************************************************#
 #                                                                              #
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
@@ -6,9 +6,9 @@
 #    By: mkling <mkling@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/14 14:56:12 by mkling            #+#    #+#              #
-#    Updated: 2024/12/13 00:20:07 by mkling           ###   ########.fr        #
+#    Updated: 2024/12/16 15:46:20 by mkling           ###   ########.fr        #
 #                                                                              #
-# **************************************************************************** #
+#******************************************************************************#
 
 NAME		= minishell
 
@@ -100,6 +100,9 @@ T_CC		= $(CC) $(CFLAGS) $(T_INC) -g
 
 T_EXCL		= obj/main.o
 
+V_FLAG		= valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes \
+				--trace-children=yes --track-fds=yes --suppressions=readline.supp
+
 
 #############################
 #							#
@@ -139,6 +142,10 @@ $(T_NAME):	$(DEP) $(OBJ)
 test:		$(T_NAME)
 			@echo "Running unit tests :"
 			@$(T_DIR)/$(T_NAME)
+
+valgrind:	$(NAME)
+			@echo "Running valgrind"
+			@$(V_FLAG) ./$(NAME)
 
 #############################
 #							#
