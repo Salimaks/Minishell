@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 09:19:30 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/18 16:19:30 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/18 18:27:33 by mkling           ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -35,7 +35,12 @@ int	cd(t_shell *shell, char *path)
 		path = extract_home(shell);
 	exit_code = chdir(path);
 	if (exit_code != 0)
-		perror("wtf");
+	{
+		print_error();
+		ft_putstr_fd("cd :", STDERR_FILENO);
+		ft_putstr_fd(path, STDERR_FILENO);
+		ft_putstr_fd(": No such file or directory\n", STDERR_FILENO);
+	}
 	return (exit_code);
 }
 

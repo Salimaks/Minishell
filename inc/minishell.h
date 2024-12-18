@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/18 16:16:28 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/18 18:34:40 by mkling           ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -82,6 +82,10 @@ typedef struct s_shell
 }	t_shell;
 
 
+/* SIGNAL */
+
+void		handle_siquit(int sig);
+
 /* INPUT */
 
 void		parse_and_exec_cmd(t_shell *shell, char *input);
@@ -123,6 +127,10 @@ void		fork_exit_if(int condition, int errcode, t_cmd *cmd, char *message);
 /* BUILT IN */
 
 int			cd(t_shell *shell, char *path);
+int			echo(char **argv, int fdout);
+int			env(t_shell *shell, int fdout);
+int			pwd(int fdout);
+void		exit_shell(t_shell *shell);
 
 /* REDIRECTION */
 
