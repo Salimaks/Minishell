@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/16 18:32:21 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/18 16:16:28 by mkling           ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -119,6 +119,10 @@ void		open_pipe(t_shell *shell, t_list *node);
 void		create_fork(t_shell *shell, int	*fork_pid);
 void		get_cmd_path(t_shell *shell, t_cmd *cmd);
 void		fork_exit_if(int condition, int errcode, t_cmd *cmd, char *message);
+
+/* BUILT IN */
+
+int			cd(t_shell *shell, char *path);
 
 /* REDIRECTION */
 
