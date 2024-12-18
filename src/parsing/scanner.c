@@ -1,14 +1,14 @@
-/******************************************************************************/
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   scanner.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/01 16:37:27 by alex              #+#    #+#             */
-/*   Updated: 2024/12/16 17:42:31 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/18 11:06:31 by alex             ###   ########.fr       */
 /*                                                                            */
-/******************************************************************************/
+/* ************************************************************************** */
 
 #include "minishell.h"
 
@@ -81,7 +81,7 @@ void	scan(t_shell *shell)
 			add_token(shell, WORD, shell->cmd_line[shell->index]);
 		shell->index++;
 	}
-	add_token(shell, END, '\0');
+	add_token(shell, END, '\n');
 	apply_to_list(shell, shell->token_list, group_words);
 	apply_to_list(shell, shell->token_list, group_strings);
 	apply_to_list(shell, shell->token_list, remove_space);

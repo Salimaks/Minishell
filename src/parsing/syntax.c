@@ -1,105 +1,98 @@
-/******************************************************************************/
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   syntax.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/14 16:42:40 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/16 18:51:27 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/18 11:23:13 by alex             ###   ########.fr       */
 /*                                                                            */
-/******************************************************************************/
+/* ************************************************************************** */
 
 #include "minishell.h"
 
-void	syntax_error(char *token_content)
+void	syntax_error(t_token *token)
 {
 	print_error();
 	ft_putstr_fd("syntax error near unexpected token '", STDERR_FILENO);
-	ft_putstr_fd(token_content, STDERR_FILENO);
+	if (token->lexem == END)
+		ft_putstr_fd("newline", STDERR_FILENO);
+	else
+		ft_putstr_fd(token->content, STDERR_FILENO);
 	ft_putstr_fd("'\n", STDERR_FILENO);
 }
 
-void	add_to_input(t_shell *shell, char delim)
-{
-	char	*result;
-
-	while (1)
-	{
-		write(STDIN_FILENO, ">", 2);
-		result = get_next_line(STDIN_FILENO);
-		shell->cmd_line = ft_strjoinfree(shell->cmd_line, result);
-		if (ft_strchr(result, delim) == 0)
-			break ;
-	}
-	lexer(shell);
-}
-
-int	is_missing_delimiter(t_list *node)
+void	is_missing_delimiter(t_shell *shell, t_list *node)
 {
 	t_token	*delim;
+	t_token	*next_delim;
 
+	if (catch_error(shell))
+		return ;
 	delim = (t_token *)node->content;
-	while ((t_token *)node->content)
+	if (delim->lexem != DELIMITER)
+		return ;
+	next_delim = (t_token *)node->next->content;
+	while (next_delim->lexem != END)
 	{
 		if (((t_token *)node->content)->letter == delim->letter)
-			return (0);
+			return ;
 		node = node->next;
+		next_delim = (t_token *)node->content;
 	}
-	return (1);
+	syntax_error(next_delim);
+	shell->critical_er = SYNTAX_ERROR;
+	return ;
 }
 
-int	is_missing_redirection(t_shell *shell, t_list *node)
+void	is_missing_redirection(t_shell *shell, t_list *node)
 {
 	t_token	*next_token;
+	t_token	*redirection;
 
+	if (catch_error(shell))
+		return ;
+	redirection = (t_token *)node->content;
+	if (redirection->letter != '<' && redirection->letter != '>')
+		return ;
 	next_token = (t_token *)node->next->content;
 	if (next_token->lexem != WORD && next_token->lexem != STRING)
 	{
-		if (next_token->lexem == END)
-			syntax_error("newline");
-		else
-			syntax_error(next_token->content);
+		syntax_error(next_token);
 		shell->critical_er = SYNTAX_ERROR;
-		return (SYNTAX_ERROR);
+		return ;
 	}
-	return (0);
+	return ;
 }
 
-int	is_missing_cmd_before_pipe(t_shell *shell, t_list *node)
+void	is_missing_cmd_before_pipe(t_shell *shell, t_list *node)
 {
 	t_token	*pipe_token;
 	t_token	*prev_token;
 
+	if (catch_error(shell))
+		return ;
 	pipe_token = (t_token *)node->content;
+	if (pipe_token->letter != '|')
+		return ;
 	prev_token = (t_token *)node->prev->content;
 	while (prev_token->lexem != START && prev_token->lexem != PIPE)
 	{
 		if (prev_token->lexem == WORD || prev_token->lexem == STRING)
-			return (0);
-		node = node->next;
+			return ;
+		node = node->prev;
 		prev_token = (t_token *)node->prev->content;
 	}
-	syntax_error(pipe_token->content);
+	syntax_error(pipe_token);
 	shell->critical_er = SYNTAX_ERROR;
-	return (SYNTAX_ERROR);
+	return ;
 }
 
 int	check_syntax(t_shell *shell, t_list *node)
 {
-	t_token	*token;
-
-	while (node->next)
-	{
-		token = (t_token *)node->content;
-		if (token->letter == '|' && is_missing_cmd_before_pipe(shell, node))
-			return (SYNTAX_ERROR);
-		if ((token->letter == '<' || token->letter == '>')
-			&& is_missing_redirection(shell, node))
-			return (SYNTAX_ERROR);
-		if (token->lexem == DELIMITER && is_missing_delimiter(node))
-			return (add_to_input(shell, token->letter), 0);
-		node = node->next;
-	}
-	return (0);
+	apply_to_list(shell, node, is_missing_cmd_before_pipe);
+	apply_to_list(shell, node, is_missing_redirection);
+	apply_to_list(shell, node, is_missing_delimiter);
+	return (shell->critical_er);
 }
