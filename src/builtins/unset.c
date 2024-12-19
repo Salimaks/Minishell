@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 09:19:57 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/19 13:40:29 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/19 14:15:53 by mkling           ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -27,12 +27,14 @@ t_list	*find_env(t_list *env_list, char *env_name)
 
 int	unset(t_shell *shell, char **argv)
 {
-	int	i;
+	int		i;
+	t_list	*to_be_unset;
 
 	i = 1;
 	while (argv[i])
 	{
-		ft_lstpop(find_env(shell->env_list, argv[i]), free);
+		to_be_unset = find_env(shell->env_list, argv[i]);
+		ft_lstpop(to_be_unset, free);
 		i++;
 	}
 	return (0);

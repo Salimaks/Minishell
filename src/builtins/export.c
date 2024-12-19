@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 09:19:50 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/19 14:01:35 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/19 14:18:49 by mkling           ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -35,8 +35,11 @@ int	export(t_shell *shell, char **argv, int fdout)
 	//alphatic tri
 	while (argv[i])
 	{
-		unset (shell, &argv[i]);
-		ft_lstadd_back(&shell->env_list, ft_lstnew(argv[i]));
+		unset(shell, &argv[i]);
+		current_env = ft_lstnew(ft_strdup(argv[i]));
+		if (!current_env || !current_env->content)
+			return (-1);
+		ft_lstadd_back(&shell->env_list, current_env);
 		i++;
 	}
 	return (0);
