@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/18 18:34:40 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/19 13:43:17 by mkling           ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -129,6 +129,8 @@ void		fork_exit_if(int condition, int errcode, t_cmd *cmd, char *message);
 int			cd(t_shell *shell, char *path);
 int			echo(char **argv, int fdout);
 int			env(t_shell *shell, int fdout);
+int			export(t_shell *shell, char **argv, int fdout);
+int			unset(t_shell *shell, char **argv);
 int			pwd(int fdout);
 void		exit_shell(t_shell *shell);
 
