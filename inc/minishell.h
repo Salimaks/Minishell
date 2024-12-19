@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/19 13:43:17 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/19 15:38:17 by mkling           ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -139,6 +139,8 @@ void		exit_shell(t_shell *shell);
 void		open_file(t_file *file, t_cmd *cmd, int mode);
 void		redirect_fork(t_shell *shell, t_list *node);
 void		close_pipe(t_shell *shell, t_list *node);
+int			get_infile_fd(t_shell *shell, t_cmd *cmd);
+int			get_outfile_fd(t_cmd *cmd);
 
 /* READABILITY */
 
