@@ -10,7 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "minishell.h"
+#include "/mnt/nfs/homes/skassimi/Minishell/inc/minishell.h"
 #include <stdio.h>
 
 int	ft_strncmp(const char *s1, const char *s2, size_t n)
@@ -23,10 +23,35 @@ int	ft_strncmp(const char *s1, const char *s2, size_t n)
 	while (i <= n && s1[i] != '\0' && s1[i] == s2[i])
 		i++;
 	if (i == n)
-		return (0);
-	return ((unsigned char)s1[i] - (unsigned char)s2[i]);
+		return (1);
+	return (0);
 }
+char	*ft_strndup(const char *src, size_t size)
+{
+	char	*new;
+	int		i;
 
+	new = malloc((size + 1) * sizeof(char));
+	if (new == NULL)
+		return (NULL);
+	i = 0;
+	while (src[i] && i <= size)
+	{
+		new[i] = src[i];
+		i++;
+	}
+	new[i] = '\0';
+	return (new);
+}
+size_t	ft_strlen(const char *str)
+{
+	size_t	i;
+
+	i = 0;
+	while (str[i])
+		i++;
+	return (i);
+}
 void	free_tokens(t_list *head)
 {
 	t_list	*current;
@@ -40,17 +65,36 @@ void	free_tokens(t_list *head)
 		current = next;
 	}
 }
-
-int	is_special_token(const char *str)
+void	ft_lstadd_back(t_list **lst, t_list *new)
 {
-	const char	*special_tokens[] = {"|", ">", ">>", "<", NULL};
+	t_list	*last;
+
+	if (new == NULL)
+		return ;
+	if (*lst == NULL)
+	{
+		*lst = new;
+		return ;
+	}
+	last = *lst;
+	while (last->next != NULL)
+		last = last->next;
+	last->next = new;
+	new->prev = last;
+}
+
+int	is_special_token(char *str)
+{
+	const char	*special_tokens[] = {"|", ">", ">>", "<","<<", NULL};
 	int			i;
+	int			len;
 
 	i = 0;
+	len = ft_strlen(special_tokens[i]);
 	while (special_tokens[i])
 	{
-		if (ft_strncmp(str, special_tokens[i], ft_strlen(special_tokens[i])))
-			return (ft_strlen(special_tokens[i]));
+		if (ft_strncmp(str, special_tokens[i], len))
+			return (len);
 		i++;
 	}
 	return (0);
@@ -69,12 +113,12 @@ t_list	*ft_lstnew(void *content)
 	return (node);
 }
 
-void	tokenize_args(const char **input, t_list **tokens)
+void	tokenize_args(char **input, t_list **tokens)
 {
-	const  char *start;
+	char *start;
 	int	nbr;
 
-	start = *input + 2;
+	*start = **input + 2;
 	*input += 2;
 	nbr = 1;
 	while (**input && nbr > 0)
@@ -83,48 +127,48 @@ void	tokenize_args(const char **input, t_list **tokens)
 			nbr++;
 		else if (**input == ')')
 			nbr--;
-		(*input)++;
+		*input++;
 	}
 	if (nbr != 0)
 	{
-		error_msg("open bracket");
-		free_tokens(tokens);
+		//error_msg("open bracket");
+		free_tokens(*tokens);
 		return ;
 	}
-	ft_lstadd_back(&tokens, ft_lstnew(ft_strndup(start, *input - start)));
+	ft_lstadd_back(tokens, ft_lstnew(ft_strndup(start, *input - start)));
 }
 
-void	tokenize_quotes(const char **input, t_list **tokens)
+void	tokenize_quotes(char **input, t_list **tokens)
 {
 	char	quote;
-	const char *start;
+	char *start;
 
-	*start = ++(*input);
+	(*input)++;
+	*start = **input;
 	quote = **input;
 	while (**input && **input != quote)
 		(*input)++;
 	if (**input == quote)
 	{
-		ft_lstadd_back(&tokens, ft_lstnew(ft_strndup(start, *input - start)));
+		ft_lstadd_back(tokens, ft_lstnew(ft_strndup(start, *input - start)));
 		(*input)++;
 	}
 	else
 	{
-		error_msg("open quote");
-		free_tokens(tokens);
+		//error_msg("open quote");
+		free_tokens(*tokens);
 		return ;
 	}
 }
 
-t_list	*tokenizer(const char *input)
+t_list	*tokenizer(char *input)
 {
 	t_list	*tokens;;
-	const char	start;
+	char	*start;
 	int len;
 
 	len = 0;
-	*tokens = NULL;
-	i = 0;
+	tokens = NULL;
 	if (!input)
 		return (NULL);
 	while (*input)
@@ -139,15 +183,15 @@ t_list	*tokenizer(const char *input)
 		{
 			len = is_special_token(input);
 			ft_lstadd_back(&tokens, ft_lstnew(ft_strndup(input, len)));
-			*input += len;
+			input += len;
 		}
 		else if (*input == '$' && *(input + 1) == '(')
-			tokenize_args(&input, tokens);
+			tokenize_args(&input, &tokens);
 		else
 		{
-			*start = input;
+			*start = *input;
 			while (*input && *input != ' ' && *input != '\t' && !is_special_token(input))
-				*input++;
+				input++;
 			ft_lstadd_back(&tokens, ft_lstnew(ft_strndup(start, input - start)));
 		}
 	}

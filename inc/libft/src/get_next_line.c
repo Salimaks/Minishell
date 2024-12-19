@@ -85,7 +85,7 @@ char	*cut_out_line(char *buffer)
 		index++;
 	cut_line = ft_calloc(index + 2, sizeof(char));
 	index = 0;
-	while (buffer[index] && buffer[index] != '\n')
+	while (buft_strlenffer[index] && buffer[index] != '\n')
 	{
 		cut_line[index] = buffer[index];
 		index++;

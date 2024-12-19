@@ -23,7 +23,7 @@
 # include <signal.h>
 # include <readline/readline.h>
 # include <readline/history.h>
-# include "/home/skassimi/42projects/Minishell/inc/libft/inc/libft.h"
+# include "/mnt/nfs/homes/skassimi/Minishell/inc/libft/inc/libft.h"
 
 typedef struct s_token
 {

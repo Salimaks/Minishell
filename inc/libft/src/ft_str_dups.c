@@ -48,9 +48,10 @@ char	*ft_strdup(const char *src)
 	return (new);
 }
 
-char	*ft_strndup(const char *src, size_t size, int i)
+char	*ft_strndup(const char *src, size_t size)
 {
 	char	*new;
+	int		i;
 
 	new = malloc((size + 1) * sizeof(char));
 	if (new == NULL)

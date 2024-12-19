@@ -52,7 +52,7 @@ size_t	ft_strlcat(char *dest, const char *src, size_t size);
 int		ft_atoi(const char *str);
 void	*ft_calloc(size_t nmemb, size_t size);
 char	*ft_strdup(const char *src);
-char	*ft_strndup(const char *src, size_t size, int i);
+char	*ft_strndup(const char *src, size_t size);
 char	*ft_strjoin(const char *s1, const char *s2);
 char	*ft_strtrim(const char *s1, const char *set);
 char	**ft_split(char const *s, char c);
