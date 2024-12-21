@@ -1,14 +1,14 @@
-/******************************************************************************/
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/30 13:06:39 by alex              #+#    #+#             */
-/*   Updated: 2024/12/16 15:57:29 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/21 22:49:59 by alex             ###   ########.fr       */
 /*                                                                            */
-/******************************************************************************/
+/* ************************************************************************** */
 
 #include "minishell.h"
 
@@ -28,7 +28,7 @@ void	parse_outfiles(t_shell *shell, t_cmd *cmd, t_list **current)
 		if (((t_token *)(*current)->next->content)->lexem != WORD)
 			return (set_error(SYNTAX_ERROR, shell, "No outfile"));
 		*current = (*current)->next;
-		((t_token *)(*current)->content)->lexem = INFILE;
+		((t_token *)(*current)->content)->lexem = OUTFILE;
 	}
 	create_file(shell, cmd, ((t_token *)(*current)->content));
 }

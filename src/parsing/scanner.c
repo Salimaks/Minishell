@@ -6,19 +6,24 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/01 16:37:27 by alex              #+#    #+#             */
-/*   Updated: 2024/12/18 11:06:31 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/21 23:13:57 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+int	is_blank(t_list *node)
+{
+	if (!node || !node->content)
+		return (0);
+	return (((t_token *)node->content)->lexem == BLANK);
+}
+
 void	remove_space(t_shell *shell, t_list *current)
 {
-	if (catch_error(shell)
-		|| ((t_token *)current->content)->lexem != BLANK)
+	if (catch_error(shell) || !current->next || !is_blank(current->next))
 		return ;
-	current = current->next;
-	ft_lstpop(current->prev, free_token);
+	ft_lstpop(&shell->token_list, current->next, free_token);
 }
 
 void	merge_token(t_shell *shell, t_list *start)
@@ -31,11 +36,13 @@ void	merge_token(t_shell *shell, t_list *start)
 	current->content = ft_strjoinfree(current->content, next->content);
 	if (!current->content)
 		return (set_error(MALLOC_FAIL, shell, "Failed to malloc token"));
-	ft_lstpop(start->next, free_token);
+	ft_lstpop(&shell->token_list, start->next, free_token);
 }
 
 void	group_words(t_shell *shell, t_list *node)
 {
+	if (!node->next || !node->next->content || ((t_token *)node->next->content)->lexem == END)
+		return ;
 	while (((t_token *)node->content)->lexem == WORD
 		&& ((t_token *)node->next->content)->lexem == WORD)
 		merge_token(shell, node);
@@ -57,8 +64,11 @@ void	group_strings(t_shell *shell, t_list *start)
 	start = start->next;
 	while (((t_token *)start->content)->lexem != END)
 	{
-		if (((t_token *)start->content)->letter == first_delim->letter)
+		if (((t_token *)start->next->content)->letter == first_delim->letter)
+		{
+			ft_lstpop(&shell->token_list, start->next, free_token);
 			break ;
+		}
 		merge_token(shell, start);
 		start = start->next;
 	}

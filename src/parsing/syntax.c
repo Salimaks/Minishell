@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/14 16:42:40 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/18 11:23:13 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/20 11:46:28 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ void	is_missing_redirection(t_shell *shell, t_list *node)
 	if (redirection->letter != '<' && redirection->letter != '>')
 		return ;
 	next_token = (t_token *)node->next->content;
-	if (next_token->lexem != WORD && next_token->lexem != STRING)
+	if (next_token->lexem != WORD)
 	{
 		syntax_error(next_token);
 		shell->critical_er = SYNTAX_ERROR;
@@ -79,7 +79,7 @@ void	is_missing_cmd_before_pipe(t_shell *shell, t_list *node)
 	prev_token = (t_token *)node->prev->content;
 	while (prev_token->lexem != START && prev_token->lexem != PIPE)
 	{
-		if (prev_token->lexem == WORD || prev_token->lexem == STRING)
+		if (prev_token->lexem == WORD)
 			return ;
 		node = node->prev;
 		prev_token = (t_token *)node->prev->content;
@@ -89,9 +89,33 @@ void	is_missing_cmd_before_pipe(t_shell *shell, t_list *node)
 	return ;
 }
 
+void	is_missing_cmd_after_pipe(t_shell *shell, t_list *node)
+{
+	t_token	*pipe_token;
+	t_token	*next_token;
+
+	if (catch_error(shell))
+		return ;
+	pipe_token = (t_token *)node->content;
+	if (pipe_token->letter != '|')
+		return ;
+	next_token = (t_token *)node->next->content;
+	while (next_token->lexem != END && next_token->lexem != PIPE)
+	{
+		if (next_token->lexem == WORD)
+			return ;
+		node = node->prev;
+		next_token = (t_token *)node->prev->content;
+	}
+	syntax_error(pipe_token);
+	shell->critical_er = SYNTAX_ERROR;
+	return ;
+}
+
 int	check_syntax(t_shell *shell, t_list *node)
 {
 	apply_to_list(shell, node, is_missing_cmd_before_pipe);
+	apply_to_list(shell, node, is_missing_cmd_after_pipe);
 	apply_to_list(shell, node, is_missing_redirection);
 	apply_to_list(shell, node, is_missing_delimiter);
 	return (shell->critical_er);

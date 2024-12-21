@@ -1,14 +1,14 @@
-/******************************************************************************/
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   lexer.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 17:34:47 by alex              #+#    #+#             */
-/*   Updated: 2024/12/19 15:57:51 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/21 22:07:53 by alex             ###   ########.fr       */
 /*                                                                            */
-/******************************************************************************/
+/* ************************************************************************** */
 
 #include "minishell.h"
 
@@ -76,7 +76,7 @@ void	id_variables(t_shell * shell, t_list *current)
 	{
 		current = current->next;
 		((t_token *)current->content)->lexem = VARIABLE;
-		ft_lstpop(current->prev, free_token);
+		ft_lstpop(&shell->token_list, current->prev, free_token);
 	}
 }
 

@@ -1,14 +1,14 @@
-/******************************************************************************/
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   ft_lst_iter.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/31 19:32:09 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/19 14:14:58 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/21 20:53:54 by alex             ###   ########.fr       */
 /*                                                                            */
-/******************************************************************************/
+/* ************************************************************************** */
 
 #include <stdlib.h>
 #include "../inc/libft.h"
@@ -77,15 +77,16 @@ t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *))
 	return (new_list);
 }
 
-void	ft_lstpop(t_list *node, void (*del)(void *))
+void	ft_lstpop(t_list **head, t_list *node, void (*del)(void *))
 {
-	if (!node)
+	if (!head || !node || !del)
 		return ;
-	if (node->prev != NULL)
+	if (node->prev)
 		node->prev->next = node->next;
-	if (node->next != NULL)
+	else
+		*head = node->next;
+	if (node->next)
 		node->next->prev = node->prev;
-	node->next = NULL;
-	node->prev = NULL;
 	ft_lstdelone(node, del);
+	node = NULL;
 }

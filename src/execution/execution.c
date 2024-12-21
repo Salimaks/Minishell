@@ -1,14 +1,14 @@
-/******************************************************************************/
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   execution.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 15:37:36 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/18 19:58:42 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/21 22:44:51 by alex             ###   ########.fr       */
 /*                                                                            */
-/******************************************************************************/
+/* ************************************************************************** */
 
 #include "minishell.h"
 
@@ -60,7 +60,6 @@ void	wait_on_fork(t_shell *shell, t_list *cmd_list)
 	waitpid(cmd->fork_pid, &cmd->exit_code, 0);
 	apply_to_list(shell, cmd->infiles, destroy_heredoc);
 }
-
 
 // TO - DO : Open only two pipes alternatively
 int	execute_all_cmd(t_shell *shell)

@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 14:15:08 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/15 12:33:00 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/21 20:54:02 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ int		ft_abs(int num);
 int		ft_isdigit_or_hexa(int c);
 void	ft_free_matrix(int	**matrix);
 int		ft_atoi_base(char *str, char *base);
-void	ft_lstpop(t_list *node, void (*del)(void *));
+void	ft_lstpop(t_list **head, t_list *node, void (*del)(void *));
 int		ft_iseven(int num);
 
 #endif

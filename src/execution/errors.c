@@ -1,14 +1,14 @@
-/******************************************************************************/
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   errors.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 14:37:02 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/16 18:33:04 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/21 23:00:08 by alex             ###   ########.fr       */
 /*                                                                            */
-/******************************************************************************/
+/* ************************************************************************** */
 
 #include "minishell.h"
 
@@ -43,7 +43,10 @@ void	fork_exit_if(int condition, int err_code, t_cmd *cmd, char *err_message)
 	if (condition)
 	{
 		print_error();
+		ft_putstr_fd((char *)cmd->arg_list->content, STDERR_FILENO);
+		ft_putstr_fd(": ", STDERR_FILENO);
 		ft_putstr_fd(err_message, STDERR_FILENO);
+		ft_putstr_fd("\n", STDERR_FILENO);
 		cmd->exit_code = err_code;
 		exit(err_code);
 	}

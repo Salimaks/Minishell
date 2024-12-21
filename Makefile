@@ -1,14 +1,14 @@
-#******************************************************************************#
+# **************************************************************************** #
 #                                                                              #
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: mkling <mkling@student.42.fr>              +#+  +:+       +#+         #
+#    By: alex <alex@student.42.fr>                  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/14 14:56:12 by mkling            #+#    #+#              #
-#    Updated: 2024/12/19 15:29:09 by mkling           ###   ########.fr        #
+#    Updated: 2024/12/20 12:09:23 by alex             ###   ########.fr        #
 #                                                                              #
-#******************************************************************************#
+# **************************************************************************** #
 
 NAME		= minishell
 
@@ -83,7 +83,7 @@ T_NAME		= utest
 
 T_DIR		= test
 
-T_SRC		= utest.c
+T_SRC		= 	utest.c
 
 T_OBJ		= utest.o
 
@@ -138,14 +138,14 @@ debug:		$(DEP) $(OBJ)
 
 $(T_NAME):	$(DEP) $(OBJ)
 			@echo "Compiling unit test"
-			$(T_CC) $(LIB)  $(T_LIB) $(filter-out $(T_EXCL), $(OBJ)) $(addprefix $(T_DIR)/, $(T_SRC)) -o $(T_DIR)/$(T_NAME) -L$(DIR_LIB) -lft -lreadline
+			$(T_CC) $(LIB) $(T_LIB) $(filter-out $(T_EXCL), $(OBJ)) $(addprefix $(T_DIR)/, $(T_SRC)) -o $(T_DIR)/$(T_NAME) -L$(DIR_LIB) -lft -lreadline
 
 test:		$(T_NAME)
 			@echo "Running unit tests :"
-			@$(T_DIR)/$(T_NAME)
+			./$(T_DIR)/$(T_NAME)
 
 valgrind:	$(NAME)
-			@echo "Running valgrind"
+			@echo "Running with valgrind :"
 			$(V_FLAG) ./$(NAME)
 
 #############################

@@ -1,14 +1,14 @@
-/******************************************************************************/
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   redirection.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 17:34:05 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/16 15:49:37 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/21 23:05:26 by alex             ###   ########.fr       */
 /*                                                                            */
-/******************************************************************************/
+/* ************************************************************************** */
 
 #include "minishell.h"
 
@@ -57,8 +57,9 @@ int	get_outfile_fd(t_cmd *cmd)
 	while (cmd->outfiles)
 	{
 		file = (t_file *)cmd->outfiles->content;
-		fork_exit_if(access(file->path, R_OK) == -1,
-			READ_ERROR, cmd, "Input file cannot be read");
+		fork_exit_if(access(file->path, F_OK) == 0
+			&& access(file->path, W_OK) == -1, READ_ERROR, cmd,
+			"Output file cannot be opened");
 		if (file->mode == APPEND)
 			open_file(file, cmd, APPEND);
 		else
