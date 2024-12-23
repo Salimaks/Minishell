@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 15:37:36 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/21 22:44:51 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/23 15:30:26 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,14 +39,17 @@ void	put_arg_in_array(t_cmd *cmd)
 }
 
 /* If fork, check command path, sends fork to execve, sets error if fail */
-void	send_fork_exec_cmd(t_shell *shell, t_cmd *cmd)
+void	send_fork_exec_cmd(t_shell *shell, t_list *node)
 {
-	if (cmd->fork_pid != 0 || catch_error(shell))
+	t_cmd	*cmd;
+
+	cmd = (t_cmd *)node->content;
+	create_fork(shell, &cmd->fork_pid);
+	if (catch_error(shell) || cmd->fork_pid != 0)
 		return ;
+	redirect_fork(shell, node);
 	put_arg_in_array(cmd);
 	get_cmd_path(shell, cmd);
-	// if (is_built_in(cmd->arg_list))
-	// 	exec_built_in();
 	execve(cmd->cmd_path, cmd->argv, shell->env);
 	fork_exit_if(1, CANT_EXECUTE_CMD, cmd, "Failed to execute command");
 }
@@ -64,7 +67,6 @@ void	wait_on_fork(t_shell *shell, t_list *cmd_list)
 // TO - DO : Open only two pipes alternatively
 int	execute_all_cmd(t_shell *shell)
 {
-	t_cmd	*cmd;
 	t_list	*node;
 
 	if (catch_error(shell))
@@ -73,10 +75,10 @@ int	execute_all_cmd(t_shell *shell)
 	apply_to_list(shell, shell->cmd_list, open_pipe);
 	while (node)
 	{
-		cmd = (t_cmd *)node->content;
-		create_fork(shell, &cmd->fork_pid);
-		redirect_fork(shell, node);
-		send_fork_exec_cmd(shell, cmd);
+		// if (is_builtin(cmd))
+		// 	exec_builtin(shell, cmd);
+		// else
+		send_fork_exec_cmd(shell, node);
 		node = node->next;
 	}
 	apply_to_list(shell, shell->cmd_list, close_pipe);

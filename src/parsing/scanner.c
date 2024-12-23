@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/01 16:37:27 by alex              #+#    #+#             */
-/*   Updated: 2024/12/21 23:13:57 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/23 17:22:35 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,26 +51,24 @@ void	group_words(t_shell *shell, t_list *node)
 		merge_token(shell, node);
 }
 
-void	group_strings(t_shell *shell, t_list *start)
+void	group_strings(t_shell *shell, t_list *node)
 {
 	t_token	*first_delim;
 
-	first_delim = ((t_token *)start->content);
+	first_delim = ((t_token *)node->content);
 	if (first_delim->lexem != DELIMITER)
 		return ;
 	first_delim->content = ft_calloc(1, sizeof(char));
 	if (!first_delim->content)
 		return (set_error(MALLOC_FAIL, shell, "Failed to malloc string"));
-	start = start->next;
-	while (((t_token *)start->content)->lexem != END)
+	while (((t_token *)node->next->content)->lexem != END)
 	{
-		if (((t_token *)start->next->content)->letter == first_delim->letter)
+		if (((t_token *)node->next->content)->letter == first_delim->letter)
 		{
-			ft_lstpop(&shell->token_list, start->next, free_token);
+			ft_lstpop(&shell->token_list, node->next, free_token);
 			break ;
 		}
-		merge_token(shell, start);
-		start = start->next;
+		merge_token(shell, node);
 	}
 	first_delim->lexem = STRING;
 }

@@ -1,14 +1,14 @@
-/******************************************************************************/
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/19 15:38:17 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/23 15:06:29 by alex             ###   ########.fr       */
 /*                                                                            */
-/******************************************************************************/
+/* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
@@ -133,6 +133,8 @@ int			export(t_shell *shell, char **argv, int fdout);
 int			unset(t_shell *shell, char **argv);
 int			pwd(int fdout);
 void		exit_shell(t_shell *shell);
+void		exec_builtin(t_shell *shell, t_cmd *cmd);
+int			is_builtin(t_cmd *cmd);
 
 /* REDIRECTION */
 

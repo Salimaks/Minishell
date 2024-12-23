@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/20 15:58:43 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/21 23:11:04 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/23 17:51:29 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -230,20 +230,26 @@ Test(Execution, get_forbidden_infile_fd, .init=redirect_all_std)
 	t_cmd	cmd;
 	t_file	file;
 	t_list	node;
-	char	*arg0 = "ls";
 
 	shell.critical_er = 0;
 	file.path = "test/forbidden.txt";
 	file.mode = INFILE;
-	cmd.arg_list = ft_lstnew(arg0);
+	cmd.arg_list = ft_lstnew("echo");
 	node.content = &file;
 	node.next = NULL;
 	node.prev = NULL;
 	cmd.infiles = &node;
+	cmd.fd_in = -1;
 
 	get_infile_fd(&shell, &cmd);
-	// cr_assert(file.fd < 0);
-	cr_assert_stderr_eq_str("shell: ls: Input file cannot be read\n");
+	int fork_pid = fork();
+	if (!fork_pid)
+	{
+		get_infile_fd(&shell, &cmd);
+		cr_assert(eq(int, cmd.fd_in, -1));
+		exit(0);
+	}
+	// cr_assert_stderr_eq_str("shell: echo: Input file cannot be read\n");
 }
 
 Test(Execution, get_forbidden_outfile_fd, .init=redirect_all_std)
@@ -251,19 +257,25 @@ Test(Execution, get_forbidden_outfile_fd, .init=redirect_all_std)
 	t_cmd	cmd;
 	t_file	file;
 	t_list	node;
-	char	*arg0 = "ls";
+	int		fork_pid;
 
 	file.path = "test/forbidden.txt";
 	file.mode = OUTFILE;
-	cmd.arg_list = ft_lstnew(arg0);
 	node.content = &file;
 	node.next = NULL;
 	node.prev = NULL;
 	cmd.outfiles = &node;
+	cmd.arg_list = ft_lstnew("echo");
+	cmd.fd_out = -1;
 
-	get_outfile_fd(&cmd);
-	// cr_assert(file.fd < 0);
-	cr_assert_stderr_eq_str("shell: ls: Output file cannot be read\n");
+	fork_pid = fork();
+	if (!fork_pid)
+	{
+		get_outfile_fd(&cmd);
+		cr_assert(eq(int, cmd.fd_out, -1));
+		exit(0);
+	}
+	// cr_assert_stderr_eq_str("shell: echo: Output file cannot be opened\n");
 }
 
 Test(Builtin, echo_valid_0, .init = redirect_all_std)

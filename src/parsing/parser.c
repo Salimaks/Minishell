@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/30 13:06:39 by alex              #+#    #+#             */
-/*   Updated: 2024/12/21 22:49:59 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/23 15:36:24 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,7 +69,7 @@ t_ast	*parse_command(t_shell *shell, t_list **node)
 			parse_infiles(shell, cmd, node);
 		else if (token->letter == '>')
 			parse_outfiles(shell, cmd, node);
-		else if (token->lexem == WORD)
+		else if (token->lexem == WORD || token->lexem == STRING)
 			ft_lstadd_back(&cmd->arg_list,
 				ft_lstnew(ft_strdup(token->content)));
 		*node = (*node)->next;

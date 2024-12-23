@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 17:34:05 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/21 23:05:26 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/23 15:10:06 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,22 +30,26 @@ int	get_infile_fd(t_shell *shell, t_cmd *cmd)
 	t_file	*file;
 
 	if (cmd->infiles == NULL)
-		return (STDIN_FILENO);
-	while (cmd->infiles)
+		cmd->fd_in = STDIN_FILENO;
+	else
 	{
-		file = (t_file *)cmd->infiles->content;
-		if (file->mode == HEREDOC)
-			assemble_heredoc(shell, cmd, cmd->infiles);
-		fork_exit_if(access(file->path, F_OK) == -1, NO_FILE, cmd,
-			"Input file does not exist");
-		fork_exit_if(access(file->path, R_OK) == -1, READ_ERROR, cmd,
-			"Input file cannot be read");
-		open_file(file, cmd, READ);
-		if (cmd->infiles->next)
-			close(file->fd);
-		cmd->infiles = cmd->infiles->next;
+		while (cmd->infiles)
+		{
+			file = (t_file *)cmd->infiles->content;
+			if (file->mode == HEREDOC)
+				assemble_heredoc(shell, cmd, cmd->infiles);
+			fork_exit_if(access(file->path, F_OK) == -1, NO_FILE, cmd,
+				"Input file does not exist");
+			fork_exit_if(access(file->path, R_OK) == -1, READ_ERROR, cmd,
+				"Input file cannot be read");
+			open_file(file, cmd, READ);
+			if (cmd->infiles->next)
+				close(file->fd);
+			cmd->infiles = cmd->infiles->next;
+		}
+		cmd->fd_in = file->fd;
 	}
-	return (file->fd);
+	return (cmd->fd_in);
 }
 
 int	get_outfile_fd(t_cmd *cmd)
@@ -53,22 +57,26 @@ int	get_outfile_fd(t_cmd *cmd)
 	t_file	*file;
 
 	if (cmd->outfiles == NULL)
-		return (STDOUT_FILENO);
-	while (cmd->outfiles)
+		cmd->fd_out = STDOUT_FILENO;
+	else
 	{
-		file = (t_file *)cmd->outfiles->content;
-		fork_exit_if(access(file->path, F_OK) == 0
-			&& access(file->path, W_OK) == -1, READ_ERROR, cmd,
-			"Output file cannot be opened");
-		if (file->mode == APPEND)
-			open_file(file, cmd, APPEND);
-		else
-			open_file(file, cmd, WRITE);
-		if (cmd->outfiles->next)
-			close(file->fd);
-		cmd->outfiles = cmd->outfiles->next;
+		while (cmd->outfiles)
+		{
+			file = (t_file *)cmd->outfiles->content;
+			fork_exit_if(access(file->path, F_OK) == 0
+				&& access(file->path, W_OK) == -1, READ_ERROR, cmd,
+				"Output file cannot be opened");
+			if (file->mode == APPEND)
+				open_file(file, cmd, APPEND);
+			else
+				open_file(file, cmd, WRITE);
+			if (cmd->outfiles->next)
+				close(file->fd);
+			cmd->outfiles = cmd->outfiles->next;
+		}
+		cmd->fd_out = file->fd;
 	}
-	return (file->fd);
+	return (cmd->fd_out);
 }
 
 void	redirect_io(t_shell *shell, t_cmd *cmd, int input, int output)
@@ -90,21 +98,14 @@ void	redirect_fork(t_shell *shell, t_list *node)
 	cmd = (t_cmd *)node->content;
 	if (catch_error(shell) || cmd->fork_pid != 0)
 		return ;
-	if (is_first_cmd(node) && is_last_cmd(node))
-		redirect_io(shell, cmd,
-			get_infile_fd(shell, cmd),
-			get_outfile_fd(cmd));
-	else if (is_first_cmd(node))
-		redirect_io(shell, cmd,
-			get_infile_fd(shell, cmd),
-			((t_cmd *)node->content)->pipe_fd[WRITE]);
-	else if (is_last_cmd(node))
-		redirect_io(shell, cmd,
-			((t_cmd *)node->prev->content)->pipe_fd[READ],
-			get_outfile_fd(cmd));
+	if (is_first_cmd(node))
+		cmd->fd_in = get_infile_fd(shell, cmd);
 	else
-		redirect_io(shell, cmd,
-			((t_cmd *)node->prev->content)->pipe_fd[READ],
-			((t_cmd *)node->content)->pipe_fd[WRITE]);
+		cmd->fd_in = ((t_cmd *)node->prev->content)->pipe_fd[READ];
+	if (is_last_cmd(node))
+		cmd->fd_out = get_outfile_fd(cmd);
+	else
+		cmd->fd_out = ((t_cmd *)node->content)->pipe_fd[WRITE];
+	redirect_io(shell, cmd, cmd->fd_in, cmd->fd_out);
 	apply_to_list(shell, shell->cmd_list, close_pipe);
 }
