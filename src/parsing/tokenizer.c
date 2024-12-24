@@ -6,55 +6,14 @@
 /*   By: skassimi <skassimi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 09:23:00 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/14 13:09:03 by skassimi         ###   ########.fr       */
+/*   Updated: 2024/12/24 14:10:52 by skassimi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "/mnt/nfs/homes/skassimi/Minishell/inc/minishell.h"
-#include <stdio.h>
+#include "minishell.h"
 
-int	ft_strncmp(const char *s1, const char *s2, size_t n)
+void	free_tokens(t_list *current)
 {
-	size_t	i;
-
-	i = 0;
-	if (n == 0)
-		return (0);
-	while (i <= n && s1[i] != '\0' && s1[i] == s2[i])
-		i++;
-	if (i == n)
-		return (1);
-	return (0);
-}
-char	*ft_strndup(const char *src, size_t size)
-{
-	char	*new;
-	int		i;
-
-	new = malloc((size + 1) * sizeof(char));
-	if (new == NULL)
-		return (NULL);
-	i = 0;
-	while (src[i] && i <= size)
-	{
-		new[i] = src[i];
-		i++;
-	}
-	new[i] = '\0';
-	return (new);
-}
-size_t	ft_strlen(const char *str)
-{
-	size_t	i;
-
-	i = 0;
-	while (str[i])
-		i++;
-	return (i);
-}
-void	free_tokens(t_list *head)
-{
-	t_list	*current;
 	t_list	*next;
 
 	while (current)
@@ -64,23 +23,6 @@ void	free_tokens(t_list *head)
 		free(current);
 		current = next;
 	}
-}
-void	ft_lstadd_back(t_list **lst, t_list *new)
-{
-	t_list	*last;
-
-	if (new == NULL)
-		return ;
-	if (*lst == NULL)
-	{
-		*lst = new;
-		return ;
-	}
-	last = *lst;
-	while (last->next != NULL)
-		last = last->next;
-	last->next = new;
-	new->prev = last;
 }
 
 int	is_special_token(char *str)
@@ -100,34 +42,21 @@ int	is_special_token(char *str)
 	return (0);
 }
 
-t_list	*ft_lstnew(void *content)
-{
-	t_list	*node;
-
-	node = malloc(sizeof(t_list));
-	if (!node)
-		return (NULL);
-	node->content = content;
-	node->next = NULL;
-	node->prev = NULL;
-	return (node);
-}
-
 void	tokenize_args(char **input, t_list **tokens)
 {
 	char *start;
 	int	nbr;
 
-	*start = **input + 2;
+	start = *input + 2;
 	*input += 2;
 	nbr = 1;
-	while (**input && nbr > 0)
+	while (*input && nbr > 0)
 	{
 		if (**input == '(')
 			nbr++;
 		else if (**input == ')')
 			nbr--;
-		*input++;
+		(*input)++;
 	}
 	if (nbr != 0)
 	{
@@ -138,18 +67,20 @@ void	tokenize_args(char **input, t_list **tokens)
 	ft_lstadd_back(tokens, ft_lstnew(ft_strndup(start, *input - start)));
 }
 
-void	tokenize_quotes(char **input, t_list **tokens)
+int	tokenize_quotes(char *input, t_list **tokens)
 {
+	int i;
 	char	quote;
 	char *start;
 
 	(*input)++;
-	*start = **input;
+	start = *input;
 	quote = **input;
 	while (**input && **input != quote)
 		(*input)++;
 	if (**input == quote)
 	{
+		printf("token_quote :%s", ft_strndup(start, *input - start));
 		ft_lstadd_back(tokens, ft_lstnew(ft_strndup(start, *input - start)));
 		(*input)++;
 	}
@@ -173,12 +104,13 @@ t_list	*tokenizer(char *input)
 		return (NULL);
 	while (*input)
 	{
-		while (*input && *input == ' ' || *input == '\t')
-			*input++;
+		while (*input && (*input == ' ' || *input == '\t'))
+			(*input)++;
 		if (!*input)
 			break ;
+		printf("input : %s\n", input);
 		if (*input == '"' || *input == '\'')
-			tokenize_quotes(&input, &tokens);
+			tokenize_quotes(input, &tokens);
 		else if (is_special_token(input))
 		{
 			len = is_special_token(input);
@@ -189,7 +121,7 @@ t_list	*tokenizer(char *input)
 			tokenize_args(&input, &tokens);
 		else
 		{
-			*start = *input;
+			start = input;
 			while (*input && *input != ' ' && *input != '\t' && !is_special_token(input))
 				input++;
 			ft_lstadd_back(&tokens, ft_lstnew(ft_strndup(start, input - start)));
@@ -197,31 +129,12 @@ t_list	*tokenizer(char *input)
 	}
 	return (tokens);
 }
-
-void print_tokens(t_list *tokens) {
+void print_tokens(t_list *tokens)
+ 
+{
     while (tokens) {
         printf("Token : %s\n", tokens->content);
         tokens = tokens->next;
     }
 }
-
-
-int main(int argc, char **argv)
-{
-	if (argc < 2) 
-	{
-        return (0);
-	}
-    char *input = argv[1];
-    t_list *tokens = tokenizer(input);
-    if (!tokens) {
-        printf("Erreur : impossible de tokenizer l'entrée\n");
-        return (0);
-    }
-
-    printf(" Tokens\n");
-    print_tokens(tokens);
-    free_tokens(tokens);
-    return (0);
-};
 /*error_msg*/

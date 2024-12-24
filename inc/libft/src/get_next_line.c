@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_input.c                                   :+:      :+:    :+:   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: skassimi <skassimi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/07/08 15:58:53 by mkling            #+#    #+#             */
-/*   Updated: 2024/10/04 15:39:31 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/24 13:19:28 by skassimi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,7 @@ char	*cut_out_line(char *buffer)
 		index++;
 	cut_line = ft_calloc(index + 2, sizeof(char));
 	index = 0;
-	while (buft_strlenffer[index] && buffer[index] != '\n')
+	while (buffer[ft_strlen(buffer)] && buffer[index] != '\n')
 	{
 		cut_line[index] = buffer[index];
 		index++;

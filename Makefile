@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: mkling <mkling@student.42.fr>              +#+  +:+       +#+         #
+#    By: skassimi <skassimi@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/14 14:56:12 by mkling            #+#    #+#              #
-#    Updated: 2024/12/04 08:20:48 by mkling           ###   ########.fr        #
+#    Updated: 2024/12/24 13:21:24 by skassimi         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -31,13 +31,9 @@ FUNC_EXEC	= 	execution.c \
 				setup.c \
 				errors.c
 
-FUNC_PARS	=	readline.c \
-				token.c \
-				scanner.c \
-				lexer.c \
+FUNC_PARS	=	tokenizer.c \
 				parser.c \
-				signals.c \
-				cleanup.c
+				signals.c
 
 FUNC		= 	$(addprefix $(DIR_EXEC)/, $(FUNC_EXEC)) \
 				$(addprefix $(DIR_PARS)/, $(FUNC_PARS)) \

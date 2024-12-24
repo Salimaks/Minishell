@@ -6,7 +6,7 @@
 /*   By: skassimi <skassimi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/22 18:03:46 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/13 10:27:03 by skassimi         ###   ########.fr       */
+/*   Updated: 2024/12/24 13:15:57 by skassimi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ char	*ft_strdup(const char *src)
 	return (new);
 }
 
-char	*ft_strndup(const char *src, size_t size)
+char	*ft_strndup(const char *src, int size)
 {
 	char	*new;
 	int		i;
