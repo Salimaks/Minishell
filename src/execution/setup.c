@@ -1,14 +1,14 @@
-/******************************************************************************/
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   setup.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 12:37:12 by alex              #+#    #+#             */
-/*   Updated: 2024/12/16 15:50:01 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/25 18:55:08 by alex             ###   ########.fr       */
 /*                                                                            */
-/******************************************************************************/
+/* ************************************************************************** */
 
 #include "minishell.h"
 
@@ -76,6 +76,8 @@ t_shell	*create_minishell(char **env)
 		return (NULL);
 	shell->env = env;
 	extract_paths(shell);
+	dup2(STDOUT_FILENO, shell->std_out);
+	dup2(STDIN_FILENO, shell->std_in);
 	extract_env_as_linked_list(shell);
 	return (shell);
 }

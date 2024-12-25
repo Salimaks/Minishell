@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/30 00:22:21 by alex              #+#    #+#             */
-/*   Updated: 2024/12/23 12:44:35 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/24 11:49:10 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,19 +53,19 @@ void	free_cmd(void *to_be_del)
 	free(cmd);
 }
 
-void	free_ast(t_ast **ast)
+void	free_tree(t_tree **tree)
 {
-	if (!(*ast))
+	if (!(*tree))
 		return ;
-	if ((*ast)->type == CMD)
-		free_cmd((*ast)->content);
+	if ((*tree)->type == CMD)
+		free_cmd((*tree)->content);
 	else
 	{
-		free_ast(&(*ast)->left);
-		free_ast(&(*ast)->right);
+		free_tree(&(*tree)->left);
+		free_tree(&(*tree)->right);
 	}
-	free(*ast);
-	(*ast) = NULL;
+	free(*tree);
+	(*tree) = NULL;
 }
 
 void	free_minishell(t_shell *shell)
@@ -79,7 +79,7 @@ void	free_minishell(t_shell *shell)
 		ft_lstclear(&shell->token_list, free_token);
 	if (shell->env_list)
 		ft_lstclear(&shell->env_list, free);
-	if (shell->ast_root)
-		free_ast(&shell->ast_root);
+	if (shell->tree_root)
+		free_tree(&shell->tree_root);
 	free(shell);
 }

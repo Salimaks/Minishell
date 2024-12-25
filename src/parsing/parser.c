@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/30 13:06:39 by alex              #+#    #+#             */
-/*   Updated: 2024/12/23 15:36:24 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/24 11:49:10 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ void	parse_infiles(t_shell *shell, t_cmd *cmd, t_list **current)
 	create_file(shell, cmd, ((t_token *)(*current)->content));
 }
 
-t_ast	*parse_command(t_shell *shell, t_list **node)
+t_tree	*parse_command(t_shell *shell, t_list **node)
 {
 	t_cmd	*cmd;
 	t_token	*token;
@@ -75,14 +75,14 @@ t_ast	*parse_command(t_shell *shell, t_list **node)
 		*node = (*node)->next;
 		token = ((t_token *)(*node)->content);
 	}
-	return (create_ast_node(shell, AST_CMD, cmd));
+	return (create_branch(shell, AST_CMD, cmd));
 }
 
-t_ast	*parse_pipe(t_shell *shell, t_list **token)
+t_tree	*parse_pipe(t_shell *shell, t_list **token)
 {
-	t_ast	*left;
-	t_ast	*right;
-	t_ast	*pipe_node;
+	t_tree	*left;
+	t_tree	*right;
+	t_tree	*pipe_node;
 
 	left = parse_command(shell, token);
 	if (!left)
@@ -92,8 +92,8 @@ t_ast	*parse_pipe(t_shell *shell, t_list **token)
 	*token = (*token)->next;
 	right = parse_pipe(shell, token);
 	if (!right)
-		return (free_ast(&left), NULL);
-	pipe_node = create_ast_node(shell, AST_PIPE, NULL);
+		return (free_tree(&left), NULL);
+	pipe_node = create_branch(shell, AST_PIPE, NULL);
 	pipe_node->left = left;
 	pipe_node->right = right;
 	return (pipe_node);
@@ -101,6 +101,6 @@ t_ast	*parse_pipe(t_shell *shell, t_list **token)
 
 void	parser(t_shell *shell)
 {
-	shell->ast_root = parse_pipe(shell, &shell->token_list);
+	shell->tree_root = parse_pipe(shell, &shell->token_list);
 	ft_lstclear(&shell->token_list, free_token);
 }

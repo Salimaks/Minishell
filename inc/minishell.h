@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/23 15:06:29 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/25 18:55:20 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ typedef struct s_ast
 	void			*content;
 	struct s_ast	*left;
 	struct s_ast	*right;
-}	t_ast;
+}	t_tree;
 
 typedef struct s_shell
 {
@@ -72,12 +72,14 @@ typedef struct s_shell
 	t_list		*token_list;	// linked list of tokens id from cmd line
 	t_list		*cmd_list;		// linked list of commands as a structs
 	t_list		*env_list;		// linked list of env strings
-	t_ast		*ast_root;		// abstract syntaxic tree
+	t_tree		*tree_root;		// abstract syntaxic tree
 	int			pipe_fd[2][2];	// two pair of pipe fd for all pipe execution
 	size_t		cmd_count;		// total of commands in commmand line
 	size_t		index;			// index of command currently being executed
 	char		**env;			// env received at start of program
 	char		**paths;		// extracted PATH variable of the env
+	int			std_out;
+	int			std_in;
 	int			critical_er;	// flag if critical error in parent process
 }	t_shell;
 
@@ -102,11 +104,10 @@ void		add_token(t_shell *shell, int type, char letter);
 void		merge_token(t_shell *shell, t_list *start);
 void		lexer(t_shell *shell);
 int			check_syntax(t_shell *shell, t_list *token_list);
-t_ast		*create_ast_node(t_shell *shell, int type, void *content);
+t_tree		*create_branch(t_shell *shell, int type, void *content);
 t_cmd		*create_cmd(void);
 void		create_file(t_shell *shell, t_cmd *cmd, t_token *token);
-void		apply_to_list(t_shell *shell, t_list *node,
-				void function(t_shell *, t_list *));
+void		apply_to_list(t_shell *shell, t_list *node, void f(t_shell *, t_list *));
 void		parser(t_shell *shell);
 
 /* HEREDOC */
@@ -117,12 +118,12 @@ void		destroy_heredoc(t_shell *shell, t_list *file_node);
 
 /* EXECUTION */
 
-void		process_ast(t_shell *shell, t_ast *ast);
+int			exec_tree(t_shell *shell, t_tree *tree, bool piped);
 int			execute_all_cmd(t_shell *shell);
 void		open_pipe(t_shell *shell, t_list *node);
 void		create_fork(t_shell *shell, int	*fork_pid);
 void		get_cmd_path(t_shell *shell, t_cmd *cmd);
-void		fork_exit_if(int condition, int errcode, t_cmd *cmd, char *message);
+void		put_arg_in_array(t_cmd *cmd);
 
 /* BUILT IN */
 
@@ -132,17 +133,18 @@ int			env(t_shell *shell, int fdout);
 int			export(t_shell *shell, char **argv, int fdout);
 int			unset(t_shell *shell, char **argv);
 int			pwd(int fdout);
-void		exit_shell(t_shell *shell);
-void		exec_builtin(t_shell *shell, t_cmd *cmd);
+int			exit_shell(t_shell *shell);
+int			exec_builtin(t_shell *shell, t_cmd *cmd);
 int			is_builtin(t_cmd *cmd);
 
 /* REDIRECTION */
 
 void		open_file(t_file *file, t_cmd *cmd, int mode);
-void		redirect_fork(t_shell *shell, t_list *node);
+void		redirect_for_cmd(t_shell *shell, t_cmd *cmd);
 void		close_pipe(t_shell *shell, t_list *node);
-int			get_infile_fd(t_shell *shell, t_cmd *cmd);
-int			get_outfile_fd(t_cmd *cmd);
+void		set_infile_fd(t_shell *shell, t_cmd *cmd);
+void		set_outfile_fd(t_cmd *cmd);
+void		redirect_io(t_shell *shell, t_cmd *cmd, int input, int output);
 
 /* READABILITY */
 
@@ -153,6 +155,7 @@ int			is_first_cmd(t_list *node);
 
 void		set_error_if(int cond, int err_code, t_shell *shell, char *message);
 void		set_error(int err_code, t_shell *shell, char *err_message);
+void		set_cmd_error(int err_code, t_cmd *cmd, char *err_message);
 int			catch_error(t_shell *shell);
 void		print_error(void);
 
@@ -161,7 +164,7 @@ void		print_error(void);
 void		free_token(void *token);
 void		free_cmd(void *cmd);
 void		free_file(void *file);
-void		free_ast(t_ast **ast);
+void		free_tree(t_tree **tree);
 void		free_minishell(t_shell *shell);
 
 /* DEBUG */
@@ -233,6 +236,14 @@ enum e_ast
 	AST_AND,
 	AST_OR,
 	AST_SUB,
+};
+
+enum e_tree_mode
+{
+	NO_PIPE,
+	IS_PIPE,
+	AST_LEFT,
+	AST_RIGHT,
 };
 
 #endif

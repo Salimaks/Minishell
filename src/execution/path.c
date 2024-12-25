@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 14:12:32 by alex              #+#    #+#             */
-/*   Updated: 2024/12/20 12:05:29 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/25 19:21:20 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,12 +55,12 @@ int	is_a_directory(char *path)
 
 void	check_cmd(t_cmd *cmd)
 {
-	fork_exit_if((cmd->cmd_path == NULL), CANT_FIND_CMD, cmd,
-		"No command found");
-	fork_exit_if(is_a_directory(cmd->cmd_path), CANT_EXECUTE_CMD, cmd,
-		"Command is a directory");
-	fork_exit_if(access(cmd->cmd_path, X_OK) != 0, CANT_EXECUTE_CMD, cmd,
-		"Command cannot be executed");
+	if (cmd->cmd_path == NULL)
+		return (set_cmd_error(CANT_FIND_CMD, cmd, "No command found"));
+	if (is_a_directory(cmd->cmd_path))
+		return (set_cmd_error(CANT_EXECUTE_CMD, cmd, "Command is a directory"));
+	if (access(cmd->cmd_path, X_OK) != 0)
+		return (set_cmd_error(CANT_EXECUTE_CMD, cmd, "Command cannot be executed"));
 }
 
 /* */
@@ -73,8 +73,8 @@ void	find_accessible_path(t_shell *shell, t_cmd *cmd)
 	while (shell->paths[i])
 	{
 		tested_path = ft_strjoin(shell->paths[i++], cmd->cmd_path);
-		fork_exit_if(!tested_path, MALLOC_FAIL, cmd,
-			"Failed to allocate path");
+		if (!tested_path)
+			return (set_cmd_error(MALLOC_FAIL, cmd, "Failed to allocate path"));
 		if (access(tested_path, F_OK | R_OK) == 0)
 		{
 			cmd->cmd_path = tested_path;
@@ -82,7 +82,7 @@ void	find_accessible_path(t_shell *shell, t_cmd *cmd)
 		}
 		free(tested_path);
 	}
-	fork_exit_if(1, CANT_FIND_CMD, cmd, "No command found");
+	set_cmd_error(CANT_FIND_CMD, cmd, "No command found");
 }
 
 /* Checks first absolute path for command
@@ -90,13 +90,13 @@ Then paths if any were extracted from env
 Exits fork if no command is found */
 void	get_cmd_path(t_shell *shell, t_cmd *cmd)
 {
-	cmd->cmd_path = ft_strjoin("/", cmd->argv[0]);
-	fork_exit_if((!cmd->cmd_path), MALLOC_FAIL, cmd,
-		"Failed to allocate path");
+	cmd->cmd_path = ft_strjoin("/", (char *)cmd->arg_list->content);
+	if (!cmd->cmd_path)
+		return (set_cmd_error(MALLOC_FAIL, cmd, "Failed to allocate path"));
 	if (access(cmd->cmd_path, F_OK) == 0)
 		return (check_cmd(cmd));
-	fork_exit_if(shell->paths == NULL, CANT_FIND_CMD, cmd,
-		"No PATH variable found");
+	if (shell->paths == NULL)
+		return (set_cmd_error(CANT_FIND_CMD, cmd, "No PATH variable found"));
 	find_accessible_path(shell, cmd);
 	return (check_cmd(cmd));
 }

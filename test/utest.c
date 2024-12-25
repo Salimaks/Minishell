@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/20 15:58:43 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/23 17:51:29 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/25 22:56:51 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -214,17 +214,16 @@ Test(Execution, get_valid_cmd_path)
 {
 	t_shell	shell;
 	t_cmd	cmd;
-	char	*argv[] = {"ls", NULL};
 
 	shell.env = environ;
 	extract_paths(&shell);
-	cmd.argv = argv;
+	cmd.arg_list = ft_lstnew("ls");
 	get_cmd_path(&shell, &cmd);
 	cr_assert(cmd.cmd_path != NULL);
 	cr_assert(eq(str, cmd.cmd_path, "/usr/bin/ls"));
 }
 
-Test(Execution, get_forbidden_infile_fd, .init=redirect_all_std)
+Test(Execution, set_infile_forbidden, .init=redirect_all_std)
 {
 	t_shell	shell;
 	t_cmd	cmd;
@@ -234,30 +233,23 @@ Test(Execution, get_forbidden_infile_fd, .init=redirect_all_std)
 	shell.critical_er = 0;
 	file.path = "test/forbidden.txt";
 	file.mode = INFILE;
-	cmd.arg_list = ft_lstnew("echo");
 	node.content = &file;
 	node.next = NULL;
 	node.prev = NULL;
 	cmd.infiles = &node;
+	cmd.arg_list = ft_lstnew("echo");
 	cmd.fd_in = -1;
 
-	get_infile_fd(&shell, &cmd);
-	int fork_pid = fork();
-	if (!fork_pid)
-	{
-		get_infile_fd(&shell, &cmd);
-		cr_assert(eq(int, cmd.fd_in, -1));
-		exit(0);
-	}
-	// cr_assert_stderr_eq_str("shell: echo: Input file cannot be read\n");
+	set_infile_fd(&shell, &cmd);
+	cr_assert(eq(int, cmd.fd_in, -1));
+	cr_assert_stderr_eq_str("shell: echo: Forbidden input file\n");
 }
 
-Test(Execution, get_forbidden_outfile_fd, .init=redirect_all_std)
+Test(Execution, set_outfile_forbidden, .init=redirect_all_std)
 {
 	t_cmd	cmd;
 	t_file	file;
 	t_list	node;
-	int		fork_pid;
 
 	file.path = "test/forbidden.txt";
 	file.mode = OUTFILE;
@@ -268,14 +260,8 @@ Test(Execution, get_forbidden_outfile_fd, .init=redirect_all_std)
 	cmd.arg_list = ft_lstnew("echo");
 	cmd.fd_out = -1;
 
-	fork_pid = fork();
-	if (!fork_pid)
-	{
-		get_outfile_fd(&cmd);
-		cr_assert(eq(int, cmd.fd_out, -1));
-		exit(0);
-	}
-	// cr_assert_stderr_eq_str("shell: echo: Output file cannot be opened\n");
+	set_outfile_fd(&cmd);
+	cr_assert_stderr_eq_str("shell: echo: Forbidden output file\n");
 }
 
 Test(Builtin, echo_valid_0, .init = redirect_all_std)
@@ -308,6 +294,17 @@ Test(Builtin, echo_option_0, .init = redirect_all_std)
 	shell->cmd_line = "echo -n hello";
 	parse_and_exec_cmd(shell, shell->cmd_line);
 	cr_assert_stdout_eq_str("hello");
+	free_minishell(shell);
+}
+
+Test(Builtin, echo_option_1, .init = redirect_all_std)
+{
+	t_shell *shell;
+
+	shell = create_minishell(environ);
+	shell->cmd_line = "echo -n 'hello and goodbye'";
+	parse_and_exec_cmd(shell, shell->cmd_line);
+	cr_assert_stdout_eq_str("hello and goodbye");
 	free_minishell(shell);
 }
 
