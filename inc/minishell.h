@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/25 18:55:20 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/26 12:40:27 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,6 @@ typedef struct s_shell
 	int			critical_er;	// flag if critical error in parent process
 }	t_shell;
 
-
 /* SIGNAL */
 
 void		handle_siquit(int sig);
@@ -107,7 +106,7 @@ int			check_syntax(t_shell *shell, t_list *token_list);
 t_tree		*create_branch(t_shell *shell, int type, void *content);
 t_cmd		*create_cmd(void);
 void		create_file(t_shell *shell, t_cmd *cmd, t_token *token);
-void		apply_to_list(t_shell *shell, t_list *node, void f(t_shell *, t_list *));
+void		apply_to_list(t_shell *s, t_list *n, void f(t_shell *, t_list *));
 void		parser(t_shell *shell);
 
 /* HEREDOC */
@@ -170,7 +169,6 @@ void		free_minishell(t_shell *shell);
 /* DEBUG */
 
 void		print_tokens(t_list *first);
-
 
 # define TRUE			1
 # define FALSE			0

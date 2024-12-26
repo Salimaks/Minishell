@@ -6,18 +6,18 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/23 10:22:40 by alex              #+#    #+#             */
-/*   Updated: 2024/12/25 19:10:57 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/26 13:37:16 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int		is_builtin(t_cmd *cmd)
+int	is_builtin(t_cmd *cmd)
 {
 	char	*argv0;
 
 	if (!cmd || !cmd->arg_list)
-		return  (0);
+		return (0);
 	argv0 = (char *)cmd->arg_list->content;
 	if (ft_strcmp(argv0, "cd") == 0)
 		return (1);
@@ -39,17 +39,18 @@ int		is_builtin(t_cmd *cmd)
 int	exec_builtin(t_shell *shell, t_cmd *cmd)
 {
 	if (ft_strcmp(cmd->argv[0], "cd") == 0)
-		exit(cd(shell, cmd->argv[1]));
+		return (cd(shell, cmd->argv[1]));
 	if (ft_strcmp(cmd->argv[0], "echo") == 0)
-		exit(echo(cmd->argv, cmd->fd_out));
+		return (echo(cmd->argv, cmd->fd_out));
 	if (ft_strcmp(cmd->argv[0], "env") == 0)
-		exit(env(shell, cmd->fd_out));
+		return (env(shell, cmd->fd_out));
 	if (ft_strcmp(cmd->argv[0], "export") == 0)
-		exit(export(shell, cmd->argv, cmd->fd_out));
+		return (export(shell, cmd->argv, cmd->fd_out));
 	if (ft_strcmp(cmd->argv[0], "unset") == 0)
-		exit(unset(shell, cmd->argv));
+		return (unset(shell, cmd->argv));
 	if (ft_strcmp(cmd->argv[0], "pwd") == 0)
-		exit(pwd(cmd->fd_out));
-	exit_shell(shell);
+		return (pwd(cmd->fd_out));
+	else
+		exit_shell(shell);
 	return (1);
 }

@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 17:34:05 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/25 23:54:17 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/26 13:28:57 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ void	set_outfile_fd(t_cmd *cmd)
 	while (cmd->outfiles)
 	{
 		file = (t_file *)cmd->outfiles->content;
-		if (access(file->path, F_OK) == 0  && access(file->path, W_OK) == -1)
+		if (access(file->path, F_OK) == 0 && access(file->path, W_OK) == -1)
 			return (set_cmd_error(READ_ERROR, cmd, "Forbidden output file"));
 		if (file->mode == APPEND)
 			open_file(file, cmd, APPEND);
@@ -80,9 +80,9 @@ void	redirect_io(t_shell *shell, t_cmd *cmd, int input, int output)
 {
 	if (catch_error(shell))
 		return ;
-	if (cmd->infiles && dup2(input, STDIN_FILENO) == -1)
+	if (input != STDIN_FILENO && dup2(input, STDIN_FILENO) == -1)
 		return (set_cmd_error(DUP_ERROR, cmd, "Error redirecting input"));
-	if (cmd->outfiles && dup2(output, STDOUT_FILENO) == -1)
+	if (output != STDOUT_FILENO && dup2(output, STDOUT_FILENO) == -1)
 		return (set_cmd_error(DUP_ERROR, cmd, "Error redirecting output"));
 }
 

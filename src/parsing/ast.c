@@ -75,7 +75,7 @@ int	exec_with_fork(t_shell *shell, t_cmd *cmd)
 	return (cmd->exit_code);
 }
 
-int	exec_single_cmd(t_shell *shell, t_tree *tree, int pipe_mode)
+int	exec_single_cmd(t_shell *shell, t_tree *tree, bool piped)
 {
 	t_cmd	*cmd;
 
@@ -83,14 +83,14 @@ int	exec_single_cmd(t_shell *shell, t_tree *tree, int pipe_mode)
 	if (!cmd->arg_list || cmd->exit_code)
 	{
 		redirect_for_cmd(shell, cmd);
-		reset_std(shell, pipe_mode);
+		reset_std(shell, piped);
 	}
 	else if (is_builtin(cmd))
 	{
 		put_arg_in_array(cmd);
 		redirect_for_cmd(shell, cmd);
 		exec_builtin(shell, cmd);
-		reset_std(shell, pipe_mode);
+		reset_std(shell, piped);
 		return (cmd->exit_code);
 	}
 	else
@@ -98,21 +98,24 @@ int	exec_single_cmd(t_shell *shell, t_tree *tree, int pipe_mode)
 	return (cmd->exit_code);
 }
 
-int	exec_tree_piped(t_shell *shell, t_tree *tree, int pipe_fd[2], int pipe_mode)
+int	pipe_exec_tree(t_shell *shell, t_tree *tree, int pipe_fd[2], int mode)
 {
-	if (pipe_mode == WRITE)
+	int	exit_code;
+
+	if (mode == WRITE)
 	{
 		close(pipe_fd[READ]);
 		dup2(pipe_fd[WRITE], STDOUT_FILENO);
 		close(pipe_fd[WRITE]);
 	}
-	if (pipe_mode == READ)
+	if (mode == READ)
 	{
 		close(pipe_fd[WRITE]);
 		dup2(pipe_fd[READ], STDIN_FILENO);
 		close(pipe_fd[READ]);
 	}
-	return(exec_tree(shell, tree, true));
+	exit_code = exec_tree(shell, tree, true);
+	exit (exit_code);
 }
 
 int	exec_pipe(t_shell *shell, t_tree *tree)
@@ -128,14 +131,14 @@ int	exec_pipe(t_shell *shell, t_tree *tree)
 	if (fork_pid1 < 0)
 		return (set_error(FORK_ERROR, shell, "Failed to fork"), FORK_ERROR);
 	if (fork_pid1 == 0)
-		exec_tree_piped(shell, tree->left, pipe_fd, WRITE);
+		pipe_exec_tree(shell, tree->left, pipe_fd, WRITE);
 	else
 	{
 		fork_pid2 = fork();
 		if (fork_pid2 < 0)
 			return (set_error(FORK_ERROR, shell, "Failed to fork"), FORK_ERROR);
 		if (fork_pid2 == 0)
-			exec_tree_piped(shell, tree->right, pipe_fd, READ);
+			pipe_exec_tree(shell, tree->right, pipe_fd, READ);
 		else
 		{
 			close(pipe_fd[READ]);
@@ -145,7 +148,7 @@ int	exec_pipe(t_shell *shell, t_tree *tree)
 			return (exit_code);
 		}
 	}
-	return (exit_code);
+	return (PIPE_ERROR);
 }
 
 int	exec_tree(t_shell *shell, t_tree *tree, bool piped)
