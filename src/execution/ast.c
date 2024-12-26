@@ -26,14 +26,6 @@ t_tree	*create_branch(t_shell *shell, int type, void *content)
 	return (node);
 }
 
-void	reset_std(t_shell *shell, bool piped)
-{
-	if (piped)
-		return ;
-	dup2(shell->std_in, 0);
-	dup2(shell->std_out, 1);
-}
-
 void	put_arg_in_array(t_cmd *cmd)
 {
 	int	argc;
@@ -50,52 +42,6 @@ void	put_arg_in_array(t_cmd *cmd)
 		cmd->arg_list = cmd->arg_list->next;
 		index++;
 	}
-}
-
-int	exec_with_fork(t_shell *shell, t_cmd *cmd)
-{
-	if (cmd->exit_code)
-		return (cmd->exit_code);
-	fprintf(stderr, "trying to exec %s\n", (char *)cmd->arg_list->content);
-	cmd->fork_pid = fork();
-	if (cmd->fork_pid == 0)
-	{
-		redirect_for_cmd(shell, cmd);
-		get_cmd_path(shell, cmd);
-		fprintf(stdout, "got path %s\n", cmd->cmd_path);
-		put_arg_in_array(cmd);
-		fprintf(stdout, "got argv %s\n", cmd->argv[0]);
-		execve(cmd->cmd_path, cmd->argv, shell->env);
-		set_cmd_error(CANT_EXECUTE_CMD, cmd, "Could not execute");
-		exit(CANT_EXECUTE_CMD);
-	}
-	fprintf(stderr, "waiting on %s\n", (char *)cmd->arg_list->content);
-	waitpid(cmd->fork_pid, &cmd->exit_code, 0);
-	fprintf(stderr, "executed %s\n", (char *)cmd->arg_list->content);
-	return (cmd->exit_code);
-}
-
-int	exec_single_cmd(t_shell *shell, t_tree *tree, bool piped)
-{
-	t_cmd	*cmd;
-
-	cmd = (t_cmd *)tree->content;
-	if (!cmd->arg_list || cmd->exit_code)
-	{
-		redirect_for_cmd(shell, cmd);
-		reset_std(shell, piped);
-	}
-	else if (is_builtin(cmd))
-	{
-		put_arg_in_array(cmd);
-		redirect_for_cmd(shell, cmd);
-		exec_builtin(shell, cmd);
-		reset_std(shell, piped);
-		return (cmd->exit_code);
-	}
-	else
-		exec_with_fork(shell, cmd);
-	return (cmd->exit_code);
 }
 
 int	pipe_exec_tree(t_shell *shell, t_tree *tree, int pipe_fd[2], int mode)
@@ -116,39 +62,6 @@ int	pipe_exec_tree(t_shell *shell, t_tree *tree, int pipe_fd[2], int mode)
 	}
 	exit_code = exec_tree(shell, tree, true);
 	exit (exit_code);
-}
-
-int	exec_pipe(t_shell *shell, t_tree *tree)
-{
-	int	pipe_fd[2];
-	int	fork_pid1;
-	int	fork_pid2;
-	int	exit_code;
-
-	if (pipe(pipe_fd) != 0)
-		return (set_error(PIPE_ERROR, shell, "Failed to pipe"), PIPE_ERROR);
-	fork_pid1 = fork();
-	if (fork_pid1 < 0)
-		return (set_error(FORK_ERROR, shell, "Failed to fork"), FORK_ERROR);
-	if (fork_pid1 == 0)
-		pipe_exec_tree(shell, tree->left, pipe_fd, WRITE);
-	else
-	{
-		fork_pid2 = fork();
-		if (fork_pid2 < 0)
-			return (set_error(FORK_ERROR, shell, "Failed to fork"), FORK_ERROR);
-		if (fork_pid2 == 0)
-			pipe_exec_tree(shell, tree->right, pipe_fd, READ);
-		else
-		{
-			close(pipe_fd[READ]);
-			close(pipe_fd[WRITE]);
-			waitpid(fork_pid1, &exit_code, 0);
-			waitpid(fork_pid2, &exit_code, 0);
-			return (exit_code);
-		}
-	}
-	return (PIPE_ERROR);
 }
 
 int	exec_tree(t_shell *shell, t_tree *tree, bool piped)

@@ -6,20 +6,85 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 15:37:36 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/25 19:00:40 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/26 13:58:05 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-// /* if not the last cmd, open pipe */
-// void	open_pipe(t_shell *shell, t_list *node)
-// {
-// 	if (catch_error(shell) || !node->next)
-// 		return ;
-// 	set_error_if(pipe(((t_cmd *)node->content)->pipe_fd) == -1, PIPE_ERROR,
-// 		shell, "Failed to pipe");
-// }
+int	exec_with_fork(t_shell *shell, t_cmd *cmd)
+{
+	if (cmd->exit_code)
+		return (cmd->exit_code);
+	cmd->fork_pid = fork();
+	if (cmd->fork_pid == 0)
+	{
+		redirect_for_cmd(shell, cmd);
+		get_cmd_path(shell, cmd);
+		if (!cmd->cmd_path)
+			exit(cmd->exit_code);
+		put_arg_in_array(cmd);
+		execve(cmd->cmd_path, cmd->argv, shell->env);
+		exit(CANT_EXECUTE_CMD);
+	}
+	waitpid(cmd->fork_pid, &cmd->exit_code, 0);
+	return (cmd->exit_code);
+}
+
+int	exec_single_cmd(t_shell *shell, t_tree *tree, bool piped)
+{
+	t_cmd	*cmd;
+
+	cmd = (t_cmd *)tree->content;
+	if (!cmd->arg_list || cmd->exit_code)
+	{
+		redirect_for_cmd(shell, cmd);
+		reset_std(shell, piped);
+	}
+	else if (is_builtin(cmd))
+	{
+		put_arg_in_array(cmd);
+		redirect_for_cmd(shell, cmd);
+		exec_builtin(shell, cmd);
+		reset_std(shell, piped);
+		return (cmd->exit_code);
+	}
+	else
+		exec_with_fork(shell, cmd);
+	return (cmd->exit_code);
+}
+
+int	exec_pipe(t_shell *shell, t_tree *tree)
+{
+	int	pipe_fd[2];
+	int	fork_pid1;
+	int	fork_pid2;
+	int	exit_code;
+
+	if (pipe(pipe_fd) != 0)
+		return (set_error(PIPE_ERROR, shell, "Failed to pipe"), PIPE_ERROR);
+	fork_pid1 = fork();
+	if (fork_pid1 < 0)
+		return (set_error(FORK_ERROR, shell, "Failed to fork"), FORK_ERROR);
+	if (fork_pid1 == 0)
+		pipe_exec_tree(shell, tree->left, pipe_fd, WRITE);
+	else
+	{
+		fork_pid2 = fork();
+		if (fork_pid2 < 0)
+			return (set_error(FORK_ERROR, shell, "Failed to fork"), FORK_ERROR);
+		if (fork_pid2 == 0)
+			pipe_exec_tree(shell, tree->right, pipe_fd, READ);
+		else
+		{
+			close_pipe(shell, pipe_fd);
+			waitpid(fork_pid1, &exit_code, 0);
+			waitpid(fork_pid2, &exit_code, 0);
+			return (exit_code);
+		}
+	}
+	return (PIPE_ERROR);
+}
 
 // /* If fork, check command path, sends fork to execve, sets error if fail */
 // void	send_fork_exec_cmd(t_shell *shell, t_list *node)

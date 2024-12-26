@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/26 12:40:27 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/26 14:43:27 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,6 @@ typedef struct s_cmd
 	int				exit_code;	// value returned by the execution of command
 	size_t			cmd_index;	// number of the command among other commands
 	int				fork_pid;	// process id of fork sent to execute command
-	int				pipe_fd[2];	// array of 2 pipe fd required for the pipe()
 }	t_cmd;
 
 typedef struct s_ast
@@ -78,9 +77,10 @@ typedef struct s_shell
 	size_t		index;			// index of command currently being executed
 	char		**env;			// env received at start of program
 	char		**paths;		// extracted PATH variable of the env
-	int			std_out;
-	int			std_in;
+	int			std_out;		// preserved stdout
+	int			std_in;			// preserved stdin
 	int			critical_er;	// flag if critical error in parent process
+	int			last_exit_code;	// result of the last command
 }	t_shell;
 
 /* SIGNAL */
@@ -118,7 +118,9 @@ void		destroy_heredoc(t_shell *shell, t_list *file_node);
 /* EXECUTION */
 
 int			exec_tree(t_shell *shell, t_tree *tree, bool piped);
-int			execute_all_cmd(t_shell *shell);
+int			exec_pipe(t_shell *shell, t_tree *tree);
+int			exec_single_cmd(t_shell *shell, t_tree *tree, bool piped);
+int			pipe_exec_tree(t_shell *shell, t_tree *tree, int pipe_fd[2], int mode);
 void		open_pipe(t_shell *shell, t_list *node);
 void		create_fork(t_shell *shell, int	*fork_pid);
 void		get_cmd_path(t_shell *shell, t_cmd *cmd);
@@ -132,7 +134,7 @@ int			env(t_shell *shell, int fdout);
 int			export(t_shell *shell, char **argv, int fdout);
 int			unset(t_shell *shell, char **argv);
 int			pwd(int fdout);
-int			exit_shell(t_shell *shell);
+int			exit_shell(t_shell *shell, char **argv);
 int			exec_builtin(t_shell *shell, t_cmd *cmd);
 int			is_builtin(t_cmd *cmd);
 
@@ -140,15 +142,10 @@ int			is_builtin(t_cmd *cmd);
 
 void		open_file(t_file *file, t_cmd *cmd, int mode);
 void		redirect_for_cmd(t_shell *shell, t_cmd *cmd);
-void		close_pipe(t_shell *shell, t_list *node);
+void		close_pipe(t_shell *shell, int *pipe_fd);
 void		set_infile_fd(t_shell *shell, t_cmd *cmd);
 void		set_outfile_fd(t_cmd *cmd);
-void		redirect_io(t_shell *shell, t_cmd *cmd, int input, int output);
-
-/* READABILITY */
-
-int			is_last_cmd(t_list *node);
-int			is_first_cmd(t_list *node);
+void		reset_std(t_shell *shell, bool piped);
 
 /* ERROR HANDLING */
 

@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 14:12:32 by alex              #+#    #+#             */
-/*   Updated: 2024/12/25 19:21:20 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/26 14:01:00 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ int	is_a_directory(char *path)
 void	check_cmd(t_cmd *cmd)
 {
 	if (cmd->cmd_path == NULL)
-		return (set_cmd_error(CANT_FIND_CMD, cmd, "No command found"));
+		return (set_cmd_error(CANT_FIND_CMD, cmd, "Command not found"));
 	if (is_a_directory(cmd->cmd_path))
 		return (set_cmd_error(CANT_EXECUTE_CMD, cmd, "Command is a directory"));
 	if (access(cmd->cmd_path, X_OK) != 0)
@@ -82,7 +82,7 @@ void	find_accessible_path(t_shell *shell, t_cmd *cmd)
 		}
 		free(tested_path);
 	}
-	set_cmd_error(CANT_FIND_CMD, cmd, "No command found");
+	cmd->cmd_path = NULL;
 }
 
 /* Checks first absolute path for command

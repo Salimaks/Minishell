@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/20 15:58:43 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/25 22:56:51 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/26 14:21:49 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -264,6 +264,29 @@ Test(Execution, set_outfile_forbidden, .init=redirect_all_std)
 	cr_assert_stderr_eq_str("shell: echo: Forbidden output file\n");
 }
 
+Test(Execution, no_path_relative_command, .init = redirect_all_std)
+{
+	t_cmd	cmd;
+	t_shell	shell;
+
+	cmd.arg_list = ft_lstnew("ls");
+	shell.paths = NULL;
+	get_cmd_path(&shell, &cmd);
+	cr_assert_stderr_eq_str("shell: ls: No PATH variable found\n");
+}
+
+Test(Execution, unknown_command, .init = redirect_all_std)
+{
+	t_cmd	cmd;
+	t_shell	shell;
+	char	*paths[] = {"usr/bin", NULL};
+
+	cmd.arg_list = ft_lstnew("eccho");
+	shell.paths = paths;
+	get_cmd_path(&shell, &cmd);
+	cr_assert_stderr_eq_str("shell: eccho: Command not found\n");
+}
+
 Test(Builtin, echo_valid_0, .init = redirect_all_std)
 {
 	t_shell *shell;
@@ -308,25 +331,24 @@ Test(Builtin, echo_option_1, .init = redirect_all_std)
 	free_minishell(shell);
 }
 
+Test(Complete, pipe_basic_0, .init = redirect_all_std)
+{
+	t_shell *shell;
 
+	shell = create_minishell(environ);
+	shell->cmd_line = "echo hello | cat -e";
+	parse_and_exec_cmd(shell, shell->cmd_line);
+	cr_assert_stdout_eq_str("hello$\n");
+	free_minishell(shell);
+}
 
+Test(Complete, pipe_synchro_0, .init = redirect_all_std)
+{
+	t_shell *shell;
 
-
-
-
-
-
-
-
-
-// Test(Execution, single_cmd, .init = redirect_all_stdout)
-// {
-// 	t_shell	*shell;
-
-// 	shell = create_minishell(environ);
-// 	shell->cmd_line = "echo hello";
-// 	parse_and_exec_cmd(shell, shell->cmd_line);
-// 	fprintf(stderr, "%s", ((t_cmd *)shell->cmd_list->content)->cmd_path);
-// 	cr_assert_stderr_eq_str("echo");
-// 	free_minishell(shell);
-// }
+	shell = create_minishell(environ);
+	shell->cmd_line = "yes | head -n 2";
+	parse_and_exec_cmd(shell, shell->cmd_line);
+	cr_assert_stdout_eq_str("y\ny\n");
+	free_minishell(shell);
+}

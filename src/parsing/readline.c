@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 13:51:38 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/25 19:06:59 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/26 14:42:25 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ void	parse_and_exec_cmd(t_shell *shell, char *input)
 	if (check_syntax(shell, shell->token_list) != 0)
 		return (ft_lstclear(&shell->token_list, free_token));
 	parser(shell);
-	exec_tree(shell, shell->tree_root, false);
+	shell->last_exit_code = exec_tree(shell, shell->tree_root, false);
 	free_tree(&shell->tree_root);
 }
 

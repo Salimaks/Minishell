@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/23 10:22:40 by alex              #+#    #+#             */
-/*   Updated: 2024/12/26 13:37:16 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/26 14:43:56 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,6 @@ int	exec_builtin(t_shell *shell, t_cmd *cmd)
 	if (ft_strcmp(cmd->argv[0], "pwd") == 0)
 		return (pwd(cmd->fd_out));
 	else
-		exit_shell(shell);
+		exit_shell(shell, cmd->argv);
 	return (1);
 }

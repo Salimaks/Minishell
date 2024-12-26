@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 17:34:05 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/26 13:28:57 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/26 13:45:40 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,14 +76,12 @@ void	set_outfile_fd(t_cmd *cmd)
 	cmd->fd_out = file->fd;
 }
 
-void	redirect_io(t_shell *shell, t_cmd *cmd, int input, int output)
+void	reset_std(t_shell *shell, bool piped)
 {
-	if (catch_error(shell))
+	if (piped)
 		return ;
-	if (input != STDIN_FILENO && dup2(input, STDIN_FILENO) == -1)
-		return (set_cmd_error(DUP_ERROR, cmd, "Error redirecting input"));
-	if (output != STDOUT_FILENO && dup2(output, STDOUT_FILENO) == -1)
-		return (set_cmd_error(DUP_ERROR, cmd, "Error redirecting output"));
+	dup2(shell->std_in, 0);
+	dup2(shell->std_out, 1);
 }
 
 void	redirect_for_cmd(t_shell *shell, t_cmd *cmd)
@@ -92,6 +90,10 @@ void	redirect_for_cmd(t_shell *shell, t_cmd *cmd)
 		return ;
 	set_infile_fd(shell, cmd);
 	set_outfile_fd(cmd);
-	redirect_io(shell, cmd, cmd->fd_in, cmd->fd_out);
-	fprintf(stderr, "redirecting\n");
+	if (cmd->exit_code)
+		return ;
+	if (cmd->fd_in != STDIN_FILENO && dup2(cmd->fd_in, STDIN_FILENO) == -1)
+		return (set_cmd_error(DUP_ERROR, cmd, "Error redirecting input"));
+	if (cmd->fd_out != STDOUT_FILENO && dup2(cmd->fd_in, STDOUT_FILENO) == -1)
+		return (set_cmd_error(DUP_ERROR, cmd, "Error redirecting output"));
 }

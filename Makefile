@@ -6,7 +6,7 @@
 #    By: alex <alex@student.42.fr>                  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/14 14:56:12 by mkling            #+#    #+#              #
-#    Updated: 2024/12/23 10:37:05 by alex             ###   ########.fr        #
+#    Updated: 2024/12/26 13:50:38 by alex             ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -31,8 +31,9 @@ FUNC_EXEC	= 	execution.c \
 				redirection.c \
 				path.c \
 				setup.c \
-				heredoc.c\
-				errors.c
+				heredoc.c \
+				errors.c \
+				ast.c
 
 FUNC_PARS	=	readline.c \
 				token.c \
@@ -40,7 +41,6 @@ FUNC_PARS	=	readline.c \
 				lexer.c \
 				parser.c \
 				signals.c \
-				ast.c \
 				syntax.c \
 				cleanup.c
 
