@@ -1,14 +1,14 @@
-/* ************************************************************************** */
+/******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/26 21:19:22 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/27 14:22:38 by mkling           ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
+/******************************************************************************/
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
@@ -94,19 +94,23 @@ void		extract_env_as_linked_list(t_shell *shell);
 void		extract_paths(t_shell *shell);
 void		init_readline(t_shell *shell);
 
-/* PARSING */
+/* TOKENIZER */
 
-t_shell		*create_minishell(char **env);
 void		scan(t_shell *shell);
 void		add_token(t_shell *shell, int type, char letter);
 void		merge_token(t_shell *shell, t_list *start);
 void		lexer(t_shell *shell);
 int			check_syntax(t_shell *shell, t_list *token_list);
+void		apply_to_list(t_shell *s, t_list *n, void f(t_shell *, t_list *));
+
+/* PARSER */
+
+t_shell		*create_minishell(char **env);
 t_tree		*create_branch(t_shell *shell, int type, void *content);
 t_cmd		*create_cmd(void);
 void		create_file(t_shell *shell, t_cmd *cmd, t_token *token);
-void		apply_to_list(t_shell *s, t_list *n, void f(t_shell *, t_list *));
 void		parser(t_shell *shell);
+void		expand_var(t_shell *shell, t_list *node);
 
 /* HEREDOC */
 
@@ -134,6 +138,7 @@ int			pwd(int fdout);
 int			exit_shell(t_shell *shell, char **argv);
 int			exec_builtin(t_shell *shell, t_cmd *cmd);
 int			is_builtin(t_cmd *cmd);
+t_list		*find_env(t_list *env_list, char *env_name);
 
 /* REDIRECTION */
 

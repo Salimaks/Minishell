@@ -1,70 +1,64 @@
-/* ************************************************************************** */
+/******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   lexer.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 17:34:47 by alex              #+#    #+#             */
-/*   Updated: 2024/12/21 22:07:53 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/27 14:32:39 by mkling           ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
+/******************************************************************************/
 
 #include "minishell.h"
 
-size_t	get_token_count(t_list *start, t_list *end)
+int	is_blank(t_list *node)
 {
-	t_list	*current;
-	size_t	count;
-
-	current = start;
-	count = 0;
-	while (current != end)
-	{
-		count++;
-		current = current->next;
-	}
-	return (count);
+	if (!node || !node->content)
+		return (0);
+	return (((t_token *)node->content)->lexem == BLANK);
 }
 
-size_t	count_tokens_of_type(t_list *start, int lexem)
+void	remove_space(t_shell *shell, t_list *current)
 {
-	t_list	*current;
-	size_t	count;
-
-	current = start;
-	count = 0;
-	while (((t_token *)current->content)->lexem != END)
-	{
-		if (((t_token *)current->content)->lexem == lexem)
-			count++;
-		current = current->next;
-	}
-	return (count);
+	if (catch_error(shell) || !current->next || !is_blank(current->next))
+		return ;
+	ft_lstpop(&shell->token_list, current->next, free_token);
 }
 
-char	**extract_token_as_array(t_shell *shell, t_list *start, int type)
+void	group_words(t_shell *shell, t_list *node)
 {
-	int		index;
-	int		count;
-	char	**result;
+	if (!node->next || !node->next->content
+		|| ((t_token *)node->next->content)->lexem == END)
+		return ;
+	while (((t_token *)node->content)->lexem == WORD
+		&& ((t_token *)node->next->content)->lexem == WORD)
+		merge_token(shell, node);
+	while (((t_token *)node->content)->lexem == BLANK
+		&& ((t_token *)node->next->content)->lexem == BLANK)
+		merge_token(shell, node);
+}
 
-	count = count_tokens_of_type(start, type);
-	if (count == 0)
-		return (NULL);
-	result = ft_calloc(sizeof(char *), count + 1);
-	if (!result)
-		return (set_error(MALLOC_FAIL, shell,
-				"Failed to allocate infile path"), NULL);
-	index = 0;
-	while (((t_token *)start->content)->lexem != END)
+void	group_strings(t_shell *shell, t_list *node)
+{
+	t_token	*first_delim;
+
+	first_delim = ((t_token *)node->content);
+	if (first_delim->lexem != DELIMITER)
+		return ;
+	first_delim->content = ft_calloc(1, sizeof(char));
+	if (!first_delim->content)
+		return (set_error(MALLOC_FAIL, shell, "Failed to malloc string"));
+	while (((t_token *)node->next->content)->lexem != END)
 	{
-		if (((t_token *)start->content)->lexem == type)
-			result[index++] = ft_strdup(((t_token *)start->content)->content);
-		start = start->next;
+		if (((t_token *)node->next->content)->letter == first_delim->letter)
+		{
+			ft_lstpop(&shell->token_list, node->next, free_token);
+			break ;
+		}
+		merge_token(shell, node);
 	}
-	result[index] = NULL;
-	return (result);
+	first_delim->lexem = STRING;
 }
 
 void	id_variables(t_shell * shell, t_list *current)
@@ -74,16 +68,20 @@ void	id_variables(t_shell * shell, t_list *current)
 		return ;
 	if (((t_token *)current->content)->letter == '$')
 	{
-		current = current->next;
+		merge_token(shell, current);
 		((t_token *)current->content)->lexem = VARIABLE;
-		ft_lstpop(&shell->token_list, current->prev, free_token);
 	}
 }
 
 void	lexer(t_shell *shell)
 {
 	scan(shell);
-	// print_tokens(shell->token_list);
+	apply_to_list(shell, shell->token_list, group_words);
+	apply_to_list(shell, shell->token_list, group_strings);
+	apply_to_list(shell, shell->token_list, remove_space);
+	apply_to_list(shell, shell->token_list, id_variables);
+	apply_to_list(shell, shell->token_list, expand_var);
+	print_tokens(shell->token_list);
 }
 
 // TO DO
