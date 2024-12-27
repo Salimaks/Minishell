@@ -25,21 +25,19 @@ void	free_tokens(t_list *current)
 	}
 }
 
-int	is_special_token(char *str)
+int	is_special_token(char c)
 {
-	const char	*special_tokens[] = {"|", ">", ">>", "<","<<", NULL};
-	int			i;
-	int			len;
+	return(c == '>' || c == '<' || c == '|' || c == '$');
+}
 
-	i = 0;
-	len = ft_strlen(special_tokens[i]);
-	while (special_tokens[i])
+void	tokenize_special(char **input, t_list **tokens)
+{
+	if ((**input = '>' && *(*input + 1) == '>') || (**input = '<' && *(*input + 1) == '<'))
 	{
-		if (ft_strncmp(str, special_tokens[i], len))
-			return (len);
-		i++;
+		ft_lstadd_back(tokens, ft_lstnew(ft_strndup(*input, 2)), T_SPECIAL);
+		*input += 2;
 	}
-	return (0);
+	
 }
 
 void	tokenize_args(char **input, t_list **tokens)
