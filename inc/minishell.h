@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/27 14:22:38 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/27 19:00:49 by mkling           ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -96,12 +96,14 @@ void		init_readline(t_shell *shell);
 
 /* TOKENIZER */
 
-void		scan(t_shell *shell);
-void		add_token(t_shell *shell, int type, char letter);
+void		scan(t_shell *shell, t_list **token_list, char *input);
+t_token		*create_token(t_shell *shell, char letter, char *content);
+void		add_token(t_shell *shell, t_list **dest, char let, char *content);
 void		merge_token(t_shell *shell, t_list *start);
-void		lexer(t_shell *shell);
+void		lexer(t_shell *shell, t_list **token_list, char *input);
 int			check_syntax(t_shell *shell, t_list *token_list);
 void		apply_to_list(t_shell *s, t_list *n, void f(t_shell *, t_list *));
+int			is_blank(t_list *node);
 
 /* PARSER */
 
@@ -110,7 +112,6 @@ t_tree		*create_branch(t_shell *shell, int type, void *content);
 t_cmd		*create_cmd(void);
 void		create_file(t_shell *shell, t_cmd *cmd, t_token *token);
 void		parser(t_shell *shell);
-void		expand_var(t_shell *shell, t_list *node);
 
 /* HEREDOC */
 
@@ -175,8 +176,8 @@ void		print_tokens(t_list *first);
 # define TRUE			1
 # define FALSE			0
 # define DELIMITERS		"'\"()"
-# define OPERATORS		"|><$"
-# define BLANKS	" \n\t"
+# define OPERATORS		"|><$&"
+# define BLANKS			" \n\t"
 # define HEREDOC_LOC	"tmp/heredoc"
 # define SHELL_NAME		"shell"
 
@@ -187,8 +188,8 @@ enum e_lexem
 	BLANK		= 2,
 	DELIMITER	= 3,
 	OPERATOR	= 4,
-	END			= 5,
-	START		= 6,
+	START		= 5,
+	END			= '\n',
 	VARIABLE,
 	CMD,
 	OUTFILE,

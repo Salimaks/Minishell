@@ -1,14 +1,14 @@
-/* ************************************************************************** */
+/******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   readline.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 13:51:38 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/26 14:42:25 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/27 18:06:44 by mkling           ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
+/******************************************************************************/
 
 #include "minishell.h"
 
@@ -28,7 +28,7 @@ void	parse_and_exec_cmd(t_shell *shell, char *input)
 {
 	shell->cmd_line = input;
 	shell->critical_er = 0;
-	lexer(shell);
+	lexer(shell, &shell->token_list, shell->cmd_line);
 	if (check_syntax(shell, shell->token_list) != 0)
 		return (ft_lstclear(&shell->token_list, free_token));
 	parser(shell);

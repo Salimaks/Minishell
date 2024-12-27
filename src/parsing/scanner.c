@@ -6,95 +6,88 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/01 16:37:27 by alex              #+#    #+#             */
-/*   Updated: 2024/12/27 14:31:32 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/27 19:01:48 by mkling           ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
 #include "minishell.h"
 
-size_t	get_token_count(t_list *start, t_list *end)
+int	is_blank(t_list *node)
 {
-	t_list	*current;
-	size_t	count;
+	if (!node || !node->content)
+		return (0);
+	return (((t_token *)node->content)->lexem == BLANK);
+}
 
-	current = start;
-	count = 0;
-	while (current != end)
+void	add_word_token(t_shell *shell, t_list **dest, char *input)
+{
+	int		len;
+	char	*word;
+	t_token	*token;
+
+	len = 0;
+	while (input[len++])
 	{
-		count++;
-		current = current->next;
+		if (ft_strchr(DELIMITERS, input[len])
+			|| ft_strchr(OPERATORS, input[len])
+			|| ft_strchr(BLANKS, input[len]))
+			break ;
 	}
-	return (count);
+	word = ft_calloc(sizeof(char), len + 1);
+	ft_strlcat(word, input, len + 1);
+	token = create_token(shell, input[shell->index], word);
+	ft_lstadd_back(dest, ft_lstnew(token));
+	shell->index += len;
 }
 
-size_t	count_tokens_of_type(t_list *start, int lexem)
+void	add_blank_token(t_shell *shell, t_list **dest, char *input)
 {
-	t_list	*current;
-	size_t	count;
+	int		len;
+	char	*space;
+	t_token	*token;
 
-	current = start;
-	count = 0;
-	while (((t_token *)current->content)->lexem != END)
+	len = 0;
+	while (ft_strchr(BLANKS, input[len]))
+		len++;
+	space = ft_calloc(sizeof(char), len + 1);
+	ft_strlcat(space, input, len + 1);
+	token = create_token(shell, input[shell->index], space);
+	ft_lstadd_back(dest, ft_lstnew(token));
+	shell->index += len;
+}
+
+void	add_operator_token(t_shell *shell, t_list **dest, char *input)
+{
+	char	*content;
+
+	if (input[shell->index] == input[shell->index + 1])
 	{
-		if (((t_token *)current->content)->lexem == lexem)
-			count++;
-		current = current->next;
+		content = ft_calloc(sizeof(char), 3);
+		ft_strlcat(content, input, 3);
+		add_token(shell, dest, input[shell->index], content);
+		shell->index += 2;
+		return ;
 	}
-	return (count);
+	content = NULL;
+	add_token(shell, dest, input[shell->index], NULL);
+	shell->index++;
 }
 
-char	**extract_token_as_array(t_shell *shell, t_list *start, int type)
-{
-	int		index;
-	int		count;
-	char	**result;
-
-	count = count_tokens_of_type(start, type);
-	if (count == 0)
-		return (NULL);
-	result = ft_calloc(sizeof(char *), count + 1);
-	if (!result)
-		return (set_error(MALLOC_FAIL, shell,
-				"Failed to allocate infile path"), NULL);
-	index = 0;
-	while (((t_token *)start->content)->lexem != END)
-	{
-		if (((t_token *)start->content)->lexem == type)
-			result[index++] = ft_strdup(((t_token *)start->content)->content);
-		start = start->next;
-	}
-	result[index] = NULL;
-	return (result);
-}
-
-void	merge_token(t_shell *shell, t_list *start)
-{
-	t_token	*current;
-	t_token	*next;
-
-	current = ((t_token *)start->content);
-	next = ((t_token *)start->next->content);
-	current->content = ft_strjoinfree(current->content, next->content);
-	if (!current->content)
-		return (set_error(MALLOC_FAIL, shell, "Failed to malloc token"));
-	ft_lstpop(&shell->token_list, start->next, free_token);
-}
-
-void	scan(t_shell *shell)
+void	scan(t_shell *shell, t_list **token_list, char *input)
 {
 	shell->index = 0;
-	add_token(shell, START, '\0');
-	while (shell->index < ft_strlen(shell->cmd_line))
+	add_token(shell, token_list, '\n', NULL);
+	while (shell->index < ft_strlen(input))
 	{
-		if (ft_strchr(DELIMITERS, shell->cmd_line[shell->index]))
-			add_token(shell, DELIMITER, shell->cmd_line[shell->index]);
-		else if (ft_strchr(OPERATORS, shell->cmd_line[shell->index]))
-			add_token(shell, OPERATOR, shell->cmd_line[shell->index]);
-		else if (ft_strchr(BLANKS, shell->cmd_line[shell->index]))
-			add_token(shell, BLANK, shell->cmd_line[shell->index]);
+		if (ft_strchr(DELIMITERS, input[shell->index]))
+			add_token(shell, token_list, input[shell->index], NULL);
+		else if (ft_strchr(OPERATORS, input[shell->index]))
+			add_operator_token(shell, token_list, input);
+		else if (ft_strchr(BLANKS, input[shell->index]))
+			add_blank_token(shell, token_list, input);
 		else
-			add_token(shell, WORD, shell->cmd_line[shell->index]);
+			add_word_token(shell, token_list, input);
 		shell->index++;
 	}
-	add_token(shell, END, '\n');
+	add_token(shell, token_list, END, NULL);
 }

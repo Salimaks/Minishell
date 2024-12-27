@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/14 16:54:16 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/27 14:48:59 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/27 18:06:28 by mkling           ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -18,7 +18,7 @@
 
 /* Applies requirements for expansion,
 NEEDS TO BE ADAPTED */
-int	must_expand(t_list *node)
+int	can_expand(t_list *node)
 {
 	if (((t_token *)node->prev->content)->letter == '\'')
 		return (0);
@@ -37,26 +37,28 @@ int	has_valid_var(char *string)
 	return (1);
 }
 
-char	*import_var(t_shell *shell, char *variable)
+void	expand_var(t_shell *shell, char *var)
 {
-	if (ft_strcmp(variable, "$?"))
-		return (ft_itoa(shell->last_exit_code));
+	char	*var_name;
+
+	var_name = var;
+	free(var);
+	if (ft_strcmp(var_name, "$?"))
+		var = ft_itoa(shell->last_exit_code);
 	else
-		return((char *)find_env(shell->env_list, &variable[1])->content);
+		var = ft_strdup((char *)find_env(shell->env_list, &var_name[1])->content);
 }
+/* if (has_valid_var(string))
+		return (expand_var(shell, string)); */
 
-void	expand_var(t_shell *shell, char *string)
+void	expand(t_shell *shell, t_list *node)
 {
-	int		i;
-	char	*expanded_var;
-	char	*left;
+	t_token	*token;
 
-	if (!has_valid_var(string))
+	if (catch_error(shell) || !node || !can_expand(node))
 		return ;
-	i = 0;
-	while (string[i] != '$')
-		i++;
-	
-
+	token = (t_token *)node->content;
+	if (!has_valid_var((char *)token->content))
+		return ;
 
 }
