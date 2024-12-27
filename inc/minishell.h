@@ -6,7 +6,7 @@
 /*   By: skassimi <skassimi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/24 13:41:38 by skassimi         ###   ########.fr       */
+/*   Updated: 2024/12/27 11:10:38 by skassimi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,6 +121,10 @@ void		free_cmd_tab(t_cmd_tab *cmd_tab);
 void		free_token_list(t_cmd_tab *cmd_tab);
 void		free_cmd_list(t_cmd_tab *cmd_tab);
 
+# define T_SPECIAL 1
+# define T_ENV_VAR	2
+# define T_EXIT	3
+# define T_ARG 4
 # define TRUE		1
 # define FALSE		0
 # define DELIMITERS	"'\"()"

@@ -6,7 +6,7 @@
 /*   By: skassimi <skassimi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/21 14:15:08 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/24 13:16:50 by skassimi         ###   ########.fr       */
+/*   Updated: 2024/12/27 10:49:44 by skassimi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@
 
 typedef struct s_list
 {
+	int				type;
 	char			*content;
 	struct s_list	*next;
 	struct s_list	*prev;
@@ -67,14 +68,13 @@ t_list	*ft_lstnew(void *content);
 void	ft_lstadd_front(t_list **lst, t_list *new);
 int		ft_lstsize(t_list *lst);
 t_list	*ft_lstlast(t_list *lst);
-void	ft_lstadd_back(t_list **lst, t_list *new);
+void	ft_lstadd_back(t_list **lst, t_list *new, int type);
 void	ft_lstclear(t_list **lst, void (*del)(void*));
 void	ft_lstiter(t_list *lst, void (*f)(void *));
 t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
 void	ft_lstdelone(t_list *lst, void (*del)(void *));
 char	*ft_strjoinfree(char *s1, char const *s2);
 char	*get_next_line(int fd);
-char	*ft_strjoinfree(char *s1, char const *s2);
 void	ft_free_tab(char **array);
 long	ft_atol(const char *str);
 size_t	countword(const char *str, char sep);
@@ -85,7 +85,5 @@ void	ft_swap_int(int *a, int *b);
 int		is_too_long_for_int(char *str);
 int		ft_abs(int num);
 int		ft_isdigit_or_hexa(int c);
-void	ft_free_matrix(int	**matrix);
-int		ft_atoi_base(char *str, char *base);
 
-#endif
+# endif
