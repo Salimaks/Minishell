@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/20 15:58:43 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/26 14:21:49 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/26 21:58:55 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,6 @@
 #include <criterion/new/assert.h>
 
 extern char	**environ;
-t_shell		*shell;
 
 void	redirect_all_std(void)
 {
@@ -261,10 +260,11 @@ Test(Execution, set_outfile_forbidden, .init=redirect_all_std)
 	cmd.fd_out = -1;
 
 	set_outfile_fd(&cmd);
+	cr_assert(eq(int, cmd.fd_out, -1));
 	cr_assert_stderr_eq_str("shell: echo: Forbidden output file\n");
 }
 
-Test(Execution, no_path_relative_command, .init = redirect_all_std)
+Test(Execution, no_path_relative_command, .init=redirect_all_std)
 {
 	t_cmd	cmd;
 	t_shell	shell;
@@ -275,7 +275,7 @@ Test(Execution, no_path_relative_command, .init = redirect_all_std)
 	cr_assert_stderr_eq_str("shell: ls: No PATH variable found\n");
 }
 
-Test(Execution, unknown_command, .init = redirect_all_std)
+Test(Execution, unknown_command, .init=redirect_all_std)
 {
 	t_cmd	cmd;
 	t_shell	shell;
@@ -287,68 +287,66 @@ Test(Execution, unknown_command, .init = redirect_all_std)
 	cr_assert_stderr_eq_str("shell: eccho: Command not found\n");
 }
 
-Test(Builtin, echo_valid_0, .init = redirect_all_std)
+Test(Builtin, echo_valid_0, .init=redirect_all_std)
 {
-	t_shell *shell;
+	char	*argv[] = {"echo", "hello", NULL};
+	int		exit_code;
 
-	shell = create_minishell(environ);
-	shell->cmd_line = "echo hello";
-	parse_and_exec_cmd(shell, shell->cmd_line);
+	exit_code = echo(argv, STDOUT_FILENO);
+	cr_assert(eq(int, exit_code, 0));
 	cr_assert_stdout_eq_str("hello\n");
-	free_minishell(shell);
 }
 
-Test(Builtin, echo_valid_1, .init = redirect_all_std)
+Test(Builtin, echo_valid_1, .init=redirect_all_std)
 {
-	t_shell *shell;
+	char	*argv[] = {"echo", "hello and goodbye", NULL};
+	int		exit_code;
 
-	shell = create_minishell(environ);
-	shell->cmd_line = "echo 'hello and goodbye'";
-	parse_and_exec_cmd(shell, shell->cmd_line);
+	exit_code = echo(argv, STDOUT_FILENO);
+	cr_assert(eq(int, exit_code, 0));
 	cr_assert_stdout_eq_str("hello and goodbye\n");
-	free_minishell(shell);
 }
 
-Test(Builtin, echo_option_0, .init = redirect_all_std)
+Test(Builtin, echo_option_0, .init=redirect_all_std)
 {
-	t_shell *shell;
+	char	*argv[] = {"echo", "-n", "hello", NULL};
+	int		exit_code;
 
-	shell = create_minishell(environ);
-	shell->cmd_line = "echo -n hello";
-	parse_and_exec_cmd(shell, shell->cmd_line);
+	exit_code = echo(argv, STDOUT_FILENO);
+	cr_assert(eq(int, exit_code, 0));
 	cr_assert_stdout_eq_str("hello");
-	free_minishell(shell);
 }
 
-Test(Builtin, echo_option_1, .init = redirect_all_std)
+Test(Builtin, echo_option_1, .init=redirect_all_std)
 {
-	t_shell *shell;
+	char	*argv[] = {"echo", "-n", "hello and goodbye", NULL};
+	int		exit_code;
 
-	shell = create_minishell(environ);
-	shell->cmd_line = "echo -n 'hello and goodbye'";
-	parse_and_exec_cmd(shell, shell->cmd_line);
+	exit_code = echo(argv, STDOUT_FILENO);
+	cr_assert(eq(int, exit_code, 0));
 	cr_assert_stdout_eq_str("hello and goodbye");
-	free_minishell(shell);
 }
 
-Test(Complete, pipe_basic_0, .init = redirect_all_std)
+Test(Complete, pipe_basic_0, .init=redirect_all_std)
 {
 	t_shell *shell;
 
 	shell = create_minishell(environ);
 	shell->cmd_line = "echo hello | cat -e";
 	parse_and_exec_cmd(shell, shell->cmd_line);
+	cr_assert(eq(int, shell->last_exit_code, 0));
 	cr_assert_stdout_eq_str("hello$\n");
 	free_minishell(shell);
 }
 
-Test(Complete, pipe_synchro_0, .init = redirect_all_std)
+Test(Complete, pipe_synchro_0, .init=redirect_all_std)
 {
 	t_shell *shell;
 
 	shell = create_minishell(environ);
 	shell->cmd_line = "yes | head -n 2";
 	parse_and_exec_cmd(shell, shell->cmd_line);
+	cr_assert(eq(int, shell->last_exit_code, 0));
 	cr_assert_stdout_eq_str("y\ny\n");
 	free_minishell(shell);
 }

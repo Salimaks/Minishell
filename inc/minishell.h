@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/26 14:43:27 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/26 21:19:22 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,12 +46,11 @@ typedef struct s_cmd
 {
 	char			**argv;		// array created with cmd_path, then arguments
 	char			*cmd_path;	// binary filepath, absolute/through PATH
-	t_list			*arg_list;
-	t_list			*redirect;
+	t_list			*arg_list;	// linked list of command arguments
 	t_list			*infiles;	// linked list of input files
 	t_list			*outfiles;	// linked list of output files
-	int				fd_out;
-	int				fd_in;
+	int				fd_out;		// fd of the final output redirection
+	int				fd_in;		// fd of the final input redirection
 	int				exit_code;	// value returned by the execution of command
 	size_t			cmd_index;	// number of the command among other commands
 	int				fork_pid;	// process id of fork sent to execute command
@@ -59,10 +58,10 @@ typedef struct s_cmd
 
 typedef struct s_ast
 {
-	int				type;
-	void			*content;
-	struct s_ast	*left;
-	struct s_ast	*right;
+	int				type;		// either pipe, or, and or single cmd node
+	void			*content;	// may contain pointer to cmd structure
+	struct s_ast	*left;		// part of the cmd line left of the operator
+	struct s_ast	*right;		// part of the cmd line right of the operator
 }	t_tree;
 
 typedef struct s_shell
@@ -86,6 +85,7 @@ typedef struct s_shell
 /* SIGNAL */
 
 void		handle_siquit(int sig);
+void		signals(void);
 
 /* INPUT */
 
@@ -93,7 +93,6 @@ void		parse_and_exec_cmd(t_shell *shell, char *input);
 void		extract_env_as_linked_list(t_shell *shell);
 void		extract_paths(t_shell *shell);
 void		init_readline(t_shell *shell);
-void		signals(void);
 
 /* PARSING */
 
@@ -120,9 +119,7 @@ void		destroy_heredoc(t_shell *shell, t_list *file_node);
 int			exec_tree(t_shell *shell, t_tree *tree, bool piped);
 int			exec_pipe(t_shell *shell, t_tree *tree);
 int			exec_single_cmd(t_shell *shell, t_tree *tree, bool piped);
-int			pipe_exec_tree(t_shell *shell, t_tree *tree, int pipe_fd[2], int mode);
-void		open_pipe(t_shell *shell, t_list *node);
-void		create_fork(t_shell *shell, int	*fork_pid);
+int			create_fork(t_shell *shell, int	*fork_pid);
 void		get_cmd_path(t_shell *shell, t_cmd *cmd);
 void		put_arg_in_array(t_cmd *cmd);
 
@@ -142,7 +139,10 @@ int			is_builtin(t_cmd *cmd);
 
 void		open_file(t_file *file, t_cmd *cmd, int mode);
 void		redirect_for_cmd(t_shell *shell, t_cmd *cmd);
-void		close_pipe(t_shell *shell, int *pipe_fd);
+int			create_pipe(t_shell *shell, int *pipe_fd);
+int			connect_pipes_and_exec(t_shell *shell, t_tree *tree,
+				int pipe_fd[2], int mode);
+void		close_pipe(int *pipe_fd);
 void		set_infile_fd(t_shell *shell, t_cmd *cmd);
 void		set_outfile_fd(t_cmd *cmd);
 void		reset_std(t_shell *shell, bool piped);
@@ -200,9 +200,7 @@ enum e_lexem
 
 enum e_exit_code
 {
-	FAIL = -1,
-	INVALID_FD = -1,
-	OK = 0,
+	SUCCESS = 0,
 	MALLOC_FAIL = 1,
 	GENERAL_ERROR = 1,
 	PIPE_ERROR = 1,

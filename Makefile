@@ -6,8 +6,12 @@
 #    By: alex <alex@student.42.fr>                  +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/14 14:56:12 by mkling            #+#    #+#              #
-#    Updated: 2024/12/26 13:50:38 by alex             ###   ########.fr        #
+#    Updated: 2024/12/26 19:45:22 by alex             ###   ########.fr        #
 #                                                                              #
+# **************************************************************************** #
+
+# **************************************************************************** #
+#		General variables													   #
 # **************************************************************************** #
 
 NAME		= minishell
@@ -75,24 +79,22 @@ CC			= cc
 CFLAGS		= -Wall -Wextra -Werror
 
 # **************************************************************************** #
-#																			   #
-#	Unit test variables														   #
-#																			   #
+#		Unit test variables													   #
 # **************************************************************************** #
 
 T_NAME		= utest
 
 T_DIR		= test
 
-T_SRC		= 	utest.c
+T_SRC		= utest.c
 
 T_OBJ		= utest.o
 
-T_INC		= 	-I$(HOME)/Criterion/include/ \
+T_INC		= -I$(HOME)/Criterion/include/ \
 				-I$(HOME)/Criterion/ \
 				$(INC)
 
-T_LIB		= 	-Wl,-rpath=$(HOME)/Criterion/build/src \
+T_LIB		= -Wl,-rpath=$(HOME)/Criterion/build/src \
 				-L$(HOME)/Criterion/build/src \
 				-L$(HOME)/Criterion \
 				-lcriterion \
@@ -102,20 +104,21 @@ T_CC		= $(CC) $(CFLAGS) $(T_INC) -g
 
 T_EXCL		= obj/main.o
 
-V_FLAG		= valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes \
-				--trace-children=yes --track-fds=yes --suppressions=readline.supp
+V_FLAG		= valgrind --leak-check=full --show-leak-kinds=all \
+				--track-origins=yes --trace-children=yes --track-fds=yes \
+				--suppressions=inc/readline.supp
 
-
-#############################
-#							#
-#		COMPILATION			#
-#							#
-#############################
+# **************************************************************************** #
+#																			   #
+#			COMPILATION														   #
+#																			   #
+# **************************************************************************** #
 
 all:				$(NAME)
 
 $(NAME):			$(DEP) $(OBJ)
-					$(CC) $(CFLAGS) $(INC) -o $(NAME) $(OBJ) -L$(DIR_LIB) -lft -lreadline
+					$(CC) $(CFLAGS) $(INC) -o $(NAME) $(OBJ) -L$(DIR_LIB) \
+					-lft -lreadline
 
 $(DIR_OBJ)/%.o:		$(DIR_SRC)/%.c
 					$(CC) $(CFLAGS) $(INC) -c $< -o  $@
@@ -127,19 +130,22 @@ $(LIB):
 					make -C $(DIR_LIB)
 
 
-#############################
-#							#
-#		TEST AND DEBUG		#
-#							#
-#############################
+# **************************************************************************** #
+#																			   #
+#			TEST AND DEBUG													   #
+#																			   #
+# **************************************************************************** #
 
 debug:		$(DEP) $(OBJ)
 			@echo "Compiling with debug flag"
-			$(CC) $(CFLAGS) -g $(INC) -o $(NAME) $(SRC) -L$(DIR_LIB) -lft -lreadline
+			$(CC) $(CFLAGS) -g $(INC) -o $(NAME) $(SRC) -L$(DIR_LIB) \
+			-lft -lreadline
 
 $(T_NAME):	$(DEP) $(OBJ)
 			@echo "Compiling unit test"
-			$(T_CC) $(LIB) $(T_LIB) $(filter-out $(T_EXCL), $(OBJ)) $(addprefix $(T_DIR)/, $(T_SRC)) -o $(T_DIR)/$(T_NAME) -L$(DIR_LIB) -lft -lreadline
+			$(T_CC) $(LIB) $(T_LIB) $(filter-out $(T_EXCL), $(OBJ)) \
+			$(addprefix $(T_DIR)/, $(T_SRC)) -o $(T_DIR)/$(T_NAME) -L$(DIR_LIB) \
+			-lft -lreadline
 
 test:		$(T_NAME)
 			@echo "Running unit tests :"
@@ -149,11 +155,11 @@ valgrind:	$(NAME)
 			@echo "Running with valgrind :"
 			$(V_FLAG) ./$(NAME)
 
-#############################
-#							#
-#		CLEAN UP			#
-#							#
-#############################
+# **************************************************************************** #
+#																			   #
+#			CLEAN UP														   #
+#																			   #
+# **************************************************************************** #
 
 clean:
 			rm -rf $(DIR_OBJ)

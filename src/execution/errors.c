@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 14:37:02 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/25 13:15:50 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/26 20:11:50 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,6 @@ void	set_cmd_error(int err_code, t_cmd *cmd, char *err_message)
 	ft_putstr_fd("\n", STDERR_FILENO);
 	cmd->exit_code = err_code;
 }
-
 
 void	set_error_if(int condition, int err_code, t_shell *shell,
 		char *err_message)

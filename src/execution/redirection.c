@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 17:34:05 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/26 13:45:40 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/26 20:50:14 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,12 +76,24 @@ void	set_outfile_fd(t_cmd *cmd)
 	cmd->fd_out = file->fd;
 }
 
-void	reset_std(t_shell *shell, bool piped)
+int	connect_pipes_and_exec(t_shell *shell, t_tree *tree, int pipe_fd[2], int mode)
 {
-	if (piped)
-		return ;
-	dup2(shell->std_in, 0);
-	dup2(shell->std_out, 1);
+	int	exit_code;
+
+	if (mode == WRITE)
+	{
+		close(pipe_fd[READ]);
+		dup2(pipe_fd[WRITE], STDOUT_FILENO);
+		close(pipe_fd[WRITE]);
+	}
+	if (mode == READ)
+	{
+		close(pipe_fd[WRITE]);
+		dup2(pipe_fd[READ], STDIN_FILENO);
+		close(pipe_fd[READ]);
+	}
+	exit_code = exec_tree(shell, tree, true);
+	exit (exit_code);
 }
 
 void	redirect_for_cmd(t_shell *shell, t_cmd *cmd)
