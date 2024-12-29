@@ -1,16 +1,30 @@
-/* ************************************************************************** */
+/******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   export.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 09:19:50 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/23 10:35:22 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/29 10:39:21 by mkling           ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
+/******************************************************************************/
 
 #include "minishell.h"
+
+void	print_env_as_export(t_shell *shell, int fdout)
+{
+	t_list	*current_env;
+
+	current_env = shell->env_list;
+	while (current_env != NULL)
+	{
+		ft_putstr_fd("export ", fdout);
+		ft_putstr_fd((char *)current_env->content, fdout);
+		write(fdout, "\n", 1);
+		current_env = current_env->next;
+	}
+}
 
 int	export(t_shell *shell, char **argv, int fdout)
 {
@@ -21,18 +35,7 @@ int	export(t_shell *shell, char **argv, int fdout)
 	if (fdout < 0)
 		return (-1);
 	if (argv[i] == NULL )
-	{
-		current_env = shell->env_list;
-		while (current_env != NULL)
-		{
-			ft_putstr_fd("export ", fdout);
-			ft_putstr_fd((char *)current_env->content, fdout);
-			write(fdout, "\n", 1);
-			current_env = current_env->next;
-		}
-		return (0);
-	}
-	//alphabetic order ?
+		return (print_env_as_export(shell, fdout), 0);
 	while (argv[i])
 	{
 		unset(shell, &argv[i]);

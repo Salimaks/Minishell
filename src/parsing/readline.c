@@ -1,14 +1,14 @@
-/* ************************************************************************** */
+/******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   readline.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 13:51:38 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/29 01:10:31 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/29 10:48:29 by mkling           ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
+/******************************************************************************/
 
 #include "minishell.h"
 
@@ -35,7 +35,6 @@ void	parse_and_exec_cmd(t_shell *shell, char *input)
 	lexer(shell, &shell->token_list);
 	parser(shell);
 	shell->last_exit_code = exec_tree(shell, shell->tree_root, false);
-	fprintf(stderr, "exit code is %d\n", shell->last_exit_code);
 	free_tree(&shell->tree_root);
 }
 
@@ -49,12 +48,13 @@ void	init_readline(t_shell *shell)
 		input = readline("shell$ ");
 		if (!input)
 			break ;
-		if (input)
+		if (input && countword(input, ' ') > 0)
 		{
 			parse_and_exec_cmd(shell, input);
 			add_history(input);
 			free(input);
 		}
+		fprintf(stderr, "exit code is %d\n", shell->last_exit_code);
 	}
 	rl_clear_history();
 }

@@ -1,14 +1,14 @@
-/* ************************************************************************** */
+/******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   utest.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/20 15:58:43 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/29 01:32:19 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/29 10:51:26 by mkling           ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
+/******************************************************************************/
 
 #include "minishell.h"
 #include <criterion/criterion.h>
@@ -435,7 +435,6 @@ Test(Execution, relative_command, .init=redirect_all_std)
 	cmd = create_cmd();
 	cmd->arg_list = ft_lstnew("./test/allowed");
 	get_cmd_path(shell, cmd);
-	fprintf(stderr, "exit code is %d\n", cmd->exit_code);
 	cr_assert(cmd->exit_code == 0);
 	cr_assert_stdout_eq_str("allowed\n");
 }

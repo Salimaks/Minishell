@@ -1,14 +1,14 @@
-/* ************************************************************************** */
+/******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   path.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 14:12:32 by alex              #+#    #+#             */
-/*   Updated: 2024/12/29 01:20:08 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/29 10:33:35 by mkling           ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
+/******************************************************************************/
 
 #include "minishell.h"
 
@@ -27,7 +27,6 @@ void	check_cmd(t_cmd *cmd)
 {
 	if (cmd->cmd_path == NULL)
 		return (set_cmd_error(CANT_FIND_CMD, cmd, "Command not found"));
-	// fprintf(stderr, "check cmd path is %s\n", cmd->cmd_path);
 	if (access(cmd->cmd_path, X_OK) != 0)
 		return (set_cmd_error(CANT_EXECUTE_CMD, cmd, "Permission denied"));
 }
@@ -85,7 +84,6 @@ void	get_cmd_path(t_shell *shell, t_cmd *cmd)
 	if (ft_strnstr(cmd->cmd_path, "./", 2))
 		return (try_working_dir_path(shell, cmd));
 	cmd->cmd_path = ft_strjoin("/", cmd->cmd_path);
-
 	if (!cmd->cmd_path)
 		return (set_cmd_error(MALLOC_FAIL, cmd, "Failed to allocate path"));
 	if (access(cmd->cmd_path, F_OK) == 0)
