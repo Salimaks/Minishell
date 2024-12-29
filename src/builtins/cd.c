@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cd.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: skassimi <skassimi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 09:19:30 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/23 10:24:34 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/29 11:46:26 by skassimi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,3 +46,8 @@ int	cd(t_shell *shell, char *path)
 
 
 // cd sans argument renvoie vers le home
+
+int cd(char *path)
+{
+    chdir(path);
+}

@@ -3,12 +3,13 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: alex <alex@student.42.fr>                  +#+  +:+       +#+         #
+#    By: skassimi <skassimi@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2024/08/14 14:56:12 by mkling            #+#    #+#              #
-#    Updated: 2024/12/26 19:45:22 by alex             ###   ########.fr        #
+#    Created: Invalid date        by                   #+#    #+#              #
+#    Updated: 2024/12/29 11:44:29 by skassimi         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
+
 
 # **************************************************************************** #
 #		General variables													   #
@@ -39,10 +40,8 @@ FUNC_EXEC	= 	execution.c \
 				errors.c \
 				ast.c
 
-FUNC_PARS	=	readline.c \
-				token.c \
-				scanner.c \
-				lexer.c \
+FUNC_PARS	=	tokenizer.c \
+				tokens.c \
 				parser.c \
 				signals.c \
 				syntax.c \

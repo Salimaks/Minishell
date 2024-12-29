@@ -3,12 +3,13 @@
 /*                                                        :::      ::::::::   */
 /*   ft_lst_add.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: skassimi <skassimi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/05/31 19:29:36 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/21 21:29:18 by alex             ###   ########.fr       */
+/*   Created: Invalid date        by                   #+#    #+#             */
+/*   Updated: 2024/12/29 11:47:19 by skassimi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #include <stdlib.h>
 #include "../inc/libft.h"
@@ -36,7 +37,7 @@ void	ft_lstadd_front(t_list **lst, t_list *new)
 	(*lst) = new;
 }
 
-void	ft_lstadd_back(t_list **lst, t_list *new)
+void	ft_lstadd_back(t_list **lst, t_list *new, int type)
 {
 	t_list	*last;
 
@@ -47,6 +48,7 @@ void	ft_lstadd_back(t_list **lst, t_list *new)
 		*lst = new;
 		return ;
 	}
+	last = *lst;
 	last = *lst;
 	while (last->next != NULL)
 		last = last->next;
