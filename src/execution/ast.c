@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/12 21:51:24 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/26 20:49:29 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/29 01:26:49 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,29 @@ t_tree	*create_branch(t_shell *shell, int type, void *content)
 	node->left = NULL;
 	node->left = NULL;
 	return (node);
+}
+
+char	**extract_list_as_array(t_shell *shell, t_list *head)
+{
+	int		len;
+	int		index;
+	char	**result;
+	t_list	*current;
+
+
+	len = ft_lstsize(head);
+	result = ft_calloc(sizeof(char *), len + 1);
+	if (!result)
+		return (set_error(MALLOC_FAIL, shell, "Failed to malloc argv"), NULL);
+	index = 0;
+	current = head;
+	while (index < len)
+	{
+		result[index] = current->content;
+		current = current->next;
+		index++;
+	}
+	return (result);
 }
 
 void	put_arg_in_array(t_cmd *cmd)

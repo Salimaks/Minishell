@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 12:37:12 by alex              #+#    #+#             */
-/*   Updated: 2024/12/25 18:55:08 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/28 20:38:20 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ t_shell	*create_minishell(char **env)
 	if (!shell)
 		return (NULL);
 	shell->env = env;
-	extract_paths(shell);
+	extract_env_as_linked_list(shell);
 	dup2(STDOUT_FILENO, shell->std_out);
 	dup2(STDIN_FILENO, shell->std_in);
 	extract_env_as_linked_list(shell);

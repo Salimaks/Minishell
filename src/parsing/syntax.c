@@ -6,110 +6,88 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/14 16:42:40 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/20 11:46:28 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/28 19:26:35 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	syntax_error(t_token *token)
-{
-	print_error();
-	ft_putstr_fd("syntax error near unexpected token '", STDERR_FILENO);
-	if (token->lexem == END)
-		ft_putstr_fd("newline", STDERR_FILENO);
-	else
-		ft_putstr_fd(token->content, STDERR_FILENO);
-	ft_putstr_fd("'\n", STDERR_FILENO);
-}
-
+/* Minishell's subject states open quotes are not to be implemented */
 void	is_missing_delimiter(t_shell *shell, t_list *node)
 {
-	t_token	*delim;
-	t_token	*next_delim;
+	t_list	*current;
+	char	delim_type;
 
-	if (catch_error(shell))
+	if (shell->critical_er || !token_is(DELIMITER, node))
 		return ;
-	delim = (t_token *)node->content;
-	if (delim->lexem != DELIMITER)
-		return ;
-	next_delim = (t_token *)node->next->content;
-	while (next_delim->lexem != END)
+	delim_type = (char)((t_token *)node->content)->letter;
+	current = node->next;
+	while (!token_is(END, current) && !token_is(END, current->next))
 	{
-		if (((t_token *)node->content)->letter == delim->letter)
+		if (((t_token *)current->content)->letter == delim_type)
 			return ;
-		node = node->next;
-		next_delim = (t_token *)node->content;
+		current = current->next;
 	}
-	syntax_error(next_delim);
+	print_syntax_error((t_token *)current->content);
 	shell->critical_er = SYNTAX_ERROR;
-	return ;
 }
 
+/* Bash syntax expect word anytime after redirection to be file path */
 void	is_missing_redirection(t_shell *shell, t_list *node)
 {
-	t_token	*next_token;
-	t_token	*redirection;
+	t_token	*operator;
+	t_list	*current;
 
-	if (catch_error(shell))
+	operator = (t_token *)node->content;
+	if (shell->critical_er || !token_is(OPERATOR, node)
+		|| (operator->letter != '<' && operator->letter != '>'))
 		return ;
-	redirection = (t_token *)node->content;
-	if (redirection->letter != '<' && redirection->letter != '>')
-		return ;
-	next_token = (t_token *)node->next->content;
-	if (next_token->lexem != WORD)
+	current = node->next;
+	while (!token_is(END, current))
 	{
-		syntax_error(next_token);
-		shell->critical_er = SYNTAX_ERROR;
-		return ;
+		if (token_is(WORD, current))
+			return ;
+		current = current->next;
 	}
+	print_syntax_error((t_token *)current->content);
+	shell->critical_er = SYNTAX_ERROR;
 	return ;
 }
 
 void	is_missing_cmd_before_pipe(t_shell *shell, t_list *node)
 {
-	t_token	*pipe_token;
-	t_token	*prev_token;
+	t_list	*current;
 
-	if (catch_error(shell))
+	if (shell->critical_er || !token_is(OPERATOR, node)
+		|| ((t_token *)node->content)->letter != '|')
 		return ;
-	pipe_token = (t_token *)node->content;
-	if (pipe_token->letter != '|')
-		return ;
-	prev_token = (t_token *)node->prev->content;
-	while (prev_token->lexem != START && prev_token->lexem != PIPE)
+	current = node->prev;
+	while (!token_is(START, current) && !token_is(PIPE, current))
 	{
-		if (prev_token->lexem == WORD)
+		if (token_is(WORD, current))
 			return ;
-		node = node->prev;
-		prev_token = (t_token *)node->prev->content;
+		current = current->prev;
 	}
-	syntax_error(pipe_token);
+	print_syntax_error(((t_token *)node->content));
 	shell->critical_er = SYNTAX_ERROR;
-	return ;
 }
 
 void	is_missing_cmd_after_pipe(t_shell *shell, t_list *node)
 {
-	t_token	*pipe_token;
-	t_token	*next_token;
+	t_list	*current;
 
-	if (catch_error(shell))
+	if (shell->critical_er || !token_is(OPERATOR, node)
+		|| ((t_token *)node->content)->letter != '|')
 		return ;
-	pipe_token = (t_token *)node->content;
-	if (pipe_token->letter != '|')
-		return ;
-	next_token = (t_token *)node->next->content;
-	while (next_token->lexem != END && next_token->lexem != PIPE)
+	current = node->next;
+	while (!token_is(END, current) && !token_is(PIPE, current))
 	{
-		if (next_token->lexem == WORD)
+		if (token_is(WORD, current))
 			return ;
-		node = node->prev;
-		next_token = (t_token *)node->prev->content;
+		current = current->next;
 	}
-	syntax_error(pipe_token);
+	print_syntax_error(((t_token *)node->content));
 	shell->critical_er = SYNTAX_ERROR;
-	return ;
 }
 
 int	check_syntax(t_shell *shell, t_list *node)

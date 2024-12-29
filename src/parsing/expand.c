@@ -1,14 +1,14 @@
-/******************************************************************************/
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   expand.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/14 16:54:16 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/27 18:06:28 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/28 19:21:09 by alex             ###   ########.fr       */
 /*                                                                            */
-/******************************************************************************/
+/* ************************************************************************** */
 
 #include "minishell.h"
 
@@ -37,25 +37,23 @@ int	has_valid_var(char *string)
 	return (1);
 }
 
-void	expand_var(t_shell *shell, char *var)
+void	expand_var(t_shell *shell, char **var_name)
 {
-	char	*var_name;
+	char	*var;
 
-	var_name = var;
-	free(var);
-	if (ft_strcmp(var_name, "$?"))
+	if (ft_strcmp(*var_name, "$?"))
 		var = ft_itoa(shell->last_exit_code);
 	else
-		var = ft_strdup((char *)find_env(shell->env_list, &var_name[1])->content);
+		var = ft_strdup((char *)find_env(shell->env_list, &(*var_name)[1])->content);
+	free(*var_name);
+	*var_name = var;
 }
-/* if (has_valid_var(string))
-		return (expand_var(shell, string)); */
 
 void	expand(t_shell *shell, t_list *node)
 {
 	t_token	*token;
 
-	if (catch_error(shell) || !node || !can_expand(node))
+	if (shell->critical_er || !node || !can_expand(node))
 		return ;
 	token = (t_token *)node->content;
 	if (!has_valid_var((char *)token->content))

@@ -1,14 +1,14 @@
-/******************************************************************************/
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   readline.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 13:51:38 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/27 18:06:44 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/29 01:10:31 by alex             ###   ########.fr       */
 /*                                                                            */
-/******************************************************************************/
+/* ************************************************************************** */
 
 #include "minishell.h"
 
@@ -16,7 +16,8 @@ void	print_tokens(t_list *node)
 {
 	while (node != NULL)
 	{
-		printf("TOKEN %d :", ((t_token *)node->content)->lexem);
+		printf("TOKEN %d -", ((t_token *)node->content)->lexem);
+		printf(" %c :", ((t_token *)node->content)->letter);
 		if (node->content != NULL)
 			printf("%s", ((t_token *)node->content)->content);
 		printf("\n");
@@ -28,11 +29,13 @@ void	parse_and_exec_cmd(t_shell *shell, char *input)
 {
 	shell->cmd_line = input;
 	shell->critical_er = 0;
-	lexer(shell, &shell->token_list, shell->cmd_line);
+	scan(shell, &shell->token_list, input);
 	if (check_syntax(shell, shell->token_list) != 0)
 		return (ft_lstclear(&shell->token_list, free_token));
+	lexer(shell, &shell->token_list);
 	parser(shell);
 	shell->last_exit_code = exec_tree(shell, shell->tree_root, false);
+	fprintf(stderr, "exit code is %d\n", shell->last_exit_code);
 	free_tree(&shell->tree_root);
 }
 

@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 15:37:36 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/26 21:10:46 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/28 16:59:53 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ int	exec_with_fork(t_shell *shell, t_cmd *cmd)
 		exit(CANT_EXECUTE_CMD);
 	}
 	waitpid(cmd->fork_pid, &cmd->exit_code, 0);
-	return (cmd->exit_code);
+	return (WEXITSTATUS(cmd->exit_code));
 }
 
 int	exec_with_main(t_shell *shell, t_cmd *cmd, bool piped)
@@ -46,7 +46,7 @@ int	exec_with_main(t_shell *shell, t_cmd *cmd, bool piped)
 		return (cmd->exit_code);
 	exec_builtin(shell, cmd);
 	reset_std(shell, piped);
-	return (cmd->exit_code);
+	return (WEXITSTATUS(cmd->exit_code));
 }
 
 int	exec_single_cmd(t_shell *shell, t_tree *tree, bool piped)
@@ -60,10 +60,8 @@ int	exec_single_cmd(t_shell *shell, t_tree *tree, bool piped)
 		reset_std(shell, piped);
 	}
 	else if (is_builtin(cmd))
-		exec_with_main(shell, cmd, piped);
-	else
-		exec_with_fork(shell, cmd);
-	return (cmd->exit_code);
+		return (exec_with_main(shell, cmd, piped));
+	return (exec_with_fork(shell, cmd));
 }
 
 int	exec_pipe(t_shell *shell, t_tree *tree)
@@ -89,7 +87,7 @@ int	exec_pipe(t_shell *shell, t_tree *tree)
 			close_pipe(pipe_fd);
 			waitpid(fork_pid[0], &exit_code, 0);
 			waitpid(fork_pid[1], &exit_code, 0);
-			return (exit_code);
+			return (WEXITSTATUS(exit_code));
 		}
 	}
 	return (PIPE_ERROR);

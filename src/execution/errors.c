@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 14:37:02 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/26 20:11:50 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/28 19:26:35 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,14 +39,15 @@ void	set_cmd_error(int err_code, t_cmd *cmd, char *err_message)
 	cmd->exit_code = err_code;
 }
 
-void	set_error_if(int condition, int err_code, t_shell *shell,
-		char *err_message)
+void	print_syntax_error(t_token *token)
 {
-	if (condition)
-		set_error(err_code, shell, err_message);
-}
-
-int	catch_error(t_shell *shell)
-{
-	return (shell->critical_er);
+	print_error();
+	ft_putstr_fd("syntax error near unexpected token '", STDERR_FILENO);
+	if (token->lexem == END)
+		ft_putstr_fd("newline", STDERR_FILENO);
+	else if (token->content)
+		ft_putstr_fd(token->content, STDERR_FILENO);
+	else
+		ft_putchar_fd(token->letter, STDERR_FILENO);
+	ft_putstr_fd("'\n", STDERR_FILENO);
 }

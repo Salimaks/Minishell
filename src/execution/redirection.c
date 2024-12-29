@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 17:34:05 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/26 20:50:14 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/28 23:14:22 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,7 +98,7 @@ int	connect_pipes_and_exec(t_shell *shell, t_tree *tree, int pipe_fd[2], int mod
 
 void	redirect_for_cmd(t_shell *shell, t_cmd *cmd)
 {
-	if (catch_error(shell))
+	if (shell->critical_er)
 		return ;
 	set_infile_fd(shell, cmd);
 	set_outfile_fd(cmd);

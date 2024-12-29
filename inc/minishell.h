@@ -1,14 +1,14 @@
-/******************************************************************************/
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/27 19:00:49 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/29 01:27:36 by alex             ###   ########.fr       */
 /*                                                                            */
-/******************************************************************************/
+/* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
@@ -91,19 +91,19 @@ void		signals(void);
 
 void		parse_and_exec_cmd(t_shell *shell, char *input);
 void		extract_env_as_linked_list(t_shell *shell);
-void		extract_paths(t_shell *shell);
 void		init_readline(t_shell *shell);
 
 /* TOKENIZER */
 
 void		scan(t_shell *shell, t_list **token_list, char *input);
-t_token		*create_token(t_shell *shell, char letter, char *content);
+t_token		*create_token(t_shell *shell, int lexem, char letter, char *content);
 void		add_token(t_shell *shell, t_list **dest, char let, char *content);
 void		merge_token(t_shell *shell, t_list *start);
-void		lexer(t_shell *shell, t_list **token_list, char *input);
+void		lexer(t_shell *shell, t_list **token_list);
 int			check_syntax(t_shell *shell, t_list *token_list);
 void		apply_to_list(t_shell *s, t_list *n, void f(t_shell *, t_list *));
-int			is_blank(t_list *node);
+int			letter_is(int lexem, char letter);
+int			token_is(int lexem, t_list *node);
 
 /* PARSER */
 
@@ -140,6 +140,7 @@ int			exit_shell(t_shell *shell, char **argv);
 int			exec_builtin(t_shell *shell, t_cmd *cmd);
 int			is_builtin(t_cmd *cmd);
 t_list		*find_env(t_list *env_list, char *env_name);
+char		**extract_list_as_array(t_shell *shell, t_list *head);
 
 /* REDIRECTION */
 
@@ -155,11 +156,10 @@ void		reset_std(t_shell *shell, bool piped);
 
 /* ERROR HANDLING */
 
-void		set_error_if(int cond, int err_code, t_shell *shell, char *message);
 void		set_error(int err_code, t_shell *shell, char *err_message);
 void		set_cmd_error(int err_code, t_cmd *cmd, char *err_message);
-int			catch_error(t_shell *shell);
 void		print_error(void);
+void		print_syntax_error(t_token *token);
 
 /* CLEAN UP */
 
@@ -189,7 +189,7 @@ enum e_lexem
 	DELIMITER	= 3,
 	OPERATOR	= 4,
 	START		= 5,
-	END			= '\n',
+	END			= 6,
 	VARIABLE,
 	CMD,
 	OUTFILE,

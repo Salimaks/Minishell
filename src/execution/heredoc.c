@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/11 15:42:30 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/15 12:40:50 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/28 19:21:09 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ void	destroy_heredoc(t_shell *shell, t_list *file_node)
 {
 	t_file	*file;
 
-	if (catch_error(shell))
+	if (shell->critical_er)
 		return ;
 	file = (t_file *)(file_node)->content;
 	if (file->mode != HEREDOC)

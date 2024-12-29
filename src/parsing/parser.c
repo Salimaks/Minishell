@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/30 13:06:39 by alex              #+#    #+#             */
-/*   Updated: 2024/12/24 11:49:10 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/28 19:21:09 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void	parse_outfiles(t_shell *shell, t_cmd *cmd, t_list **current)
 {
-	if (catch_error(shell))
+	if (shell->critical_er)
 		return ;
 	if (((t_token *)(*current)->next->content)->letter == '>')
 	{
@@ -35,7 +35,7 @@ void	parse_outfiles(t_shell *shell, t_cmd *cmd, t_list **current)
 
 void	parse_infiles(t_shell *shell, t_cmd *cmd, t_list **current)
 {
-	if (catch_error(shell))
+	if (shell->critical_er)
 		return ;
 	if (((t_token *)(*current)->next->content)->letter == '<')
 	{
@@ -63,7 +63,7 @@ t_tree	*parse_command(t_shell *shell, t_list **node)
 		return (set_error(CANT_FIND_CMD, shell, "Missing command"), NULL);
 	cmd = create_cmd();
 	token = ((t_token *)(*node)->content);
-	while (token->letter != PIPE && token->lexem != END)
+	while ((*node)->next && token->letter != PIPE && token->lexem != END)
 	{
 		if (token->letter == '<')
 			parse_infiles(shell, cmd, node);
