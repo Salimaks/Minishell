@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/29 10:30:16 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/29 16:06:25 by mkling           ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -104,6 +104,7 @@ int			check_syntax(t_shell *shell, t_list *token_list);
 void		apply_to_list(t_shell *s, t_list *n, void f(t_shell *, t_list *));
 int			letter_is(int lexem, char letter);
 int			token_is(int lexem, t_list *node);
+int			is_valid_variable(char *input);
 
 /* PARSER */
 
@@ -176,7 +177,8 @@ void		print_tokens(t_list *first);
 # define TRUE			1
 # define FALSE			0
 # define DELIMITERS		"'\"()"
-# define OPERATORS		"|><$&"
+# define OPERATORS		"|><&$"
+# define DOLLAR			"$"
 # define BLANKS			" \n\t"
 # define HEREDOC_LOC	"tmp/heredoc"
 # define SHELL_NAME		"shell"

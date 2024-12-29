@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/20 15:58:43 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/29 10:51:26 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/29 15:39:33 by mkling           ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -30,10 +30,10 @@ void	redirect_all_std(void)
 /*																			  */
 /* ************************************************************************** */
 /* ************************************************************************** */
-/*	Tokenizer																	  */
+/*	Scan																	  */
 /* ************************************************************************** */
 
-Test(Tokenizer, Empty)
+Test(Scan, Empty)
 {
 	t_shell	shell;
 	t_list	*dest = NULL;
@@ -45,7 +45,7 @@ Test(Tokenizer, Empty)
 	cr_assert_eq(((t_token *)dest->next->content)->lexem, END);
 }
 
-Test(Tokenizer, SingleBlank)
+Test(Scan, SingleBlank)
 {
 	t_shell	shell;
 	t_list	*dest = NULL;
@@ -59,7 +59,7 @@ Test(Tokenizer, SingleBlank)
 	cr_assert_eq(((t_token *)dest->next->next->content)->lexem, END);
 }
 
-Test(Tokenizer, SingleWord)
+Test(Scan, SingleWord)
 {
 	t_shell	shell;
 	t_list	*dest = NULL;
@@ -74,7 +74,7 @@ Test(Tokenizer, SingleWord)
 	cr_assert_eq(((t_token *)dest->next->next->content)->lexem, END);
 }
 
-Test(Tokenizer, SinglePipe)
+Test(Scan, SinglePipe)
 {
 	t_shell	shell;
 	t_list	*dest = NULL;
@@ -89,7 +89,7 @@ Test(Tokenizer, SinglePipe)
 	cr_assert(eq(int, ((t_token *)dest->next->next->content)->lexem, END));
 }
 
-Test(Tokenizer, SingleQuote)
+Test(Scan, SingleQuote)
 {
 	t_shell	shell;
 	t_list	*dest = NULL;
@@ -104,7 +104,7 @@ Test(Tokenizer, SingleQuote)
 	cr_assert_eq(((t_token *)dest->next->next->content)->lexem, END);
 }
 
-Test(Tokenizer, OpenQuote)
+Test(Scan, OpenQuote)
 {
 	t_shell	shell;
 	t_list	*dest = NULL;
@@ -116,6 +116,22 @@ Test(Tokenizer, OpenQuote)
 	cr_assert_eq(((t_token *)dest->content)->lexem, START);
 	cr_assert_eq(((t_token *)dest->next->content)->lexem, DELIMITER);
 	cr_assert_eq((((t_token *)dest->next->content)->letter), '"');
+	cr_assert_eq(((t_token *)dest->next->next->content)->lexem, BLANK);
+	cr_assert_eq(((t_token *)dest->next->next->next->content)->lexem, END);
+}
+
+Test(Scan, SingleDollar)
+{
+	t_shell	shell;
+	t_list	*dest = NULL;
+	char	*input = "$   ";
+
+	shell.index = 0;
+	scan(&shell, &dest, input);
+
+	cr_assert_eq(((t_token *)dest->content)->lexem, START);
+	cr_assert_eq(((t_token *)dest->next->content)->lexem, OPERATOR);
+	cr_assert_eq((((t_token *)dest->next->content)->letter), '$');
 	cr_assert_eq(((t_token *)dest->next->next->content)->lexem, BLANK);
 	cr_assert_eq(((t_token *)dest->next->next->next->content)->lexem, END);
 }
@@ -319,8 +335,125 @@ Test(Syntax, Invalid_Redirection2, .init=redirect_all_std)
 }
 
 /* ************************************************************************** */
+/*	Lexer																	  */
+/* ************************************************************************** */
+
+Test(Lexer, Remove_single_space)
+{
+	t_shell	*shell;
+
+	shell = create_minishell(environ);
+	shell->cmd_line = "echp hello";
+	scan(shell, &shell->token_list, shell->cmd_line);
+	lexer(shell, &shell->token_list);
+	cr_assert_eq(((t_token *)shell->token_list->content)->lexem, START);
+	cr_assert_eq(((t_token *)shell->token_list->next->content)->lexem, WORD);
+	cr_assert_str_eq((char *)(((t_token *)shell->token_list->next->content)->content), "echp");
+	cr_assert_eq(((t_token *)shell->token_list->next->next->content)->lexem, WORD);
+	cr_assert_str_eq((char *)(((t_token *)shell->token_list->next->next->content)->content), "hello");
+	cr_assert_eq(((t_token *)shell->token_list->next->next->next->content)->lexem, END);
+}
+
+Test(Lexer, Remove_many_spaces)
+{
+	t_shell	*shell;
+
+	shell = create_minishell(environ);
+	shell->cmd_line = "echp       hello";
+	scan(shell, &shell->token_list, shell->cmd_line);
+	lexer(shell, &shell->token_list);
+	cr_assert_eq(((t_token *)shell->token_list->content)->lexem, START);
+	cr_assert_eq(((t_token *)shell->token_list->next->content)->lexem, WORD);
+	cr_assert_str_eq((char *)(((t_token *)shell->token_list->next->content)->content), "echp");
+	cr_assert_eq(((t_token *)shell->token_list->next->next->content)->lexem, WORD);
+	cr_assert_str_eq((char *)(((t_token *)shell->token_list->next->next->content)->content), "hello");
+	cr_assert_eq(((t_token *)shell->token_list->next->next->next->content)->lexem, END);
+}
+
+Test(Lexer, Id_variable)
+{
+	t_shell	*shell;
+
+	shell = create_minishell(environ);
+	shell->cmd_line = "echp       $hello";
+	scan(shell, &shell->token_list, shell->cmd_line);
+	lexer(shell, &shell->token_list);
+	cr_assert_eq(((t_token *)shell->token_list->content)->lexem, START);
+	cr_assert_eq(((t_token *)shell->token_list->next->content)->lexem, WORD);
+	cr_assert_str_eq((char *)(((t_token *)shell->token_list->next->content)->content), "echp");
+	cr_assert_eq(((t_token *)shell->token_list->next->next->content)->lexem, VARIABLE);
+	cr_assert_eq((((t_token *)shell->token_list->next->next->content)->letter), '$');
+	cr_assert_str_eq((char *)(((t_token *)shell->token_list->next->next->content)->content), "$hello");
+	cr_assert_eq(((t_token *)shell->token_list->next->next->next->content)->lexem, END);
+}
+
+Test(Lexer, Id_multiple_variable)
+{
+	t_shell	*shell;
+	t_token	*token;
+
+	shell = create_minishell(environ);
+	shell->cmd_line = "echp       $hello$arg";
+	scan(shell, &shell->token_list, shell->cmd_line);
+	lexer(shell, &shell->token_list);
+	token = (t_token *)shell->token_list->content;
+	cr_assert_eq(token->lexem, START);
+	token = (t_token *)shell->token_list->next->content;
+	cr_assert_eq(token->lexem, WORD);
+	cr_assert_str_eq(((char *)token->content), "echp");
+	token = (t_token *)shell->token_list->next->next->content;
+	cr_assert_eq(token->lexem, VARIABLE);
+	cr_assert_eq(token->letter, '$');
+	cr_assert_str_eq((char *)token->content, "$hello");
+	token = (t_token *)shell->token_list->next->next->next->content;
+	cr_assert_eq(token->lexem, VARIABLE);
+	cr_assert_eq(token->letter, '$');
+	cr_assert_str_eq((char *)token->content, "$arg");
+	token = (t_token *)shell->token_list->next->next->next->next->content;
+	cr_assert_eq(token->lexem, END);
+}
+
+Test(Lexer, Wrong_numerical_variable)
+{
+	t_shell	*shell;
+	t_token	*token;
+
+	shell = create_minishell(environ);
+	shell->cmd_line = "echp       $1";
+	scan(shell, &shell->token_list, shell->cmd_line);
+	lexer(shell, &shell->token_list);
+	token = (t_token *)shell->token_list->content;
+	cr_assert_eq(token->lexem, START);
+	token = (t_token *)shell->token_list->next->content;
+	cr_assert_eq(token->lexem, WORD);
+	cr_assert_str_eq(((char *)token->content), "echp");
+	token = (t_token *)shell->token_list->next->next->content;
+	cr_assert_eq(token->lexem, VARIABLE);
+	cr_assert_eq(token->letter, '$');
+	cr_assert_str_eq((char *)token->content, "$hello");
+	token = (t_token *)shell->token_list->next->next->next->content;
+	cr_assert_eq(token->lexem, VARIABLE);
+	cr_assert_eq(token->letter, '$');
+	cr_assert_str_eq((char *)token->content, "$arg");
+	token = (t_token *)shell->token_list->next->next->next->next->content;
+	cr_assert_eq(token->lexem, END);
+}
+
+
+
+/* ************************************************************************** */
 /*	Parsing																	  */
 /* ************************************************************************** */
+
+
+
+
+
+
+/* ************************************************************************** */
+/*	Expand																	  */
+/* ************************************************************************** */
+
 
 
 

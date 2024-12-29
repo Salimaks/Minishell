@@ -6,7 +6,7 @@
 /*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 14:12:32 by alex              #+#    #+#             */
-/*   Updated: 2024/12/29 10:33:35 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/29 16:13:11 by mkling           ###   ########.fr       */
 /*                                                                            */
 /******************************************************************************/
 
@@ -76,6 +76,8 @@ Then paths if any were extracted from env
 Exits fork if no command is found */
 void	get_cmd_path(t_shell *shell, t_cmd *cmd)
 {
+	char	*path;
+
 	if (!cmd || !cmd->arg_list || !((char *)cmd->arg_list->content)[0])
 		return (set_cmd_error(CANT_FIND_CMD, cmd, "Command not found"));
 	cmd->cmd_path = (char *)cmd->arg_list->content;
@@ -83,9 +85,10 @@ void	get_cmd_path(t_shell *shell, t_cmd *cmd)
 		return (check_if_directory(cmd, cmd->cmd_path));
 	if (ft_strnstr(cmd->cmd_path, "./", 2))
 		return (try_working_dir_path(shell, cmd));
-	cmd->cmd_path = ft_strjoin("/", cmd->cmd_path);
-	if (!cmd->cmd_path)
+	path = ft_strjoin("/", cmd->cmd_path);
+	if (!path)
 		return (set_cmd_error(MALLOC_FAIL, cmd, "Failed to allocate path"));
+	cmd->cmd_path = path;
 	if (access(cmd->cmd_path, F_OK) == 0)
 		return (check_cmd(cmd));
 	return (try_relative_paths(shell, cmd));

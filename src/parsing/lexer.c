@@ -1,14 +1,14 @@
-/* ************************************************************************** */
+/******************************************************************************/
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   lexer.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 17:34:47 by alex              #+#    #+#             */
-/*   Updated: 2024/12/28 20:53:23 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/29 16:14:49 by mkling           ###   ########.fr       */
 /*                                                                            */
-/* ************************************************************************** */
+/******************************************************************************/
 
 #include "minishell.h"
 
@@ -56,13 +56,14 @@ void	group_strings(t_shell *shell, t_list *node)
 
 void	id_variables(t_shell *shell, t_list *current)
 {
-	if (shell->critical_er || !token_is(OPERATOR, current))
+	char	*variable;
+
+	if (shell->critical_er || !token_is(VARIABLE, current) || !current->next)
 		return ;
-	if (((t_token *)current->content)->letter == '$')
-	{
-		merge_token(shell, current);
-		((t_token *)current->content)->lexem = VARIABLE;
-	}
+	variable = ft_strjoin("$", ((t_token *)current->next->content)->content);
+	((t_token *)current->content)->lexem = VARIABLE;
+	((t_token *)current->content)->content = variable;
+	ft_lstpop(&shell->token_list, current->next, free_token);
 }
 
 void	lexer(t_shell *shell, t_list **token_list)
@@ -70,7 +71,7 @@ void	lexer(t_shell *shell, t_list **token_list)
 	apply_to_list(shell, *token_list, group_strings);
 	apply_to_list(shell, *token_list, remove_space);
 	apply_to_list(shell, *token_list, id_variables);
-	// print_tokens(*token_list);
+	print_tokens(*token_list);
 }
 
 // TO DO
