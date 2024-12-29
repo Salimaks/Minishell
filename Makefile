@@ -6,7 +6,7 @@
 #    By: skassimi <skassimi@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/08/14 14:56:12 by mkling            #+#    #+#              #
-#    Updated: 2024/12/24 13:21:24 by skassimi         ###   ########.fr        #
+#    Updated: 2024/12/29 11:00:25 by skassimi         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -32,6 +32,7 @@ FUNC_EXEC	= 	execution.c \
 				errors.c
 
 FUNC_PARS	=	tokenizer.c \
+				tokens.c \
 				parser.c \
 				signals.c
 

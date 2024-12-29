@@ -6,7 +6,7 @@
 /*   By: skassimi <skassimi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/27 11:19:34 by skassimi         ###   ########.fr       */
+/*   Updated: 2024/12/29 10:58:58 by skassimi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,9 +81,13 @@ t_cmd		*create_cmd(t_cmd_tab *cmd_tab);
 void		append_cmd(t_cmd *cmd, t_cmd_tab *cmd_tab);
 void		load_cmd(t_cmd_tab *cmd_tab, t_token *token);
 void		parse(t_cmd_tab *cmd_tab, t_token *start);
+char		*ft_strndup(const char *src, int size);
 void		free_tokens(t_list *current);
 void		print_tokens(t_list *tokens);
 t_list		*tokenizer(char *input);
+void		tokenize_special(char **input, t_list **tokens);
+int			is_not_space(char c);
+void		free_tokens(t_list *current);
 
 /* EXECUTION */
 

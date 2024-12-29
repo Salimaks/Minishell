@@ -6,7 +6,7 @@
 /*   By: skassimi <skassimi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/05/24 17:12:03 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/27 13:03:12 by skassimi         ###   ########.fr       */
+/*   Updated: 2024/12/29 10:30:38 by skassimi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,8 +59,6 @@ char	*ft_strtrim(char const *s1, char const *set)
 	char	*result;
 	size_t	start;
 	size_t	len;
-		while (*input && !is_not_space(*input))
-			(*input)++;
 
 	if (!set)
 		return (ft_strdup(s1));
