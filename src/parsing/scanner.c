@@ -1,14 +1,14 @@
-/******************************************************************************/
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   scanner.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/01 16:37:27 by alex              #+#    #+#             */
-/*   Updated: 2024/12/29 16:13:07 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/30 13:24:52 by alex             ###   ########.fr       */
 /*                                                                            */
-/******************************************************************************/
+/* ************************************************************************** */
 
 #include "minishell.h"
 
@@ -30,7 +30,7 @@ void	add_word_token(t_shell *shell, t_list **dest, char *input)
 	len = 0;
 	while (input[len])
 	{
-		if (!letter_is(WORD, input[shell->index + len]))
+		if (!letter_is(WORD, &input[shell->index + len]))
 			break ;
 		len++;
 	}
@@ -48,7 +48,7 @@ void	add_blank_token(t_shell *shell, t_list **dest, char *input)
 	t_token	*token;
 
 	len = 0;
-	while (letter_is(BLANK, input[shell->index + len]))
+	while (letter_is(BLANK, &input[shell->index + len]))
 		len++;
 	space = ft_calloc(sizeof(char), len + 1);
 	ft_strlcat(space, &input[shell->index], len + 1);
@@ -83,11 +83,11 @@ void	scan(t_shell *shell, t_list **dest, char *input)
 	ft_lstadd_back(dest, ft_lstnew(create_token(shell, START, '\0', NULL)));
 	while (shell->index < ft_strlen(input))
 	{
-		if (letter_is(DELIMITER, input[shell->index]))
+		if (letter_is(DELIMITER, &input[shell->index]))
 			add_delimiter_token(shell, dest, input);
-		else if (letter_is(OPERATOR, input[shell->index]))
+		else if (letter_is(OPERATOR, &input[shell->index]))
 			add_operator_token(shell, dest, input);
-		else if (letter_is(BLANK, input[shell->index]))
+		else if (letter_is(BLANK, &input[shell->index]))
 			add_blank_token(shell, dest, input);
 		else
 			add_word_token(shell, dest, input);

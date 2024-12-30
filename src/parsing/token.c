@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 18:04:03 by alex              #+#    #+#             */
-/*   Updated: 2024/12/28 12:46:21 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/30 13:24:33 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,19 @@ void	add_token(t_shell *shell, t_list **dest, char letter, char *content)
 
 	token = create_token(shell, letter, letter, content);
 	ft_lstadd_back(dest, ft_lstnew(token));
+}
+
+void	merge_token(t_shell *shell, t_list *start)
+{
+	t_token	*current;
+	t_token	*next;
+
+	current = ((t_token *)start->content);
+	next = ((t_token *)start->next->content);
+	current->content = ft_strjoinfree(current->content, next->content);
+	if (!current->content)
+		return (set_error(MALLOC_FAIL, shell, "Failed to malloc token"));
+	ft_lstpop(&shell->token_list, start->next, free_token);
 }
 
 void	apply_to_list(t_shell *shell, t_list *node,

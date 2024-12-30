@@ -1,29 +1,16 @@
-/******************************************************************************/
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   lexer.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 17:34:47 by alex              #+#    #+#             */
-/*   Updated: 2024/12/29 16:14:49 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/30 13:25:59 by alex             ###   ########.fr       */
 /*                                                                            */
-/******************************************************************************/
+/* ************************************************************************** */
 
 #include "minishell.h"
-
-void	merge_token(t_shell *shell, t_list *start)
-{
-	t_token	*current;
-	t_token	*next;
-
-	current = ((t_token *)start->content);
-	next = ((t_token *)start->next->content);
-	current->content = ft_strjoinfree(current->content, next->content);
-	if (!current->content)
-		return (set_error(MALLOC_FAIL, shell, "Failed to malloc token"));
-	ft_lstpop(&shell->token_list, start->next, free_token);
-}
 
 void	remove_space(t_shell *shell, t_list *current)
 {
@@ -56,22 +43,21 @@ void	group_strings(t_shell *shell, t_list *node)
 
 void	id_variables(t_shell *shell, t_list *current)
 {
-	char	*variable;
-
-	if (shell->critical_er || !token_is(VARIABLE, current) || !current->next)
+	if (shell->critical_er || ((t_token *)current->content)->lexem != OPERATOR
+		|| ((t_token *)current->content)->letter != '$')
 		return ;
-	variable = ft_strjoin("$", ((t_token *)current->next->content)->content);
 	((t_token *)current->content)->lexem = VARIABLE;
-	((t_token *)current->content)->content = variable;
+	((t_token *)current->content)->content
+		= ft_strjoin("$", (char *)((t_token *)current->next->content)->content);
 	ft_lstpop(&shell->token_list, current->next, free_token);
 }
 
 void	lexer(t_shell *shell, t_list **token_list)
 {
+	apply_to_list(shell, *token_list, id_variables);
 	apply_to_list(shell, *token_list, group_strings);
 	apply_to_list(shell, *token_list, remove_space);
-	apply_to_list(shell, *token_list, id_variables);
-	print_tokens(*token_list);
+	// print_tokens(*token_list);
 }
 
 // TO DO

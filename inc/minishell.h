@@ -1,14 +1,14 @@
-/******************************************************************************/
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mkling <mkling@student.42.fr>              +#+  +:+       +#+        */
+/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/29 16:06:25 by mkling           ###   ########.fr       */
+/*   Updated: 2024/12/30 12:33:56 by alex             ###   ########.fr       */
 /*                                                                            */
-/******************************************************************************/
+/* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
@@ -102,9 +102,10 @@ void		merge_token(t_shell *shell, t_list *start);
 void		lexer(t_shell *shell, t_list **token_list);
 int			check_syntax(t_shell *shell, t_list *token_list);
 void		apply_to_list(t_shell *s, t_list *n, void f(t_shell *, t_list *));
-int			letter_is(int lexem, char letter);
+int			letter_is(int lexem, char *string);
 int			token_is(int lexem, t_list *node);
 int			is_valid_variable(char *input);
+void		ft_swap_ptr(void **a, void **b);
 
 /* PARSER */
 
