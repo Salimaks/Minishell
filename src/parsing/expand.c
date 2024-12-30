@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/14 16:54:16 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/30 12:32:28 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/30 17:08:45 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,11 +40,19 @@ int	has_valid_var(char *string)
 void	expand_var(t_shell *shell, char **var_name)
 {
 	char	*var;
+	t_list	*env;
 
 	if (ft_strcmp(*var_name, "$?"))
 		var = ft_itoa(shell->last_exit_code);
 	else
-		var = ft_strdup((char *)find_env(shell->env_list, &(*var_name)[1])->content);
+	{
+		env = find_env(shell->env_list, var_name[1]);
+		if (env)
+		{
+			fprintf(stderr, "variable is %s\n", (char *)env->content);
+			var = (char *)env->content;
+		}
+	}
 	free(*var_name);
 	*var_name = var;
 }
@@ -56,7 +64,10 @@ void	expand(t_shell *shell, t_list *node)
 	if (shell->critical_er || !node || !can_expand(node))
 		return ;
 	token = (t_token *)node->content;
-	if (!has_valid_var((char *)token->content))
-		return ;
-
+	if (token->lexem == VARIABLE)
+		expand_var(shell, &token->content);
+	if (token->lexem == STRING && has_valid_var((char *)token->content))
+	{
+		fprintf(stderr, "need to scan lex and expand string\n");
+	}
 }

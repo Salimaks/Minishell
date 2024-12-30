@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 17:34:47 by alex              #+#    #+#             */
-/*   Updated: 2024/12/30 13:25:59 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/30 13:37:49 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ void	remove_space(t_shell *shell, t_list *current)
 	ft_lstpop(&shell->token_list, current->next, free_token);
 }
 
+/* might want to add string grouping when word next to empty quotes */
 void	group_strings(t_shell *shell, t_list *node)
 {
 	t_token	*first_delim;

@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/28 13:50:23 by alex              #+#    #+#             */
-/*   Updated: 2024/12/30 13:25:38 by alex             ###   ########.fr       */
+/*   Updated: 2024/12/30 19:17:29 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@ int	is_valid_variable(char *input)
 {
 	if (input[0] != '$')
 		return (0);
+	if (input[1] == '?' && (input[2] == '\0' || input[2] == ' '))
+		return (1);
 	if (input[1] != '_' && !ft_isalpha(input[1]))
 		return (0);
 	return (1);
