@@ -69,7 +69,7 @@ t_tree	*parse_command(t_shell *shell, t_list **node)
 			parse_infiles(shell, cmd, node);
 		else if (token->letter == '>')
 			parse_outfiles(shell, cmd, node);
-		else if (token->lexem == WORD || token->lexem == STRING)
+		else if (token->lexem == WORD || token->lexem == STRING || token->lexem == VARIABLE)
 			ft_lstadd_back(&cmd->arg_list,
 				ft_lstnew(ft_strdup(token->content)));
 		*node = (*node)->next;

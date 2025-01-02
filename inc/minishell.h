@@ -106,6 +106,8 @@ int			letter_is(int lexem, char *string);
 int			token_is(int lexem, t_list *node);
 int			is_valid_variable(char *input);
 void		ft_swap_ptr(void **a, void **b);
+void		id_variables(t_shell *shell, t_list *current);
+void		group_strings(t_shell *shell, t_list *node);
 
 /* PARSER */
 
@@ -129,6 +131,7 @@ int			exec_single_cmd(t_shell *shell, t_tree *tree, bool piped);
 int			create_fork(t_shell *shell, int	*fork_pid);
 void		get_cmd_path(t_shell *shell, t_cmd *cmd);
 void		put_arg_in_array(t_cmd *cmd);
+void		expand(t_shell *shell, t_list *node);
 
 /* BUILT IN */
 

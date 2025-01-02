@@ -59,5 +59,10 @@
   "files.associations": {
     "minishell.h": "c",
     "readline.h": "c"
-  }
+  },
+  "editor.tabSize": 4,
+  "editor.insertSpaces": false,
+  "editor.renderWhitespace": "all",
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true
 }

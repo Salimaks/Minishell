@@ -26,6 +26,7 @@ int	exec_with_fork(t_shell *shell, t_cmd *cmd)
 		get_cmd_path(shell, cmd);
 		if (cmd->exit_code)
 			exit(cmd->exit_code);
+		apply_to_list(shell, cmd->arg_list, expand);
 		put_arg_in_array(cmd);
 		if (!cmd->argv)
 			exit(cmd->exit_code);
@@ -38,6 +39,7 @@ int	exec_with_fork(t_shell *shell, t_cmd *cmd)
 
 int	exec_with_main(t_shell *shell, t_cmd *cmd, bool piped)
 {
+	apply_to_list(shell, cmd->arg_list, expand);
 	put_arg_in_array(cmd);
 	if (!cmd->argv)
 		return (cmd->exit_code);
