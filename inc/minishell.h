@@ -108,6 +108,7 @@ int			is_valid_variable(char *input);
 void		ft_swap_ptr(void **a, void **b);
 void		id_variables(t_shell *shell, t_list *current);
 void		group_strings(t_shell *shell, t_list *node);
+void		remove_delimiter_on_ptr(t_shell *shell, void **ptr_to_string);
 
 /* PARSER */
 

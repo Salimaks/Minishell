@@ -182,6 +182,18 @@ Test(Syntax, Valid_Single_Command1)
 	free_minishell(shell);
 }
 
+Test(Syntax, Valid_String)
+{
+	t_shell	*shell;
+
+	shell = create_minishell(environ);
+	shell->cmd_line = "echo   \"hello and goodbye\"";
+	scan(shell, &shell->token_list, shell->cmd_line);
+	cr_assert(check_syntax(shell, shell->token_list) == 0);
+	cr_assert(shell->critical_er == 0);
+	free_minishell(shell);
+}
+
 Test(Syntax, Valid_Out_Redirection0)
 {
 	t_shell	*shell;

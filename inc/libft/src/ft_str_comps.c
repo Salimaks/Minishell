@@ -18,6 +18,8 @@ char	*ft_strchr(const char *str, int c)
 	int	i;
 
 	i = 0;
+	if (!str)
+		return (0);
 	while (str[i])
 	{
 		if (str[i] == (char)c)
@@ -26,8 +28,6 @@ char	*ft_strchr(const char *str, int c)
 	}
 	if (str[i] == (char)c)
 		return ((char *)&str[i]);
-	if (!str)
-		return (0);
 	return (0);
 }
 

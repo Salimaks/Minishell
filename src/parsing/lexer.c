@@ -19,6 +19,23 @@ void	remove_space(t_shell *shell, t_list *current)
 	ft_lstpop(&shell->token_list, current->next, free_token);
 }
 
+/* For use on t_list, not on tokens */
+void	remove_delimiter_on_ptr(t_shell *shell, void **ptr_to_string)
+{
+	char	*original_string;
+	char	*quotefree_string;
+	size_t	len;
+
+	if (shell->critical_er)
+		return ;
+	original_string = *ptr_to_string;
+	len = ft_strlen(original_string);
+	quotefree_string = ft_calloc(sizeof(char), len - 1);
+	ft_strlcat(quotefree_string, &original_string[1], len - 1);
+	free(original_string);
+	*ptr_to_string = quotefree_string;
+}
+
 /* might want to add string grouping when word next to empty quotes */
 void	group_strings(t_shell *shell, t_list *node)
 {
@@ -27,14 +44,11 @@ void	group_strings(t_shell *shell, t_list *node)
 	first_delim = ((t_token *)node->content);
 	if (first_delim->lexem != DELIMITER)
 		return ;
-	first_delim->content = ft_calloc(1, sizeof(char));
-	if (!first_delim->content)
-		return (set_error(MALLOC_FAIL, shell, "Failed to malloc string"));
 	while (!token_is(END, node->next))
 	{
 		if (((t_token *)node->next->content)->letter == first_delim->letter)
 		{
-			ft_lstpop(&shell->token_list, node->next, free_token);
+			merge_token(shell, node);
 			break ;
 		}
 		merge_token(shell, node);

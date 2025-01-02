@@ -15,8 +15,13 @@
 void	add_delimiter_token(t_shell *shell, t_list **dest, char *input)
 {
 	t_token	*token;
+	char	*delim;
 
-	token = create_token(shell, DELIMITER, input[shell->index], NULL);
+	delim = ft_calloc(sizeof(char), 2);
+	ft_strlcat(delim, &input[shell->index], 2);
+	if (!delim)
+		return (set_error(MALLOC_FAIL, shell, "Failed to malloc token"));
+	token = create_token(shell, DELIMITER, input[shell->index], delim);
 	ft_lstadd_back(dest, ft_lstnew(token));
 	shell->index++;
 }
@@ -35,6 +40,8 @@ void	add_word_token(t_shell *shell, t_list **dest, char *input)
 		len++;
 	}
 	word = ft_calloc(sizeof(char), len + 1);
+	if (!word)
+		return (set_error(MALLOC_FAIL, shell, "Failed to malloc token"));
 	ft_strlcat(word, &input[shell->index], len + 1);
 	token = create_token(shell, WORD, input[shell->index], word);
 	ft_lstadd_back(dest, ft_lstnew(token));
@@ -51,6 +58,8 @@ void	add_blank_token(t_shell *shell, t_list **dest, char *input)
 	while (letter_is(BLANK, &input[shell->index + len]))
 		len++;
 	space = ft_calloc(sizeof(char), len + 1);
+	if (!space)
+		return (set_error(MALLOC_FAIL, shell, "Failed to malloc token"));
 	ft_strlcat(space, &input[shell->index], len + 1);
 	token = create_token(shell, BLANK, input[shell->index], space);
 	ft_lstadd_back(dest, ft_lstnew(token));
@@ -65,13 +74,18 @@ void	add_operator_token(t_shell *shell, t_list **dest, char *input)
 	if (input[shell->index] == input[shell->index + 1])
 	{
 		content = ft_calloc(sizeof(char), 3);
+		if (!content)
+			return (set_error(MALLOC_FAIL, shell, "Failed to malloc token"));
 		ft_strlcat(content, &input[shell->index], 3);
 		token = create_token(shell, OPERATOR, input[shell->index], content);
 		ft_lstadd_back(dest, ft_lstnew(token));
 		shell->index += 2;
 		return ;
 	}
-	content = NULL;
+	content = ft_calloc(sizeof(char), 2);
+	ft_strlcat(content, &input[shell->index], 2);
+	if (!content)
+		return (set_error(MALLOC_FAIL, shell, "Failed to malloc token"));
 	token = create_token(shell, OPERATOR, input[shell->index], NULL);
 	ft_lstadd_back(dest, ft_lstnew(token));
 	shell->index++;

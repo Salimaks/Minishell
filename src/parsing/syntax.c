@@ -20,13 +20,20 @@ void	is_missing_delimiter(t_shell *shell, t_list *node)
 
 	if (shell->critical_er || !token_is(DELIMITER, node))
 		return ;
-	delim_type = (char)((t_token *)node->content)->letter;
+	delim_type = ((t_token *)node->content)->letter;
 	current = node->next;
-	while (!token_is(END, current) && !token_is(END, current->next))
+	while (!token_is(END, current))
 	{
 		if (((t_token *)current->content)->letter == delim_type)
 			return ;
 		current = current->next;
+	}
+	current = node->prev;
+	while (!token_is(START, current))
+	{
+		if (((t_token *)current->content)->letter == delim_type)
+			return ;
+		current = current->prev;
 	}
 	print_syntax_error((t_token *)current->content);
 	shell->critical_er = SYNTAX_ERROR;
