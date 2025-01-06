@@ -10,6 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "../inc/libft.h"
+
 void	ft_swap_int(int *a, int *b)
 {
 	int	tmp;
@@ -19,11 +21,13 @@ void	ft_swap_int(int *a, int *b)
 	*b = tmp;
 }
 
-void	ft_swap_ptr(void **a, void **b)
+void	ft_swap_ptr(void **a, void **b, size_t size)
 {
-	void	*tmp;
-
-	tmp = *a;
-	*a = *b;
-	*b = tmp;
+	void *tmp = malloc(sizeof(size));
+	if (!tmp)
+		return ;
+	ft_memcpy(tmp, a, size);
+	ft_memcpy(a, b, size);
+	ft_memcpy(a, tmp, size);
+	free(tmp);
 }

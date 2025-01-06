@@ -105,10 +105,11 @@ void		apply_to_list(t_shell *s, t_list *n, void f(t_shell *, t_list *));
 int			letter_is(int lexem, char *string);
 int			token_is(int lexem, t_list *node);
 int			is_valid_variable(char *input);
-void		ft_swap_ptr(void **a, void **b);
 void		id_variables(t_shell *shell, t_list *current);
 void		group_strings(t_shell *shell, t_list *node);
-void		remove_delimiter_on_ptr(t_shell *shell, void **ptr_to_string);
+void		remove_delimiter(t_shell *shell, void **ptr_to_string);
+int			can_expand(t_list *node);
+int			has_valid_var(char *string);
 
 /* PARSER */
 

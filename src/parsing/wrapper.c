@@ -49,3 +49,27 @@ int	letter_is(int lexem, char *string)
 		token_type = WORD;
 	return (token_type == lexem);
 }
+
+int	has_valid_var(char *string)
+{
+	char	first_letter;
+
+	if (!string || !string[0] || !ft_strchr(string, '$'))
+		return (0);
+	first_letter = *(ft_strchr(string, '$') + 1);
+	if (first_letter == '_' || ft_isalpha(first_letter))
+		return (1);
+	return (0);
+}
+
+int	can_expand(t_list *node)
+{
+	char	*string;
+
+	if (!node || !node->content)
+		return (0);
+	string = (char *)node->content;
+	if (string[0] == '\'')
+		return (0);
+	return (1);
+}

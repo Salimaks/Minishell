@@ -83,10 +83,10 @@ void	ft_bubble_sort(int	*num_array, int size_array);
 void	ft_swap_int(int *a, int *b);
 int		is_too_long_for_int(char *str);
 int		ft_abs(int num);
-int		ft_isdigit_or_hexa(int c);
 void	ft_free_matrix(int	**matrix);
 int		ft_atoi_base(char *str, char *base);
 void	ft_lstpop(t_list **head, t_list *node, void (*del)(void *));
 int		ft_iseven(int num);
+void	ft_swap_ptr(void **a, void **b, size_t size);
 
 #endif

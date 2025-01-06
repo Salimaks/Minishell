@@ -12,35 +12,6 @@
 
 #include "minishell.h"
 
-
-// tokenize "" or '' as single empty string to ensure ""'$USER'"" and ''$USER''
-// expand as they do in bash
-/* Applies requirements for expansion,
-NEEDS TO BE ADAPTED */
-int	can_expand(t_list *node)
-{
-	char	*string;
-
-	if (!node || !node->content)
-		return (0);
-	string = (char *)node->content;
-	if (string[0] == '\'')
-		return (0);
-	return (1);
-}
-
-int	has_valid_var(char *string)
-{
-	char	first_letter;
-
-	if (!string || !string[0] || !ft_strchr(string, '$'))
-		return (0);
-	first_letter = *(ft_strchr(string, '$') + 1);
-	if (first_letter == '_' || ft_isalpha(first_letter))
-		return (1);
-	return (0);
-}
-
 void	expand_variable(t_shell *shell, char **ptr_to_variable)
 {
 	char	*var_name;
@@ -79,19 +50,15 @@ char	*flatten_token_list_into_string(t_shell *shell, t_list *head)
 			len += ft_strlen((char *)((t_token *)current->content)->content);
 		current = current->next;
 	}
-	fprintf(stderr, "len is %u\n", len);
 	result = ft_calloc(sizeof(char), len + 1);
-	len = 0;
 	current = head;
 	while (current->next)
 	{
 		token = (t_token *)current->content;
-		fprintf(stderr, "word is %s\n", (char *)token->content);
 		if (current->content && ((t_token *)current->content)->content)
-			ft_strlcat(result, (char *)token->content, ft_strlen((char *)token->content));
+			result = ft_strjoinfree(result, (char *)token->content);
 		current = current->next;
 	}
-	fprintf(stderr, "string is : %s\n", result);
 	return (result);
 }
 
@@ -130,8 +97,9 @@ void	expand(t_shell *shell, t_list *node)
 		expand_variable(shell, (char **)&node->content);
 	if (has_valid_var((char *)node->content) && can_expand(node))
 	{
-		remove_delimiter_on_ptr(shell, &node->content);
+		remove_delimiter(shell, &node->content);
 		expand_in_string(shell, node);
 	}
-
+	else
+		remove_delimiter(shell, &node->content);
 }
