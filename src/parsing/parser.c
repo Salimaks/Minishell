@@ -12,41 +12,27 @@
 
 #include "minishell.h"
 
-void	parse_outfiles(t_shell *shell, t_cmd *cmd, t_list **current)
+void	parse_in_out_files(t_shell *shell, t_cmd *cmd, t_list **current)
 {
 	if (shell->critical_er)
 		return ;
-	if (((t_token *)(*current)->next->content)->letter == '>')
+	if (token_is(APPEND, (*current)) || token_is(OUTFILE, (*current)))
 	{
-		if (((t_token *)(*current)->next->next->content)->lexem != WORD)
-			return (set_error(SYNTAX_ERROR, shell, "No append outfile"));
-		*current = (*current)->next->next;
-		((t_token *)(*current)->content)->lexem = APPEND;
-	}
-	else
-	{
-		if (((t_token *)(*current)->next->content)->lexem != WORD)
+		if (token_is(WORD, (*current)->next))
 			return (set_error(SYNTAX_ERROR, shell, "No outfile"));
 		*current = (*current)->next;
-		((t_token *)(*current)->content)->lexem = OUTFILE;
+		((t_token *)(*current)->content)->lexem = APPEND;
 	}
-	create_file(shell, cmd, ((t_token *)(*current)->content));
-}
-
-void	parse_infiles(t_shell *shell, t_cmd *cmd, t_list **current)
-{
-	if (shell->critical_er)
-		return ;
-	if (((t_token *)(*current)->next->content)->letter == '<')
+	else if (token_is(HEREDOC, (*current)))
 	{
-		if (((t_token *)(*current)->next->next->content)->lexem != WORD)
+		if (!token_is(WORD, (*current)->next))
 			return (set_error(SYNTAX_ERROR, shell, "No delimiter"));
-		*current = (*current)->next->next;
+		*current = (*current)->next;
 		((t_token *)(*current)->content)->lexem = HEREDOC;
 	}
-	else
+	else if (token_is(OUTFILE, (*current)))
 	{
-		if (((t_token *)(*current)->next->content)->lexem != WORD)
+		if (!token_is(WORD, (*current)->next))
 			return (set_error(SYNTAX_ERROR, shell, "No infile"));
 		*current = (*current)->next;
 		((t_token *)(*current)->content)->lexem = INFILE;
@@ -57,23 +43,21 @@ void	parse_infiles(t_shell *shell, t_cmd *cmd, t_list **current)
 t_tree	*parse_command(t_shell *shell, t_list **node)
 {
 	t_cmd	*cmd;
-	t_token	*token;
 
 	if (!(*node))
 		return (set_error(CANT_FIND_CMD, shell, "Missing command"), NULL);
 	cmd = create_cmd();
-	token = ((t_token *)(*node)->content);
-	while ((*node)->next && token->letter != PIPE && token->lexem != END)
+	while ((*node)->next && !token_is(PIPE, (*node)) && !token_is(END, (*node))
+		&& !token_is(OR, (*node)) && !token_is(AND, (*node)))
 	{
-		if (token->letter == '<')
-			parse_infiles(shell, cmd, node);
-		else if (token->letter == '>')
-			parse_outfiles(shell, cmd, node);
-		else if (token->lexem == WORD || token->lexem == STRING || token->lexem == VARIABLE)
+		if (token_is(OUTFILE, (*node)) || token_is(APPEND, (*node))
+			|| token_is(INFILE, (*node)) || token_is(HEREDOC, (*node)))
+			parse_in_out_files(shell, cmd, node);
+		else if (token_is(WORD, (*node)) || token_is(STRING, (*node))
+			|| token_is(VARIABLE, (*node)))
 			ft_lstadd_back(&cmd->arg_list,
-				ft_lstnew(ft_strdup(token->content)));
+				ft_lstnew(ft_strdup(((t_token *)(*node)->content)->content)));
 		*node = (*node)->next;
-		token = ((t_token *)(*node)->content);
 	}
 	return (create_branch(shell, AST_CMD, cmd));
 }
@@ -87,7 +71,7 @@ t_tree	*parse_pipe(t_shell *shell, t_list **token)
 	left = parse_command(shell, token);
 	if (!left)
 		return (NULL);
-	if (!(*token) || ((t_token *)(*token)->content)->letter != PIPE)
+	if (!(*token) || !token_is(PIPE, (*token)))
 		return (left);
 	*token = (*token)->next;
 	right = parse_pipe(shell, token);
@@ -99,8 +83,34 @@ t_tree	*parse_pipe(t_shell *shell, t_list **token)
 	return (pipe_node);
 }
 
+t_tree	*parse_and_or(t_shell *shell, t_list **node)
+{
+	t_tree	*left;
+	t_tree	*right;
+	t_tree	*pipe_node;
+	int		type;
+
+	left = parse_pipe(shell, node);
+	if (!left)
+		return (NULL);
+	if (!(*node) || (!token_is(AND, (*node)) && !token_is(OR, (*node))))
+		return (left);
+	if (token_is(AND, (*node)))
+		type = AST_AND;
+	else
+		type = AST_OR;
+	*node = (*node)->next;
+	right = parse_and_or(shell, node);
+	if (!right)
+		return (free_tree(&left), NULL);
+	pipe_node = create_branch(shell, type, NULL);
+	pipe_node->left = left;
+	pipe_node->right = right;
+	return (pipe_node);
+}
+
 void	parser(t_shell *shell)
 {
-	shell->tree_root = parse_pipe(shell, &shell->token_list);
+	shell->tree_root = parse_and_or(shell, &shell->token_list);
 	ft_lstclear(&shell->token_list, free_token);
 }

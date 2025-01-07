@@ -21,12 +21,12 @@ int	token_is(int lexem, t_list *node)
 
 int	is_valid_variable(char *input)
 {
-	if (input[0] != '$')
+	if (input[0] != '$' || !letter_is(WORD, &input[1]))
 		return (0);
-	if (input[1] == '?' && (input[2] == '\0' || input[2] == ' '))
-		return (1);
-	if (input[1] != '_' && !ft_isalpha(input[1]))
-		return (0);
+	// if (input[1] == '?' && (input[2] == '\0' || input[2] == ' '))
+	// 	return (1);
+	// if (input[1] != '_' && !ft_isalpha(input[1]))
+	// 	return (0);
 	return (1);
 }
 

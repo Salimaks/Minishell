@@ -70,9 +70,9 @@ SRC			= 	$(addprefix $(DIR_SRC)/, $(FUNC)) \
 
 OBJ			= $(SRC:$(DIR_SRC)/%.c=$(DIR_OBJ)/%.o)
 
-LIB			= $(DIR_LIB)/libft.a
+LIB			=  -L$(DIR_LIB) -lft -lreadline
 
-DEP			= $(LIB) $(DIR_OBJS) $(HEADER)
+DEP			= $(DIR_LIB)/libft.a $(DIR_OBJS) $(HEADER)
 
 INC			= -I$(DIR_INC) -I$(DIR_LIB)
 
@@ -90,11 +90,9 @@ T_DIR		= test
 
 T_SRC		= utest.c
 
-T_OBJ		= utest.o
+T_OBJ		= $(filter-out $(T_EXCL), $(OBJ)) $(addprefix $(T_DIR)/, $(T_SRC))
 
-T_INC		= -I$(HOME)/Criterion/include/ \
-				-I$(HOME)/Criterion/ \
-				$(INC)
+T_INC		= -I$(HOME)/Criterion/include/ -I$(HOME)/Criterion/ $(INC)
 
 T_LIB		= -Wl,-rpath=$(HOME)/Criterion/build/src \
 				-L$(HOME)/Criterion/build/src \
@@ -140,14 +138,11 @@ $(LIB):
 
 debug:		$(DEP) $(OBJ)
 			@echo "Compiling with debug flag"
-			$(CC) $(CFLAGS) -g $(INC) -o $(NAME) $(SRC) -L$(DIR_LIB) \
-			-lft -lreadline
+			$(CC) $(CFLAGS) -g $(INC) -o $(NAME) $(SRC) $(LIB)
 
 $(T_NAME):	$(DEP) $(OBJ)
 			@echo "Compiling unit test"
-			$(T_CC) $(LIB) $(T_LIB) $(filter-out $(T_EXCL), $(OBJ)) \
-			$(addprefix $(T_DIR)/, $(T_SRC)) -o $(T_DIR)/$(T_NAME) -L$(DIR_LIB) \
-			-lft -lreadline
+			$(T_CC) $(T_OBJ) -o $(T_DIR)/$(T_NAME) -L$(DIR_LIB) $(LIB) $(T_LIB)
 
 test:		$(T_NAME)
 			@echo "Running unit tests :"

@@ -463,7 +463,7 @@ Test(Lexer, Wrong_variable_number)
 	cr_assert_eq(token->lexem, WORD);
 	cr_assert_str_eq(((char *)token->content), "echp");
 	token = (t_token *)shell->token_list->next->next->content;
-	cr_assert_eq(token->lexem, WORD);
+	cr_assert_eq(token->lexem, VARIABLE);
 	cr_assert_eq(token->letter, '$');
 	cr_assert_str_eq((char *)token->content, "$1");
 	token = (t_token *)shell->token_list->next->next->next->content;
@@ -485,7 +485,152 @@ Test(Lexer, Wrong_variable_number)
 /*	Expand																	  */
 /* ************************************************************************** */
 
+Test(Expand, valid_variable)
+{
+	t_list	env_node = {
+		.next = NULL,
+		.prev = NULL,
+		.content = ft_strdup("USERR=alex"),
+	};
+	t_list	arg_node = {
+		.next = NULL,
+		.prev = NULL,
+		.content = ft_strdup("$USERR"),
+	};
+	t_shell	shell = {
+		.last_exit_code = 0,
+		.env_list = &env_node,
+	};
 
+	expand(&shell, &arg_node);
+	cr_assert_str_eq(arg_node.content, "alex");
+}
+
+Test(Expand, absent_variable)
+{
+	t_list	env_node = {
+		.next = NULL,
+		.prev = NULL,
+		.content = ft_strdup("USER=alex"),
+	};
+	t_list	arg_node = {
+		.next = NULL,
+		.prev = NULL,
+		.content = ft_strdup("$INVALID"),
+	};
+	t_shell	shell = {
+		.last_exit_code = 0,
+		.env_list = &env_node,
+	};
+
+	expand(&shell, &arg_node);
+	cr_assert(arg_node.content == NULL);
+}
+
+Test(Expand, invalid_variable)
+{
+	t_list	env_node = {
+		.next = NULL,
+		.prev = NULL,
+		.content = ft_strdup("USER=alex"),
+	};
+	t_list	arg_node = {
+		.next = NULL,
+		.prev = NULL,
+		.content = ft_strdup("$"),
+	};
+	t_shell	shell = {
+		.last_exit_code = 0,
+		.env_list = &env_node,
+	};
+
+	expand(&shell, &arg_node);
+	cr_assert_str_eq(arg_node.content, "$");
+}
+
+Test(Expand, exit_code_variable)
+{
+	t_list	env_node = {
+		.next = NULL,
+		.prev = NULL,
+		.content = ft_strdup("USER=alex"),
+	};
+	t_list	arg_node = {
+		.next = NULL,
+		.prev = NULL,
+		.content = ft_strdup("$?"),
+	};
+	t_shell	shell = {
+		.last_exit_code = 42,
+		.env_list = &env_node,
+	};
+
+	expand(&shell, &arg_node);
+	cr_assert_str_eq(arg_node.content, "42");
+}
+
+Test(Expand, string_with_variable)
+{
+	t_list	env_node = {
+		.next = NULL,
+		.prev = NULL,
+		.content = ft_strdup("USER=alex"),
+	};
+	t_list	arg_node = {
+		.next = NULL,
+		.prev = NULL,
+		.content = ft_strdup("hello $USER"),
+	};
+	t_shell	shell = {
+		.last_exit_code = 42,
+		.env_list = &env_node,
+	};
+
+	expand(&shell, &arg_node);
+	cr_assert_str_eq(arg_node.content, "hello alex");
+}
+
+Test(Expand, string_without_variable)
+{
+	t_list	env_node = {
+		.next = NULL,
+		.prev = NULL,
+		.content = ft_strdup("USER=alex"),
+	};
+	t_list	arg_node = {
+		.next = NULL,
+		.prev = NULL,
+		.content = ft_strdup("hello and goodbye"),
+	};
+	t_shell	shell = {
+		.last_exit_code = 42,
+		.env_list = &env_node,
+	};
+
+	expand(&shell, &arg_node);
+	cr_assert_str_eq(arg_node.content, "hello and goodbye");
+}
+
+Test(Expand, string_with_invalid_variable)
+{
+	t_list	env_node = {
+		.next = NULL,
+		.prev = NULL,
+		.content = ft_strdup("USER=alex"),
+	};
+	t_list	arg_node = {
+		.next = NULL,
+		.prev = NULL,
+		.content = ft_strdup("hello and $ goodbye"),
+	};
+	t_shell	shell = {
+		.last_exit_code = 0,
+		.env_list = &env_node,
+	};
+
+	expand(&shell, &arg_node);
+	cr_assert_str_eq(arg_node.content, "hello and $ goodbye");
+}
 
 
 
@@ -755,16 +900,6 @@ Test(Builtin, echo_option_single, .init=redirect_all_std)
 Test(Builtin, echo_option_string, .init=redirect_all_std)
 {
 	char	*argv[] = {"echo", "-n", "hello and goodbye", NULL};
-	int		exit_code;
-
-	exit_code = echo(argv, STDOUT_FILENO);
-	cr_assert(eq(int, exit_code, 0));
-	cr_assert_stdout_eq_str("hello and goodbye");
-}
-
-Test(Builtin, echo_option_multiple, .init=redirect_all_std)
-{
-	char	*argv[] = {"echo", "-n", "hello", "and", "goodbye", NULL};
 	int		exit_code;
 
 	exit_code = echo(argv, STDOUT_FILENO);

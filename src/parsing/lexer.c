@@ -61,18 +61,49 @@ void	group_strings(t_shell *shell, t_list *node)
 
 void	id_variables(t_shell *shell, t_list *current)
 {
-	if (shell->critical_er || ((t_token *)current->content)->lexem != OPERATOR
-		|| ((t_token *)current->content)->letter != '$')
+	t_token	*token;
+
+	token = (t_token *)current->content;
+	if (shell->critical_er || token->letter != '$')
 		return ;
-	((t_token *)current->content)->lexem = VARIABLE;
-	((t_token *)current->content)->content
-		= ft_strjoin("$", (char *)((t_token *)current->next->content)->content);
-	ft_lstpop(&shell->token_list, current->next, free_token);
+	if (current->next->next)
+		merge_token(shell, current);
+	if (is_valid_variable((char *)((t_token *)current->content)->content))
+		token->lexem = VARIABLE;
+	else
+		token->lexem = WORD;
+}
+
+void	id_operators(t_shell *shell, t_list *current)
+{
+	t_token	*token;
+
+	if (shell->critical_er || !current || !token_is(OPERATOR, current))
+		return ;
+	token = (t_token *)current->content;
+	if (ft_strcmp(token->content, "||") == 0)
+		token->lexem = OR;
+	else if (ft_strcmp(token->content, "&&") == 0)
+		token->lexem = AND;
+	else if (ft_strcmp(token->content, ">>") == 0)
+		token->lexem = APPEND;
+	else if (ft_strcmp(token->content, "<<") == 0)
+		token->lexem = HEREDOC;
+	else if (ft_strcmp(token->content, ">") == 0)
+		token->lexem = OUTFILE;
+	else if (ft_strcmp(token->content, "<") == 0)
+		token->lexem = INFILE;
+	else if (ft_strcmp(token->content, "|") == 0)
+		token->lexem = PIPE;
+	else if (ft_strcmp(token->content, "$") == 0)
+		id_variables(shell, current);
+	else
+		token->lexem = WORD;
 }
 
 void	lexer(t_shell *shell, t_list **token_list)
 {
-	apply_to_list(shell, *token_list, id_variables);
+	apply_to_list(shell, *token_list, id_operators);
 	apply_to_list(shell, *token_list, group_strings);
 	apply_to_list(shell, *token_list, remove_space);
 	// print_tokens(*token_list);

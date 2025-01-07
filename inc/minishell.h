@@ -110,6 +110,7 @@ void		group_strings(t_shell *shell, t_list *node);
 void		remove_delimiter(t_shell *shell, void **ptr_to_string);
 int			can_expand(t_list *node);
 int			has_valid_var(char *string);
+void		id_operator(t_shell *shell, t_list *current);
 
 /* PARSER */
 
@@ -201,15 +202,17 @@ enum e_lexem
 	VARIABLE,
 	CMD,
 	OUTFILE,
-	INFILE,
+	INFILE		= 10,
 	HEREDOC,
 	APPEND,
 	STRING,
-	DOUB_QUOTE	= '"',
-	SING_QUOTE	= '\'',
-	PIPE		= '|',
-	GREATER		= '>',
-	LESSER		= '<',
+	DOUB_QUOTE,
+	SING_QUOTE,
+	PIPE,
+	GREATER,
+	LESSER,
+	AND,
+	OR			= 20,
 };
 
 enum e_exit_code

@@ -68,27 +68,23 @@ void	add_blank_token(t_shell *shell, t_list **dest, char *input)
 
 void	add_operator_token(t_shell *shell, t_list **dest, char *input)
 {
-	char	*content;
 	t_token	*token;
+	int		len;
 
+	len = 1;
 	if (input[shell->index] == input[shell->index + 1])
-	{
-		content = ft_calloc(sizeof(char), 3);
-		if (!content)
-			return (set_error(MALLOC_FAIL, shell, "Failed to malloc token"));
-		ft_strlcat(content, &input[shell->index], 3);
-		token = create_token(shell, OPERATOR, input[shell->index], content);
-		ft_lstadd_back(dest, ft_lstnew(token));
-		shell->index += 2;
-		return ;
-	}
-	content = ft_calloc(sizeof(char), 2);
-	ft_strlcat(content, &input[shell->index], 2);
-	if (!content)
-		return (set_error(MALLOC_FAIL, shell, "Failed to malloc token"));
+		len = 2;
 	token = create_token(shell, OPERATOR, input[shell->index], NULL);
+	token->content = ft_calloc(sizeof(char), len + 1);
+	if (!token)
+		return ;
+	ft_strlcat(token->content, &input[shell->index], 2);
+	if (!token->content)
+		return (set_error(MALLOC_FAIL, shell, "Failed to malloc token"));
+	token->lexem = OPERATOR;
+	ft_strlcat(token->content, &input[shell->index], len + 1);
 	ft_lstadd_back(dest, ft_lstnew(token));
-	shell->index++;
+	shell->index += len;
 }
 
 void	scan(t_shell *shell, t_list **dest, char *input)

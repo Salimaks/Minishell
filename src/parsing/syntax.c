@@ -52,7 +52,7 @@ void	is_missing_redirection(t_shell *shell, t_list *node)
 	current = node->next;
 	while (!token_is(END, current))
 	{
-		if (token_is(WORD, current))
+		if (token_is(WORD, current) || token_is(STRING, current))
 			return ;
 		current = current->next;
 	}

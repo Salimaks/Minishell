@@ -114,8 +114,8 @@ int	exec_tree(t_shell *shell, t_tree *tree, bool piped)
 	{
 		exit_code = exec_tree(shell, tree->left, NO_PIPE);
 		if (exit_code != SUCCESS)
-			return (exit_code);
-		return (exec_tree(shell, tree->right, NO_PIPE));
+			return (exec_tree(shell, tree->right, NO_PIPE));
+		return (exit_code);
 	}
 	return (exec_single_cmd(shell, tree, piped));
 }
