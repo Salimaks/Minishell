@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/20 15:58:43 by mkling            #+#    #+#             */
-/*   Updated: 2025/01/09 12:02:27 by alex             ###   ########.fr       */
+/*   Updated: 2025/01/09 15:50:07 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -723,8 +723,6 @@ Test(Redirection, no_path_relative)
 	ft_lstadd_back(&cmd->arg_list, ft_lstnew("ls"));
 	path_env = find_env(shell->env_list, "PATH");
 	ft_lstpop(&shell->env_list, path_env, free);
-	path_env = find_env(shell->env_list, "PATH");
-	ft_lstpop(&shell->env_list, path_env, free);
 	get_cmd_path(shell, cmd);
 	cr_assert(cmd->exit_code = 127);
 	cr_assert_stderr_eq_str("shell: ls: No PATH variable found\n");
@@ -732,10 +730,10 @@ Test(Redirection, no_path_relative)
 }
 
 /* ************************************************************************** */
-/*	Command																	  */
+/*	Path																	  */
 /* ************************************************************************** */
 
-Test(Execution, relative_command, .init=redirect_all_std)
+Test(Path, get_path_relative_command_with_dot)
 {
 	t_cmd	*cmd;
 	t_shell	*shell;
@@ -745,10 +743,23 @@ Test(Execution, relative_command, .init=redirect_all_std)
 	cmd->arg_list = ft_lstnew("./test/allowed");
 	get_cmd_path(shell, cmd);
 	cr_assert(cmd->exit_code == 0);
-	cr_assert_stdout_eq_str("allowed\n");
+	cr_assert_str_eq(cmd->cmd_path, "./test/allowed");
 }
 
-Test(Execution, unknown_command, .init=redirect_all_std)
+Test(Path, get_path_relative_command)
+{
+	t_cmd	*cmd;
+	t_shell	*shell;
+
+	shell = create_minishell(environ);
+	cmd = create_cmd();
+	cmd->arg_list = ft_lstnew("test/allowed");
+	get_cmd_path(shell, cmd);
+	cr_assert(cmd->exit_code == 0);
+	cr_assert_str_eq(cmd->cmd_path, "test/allowed");
+}
+
+Test(Path, get_path_unknown_command, .init=redirect_all_std)
 {
 	t_cmd	*cmd;
 	t_shell	*shell;
@@ -761,7 +772,7 @@ Test(Execution, unknown_command, .init=redirect_all_std)
 	cr_assert_stderr_eq_str("shell: eccho: Command not found\n");
 }
 
-Test(Execution, forbidden_command, .init=redirect_all_std)
+Test(Path, get_path_forbidden_command, .init=redirect_all_std)
 {
 	t_cmd	*cmd;
 	int		fd;
@@ -779,7 +790,7 @@ Test(Execution, forbidden_command, .init=redirect_all_std)
 	unlink("test/forbidden");
 }
 
-Test(Execution, directory_cmd, .init=redirect_all_std)
+Test(Path, get_path_directory_cmd, .init=redirect_all_std)
 {
 	t_cmd	*cmd;
 	t_shell	*shell;
@@ -792,7 +803,7 @@ Test(Execution, directory_cmd, .init=redirect_all_std)
 	cr_assert_stderr_eq_str("shell: test/: Is a directory\n");
 }
 
-Test(Execution, wrong_directory_cmd, .init=redirect_all_std)
+Test(Path, get_path_wrong_directory_cmd, .init=redirect_all_std)
 {
 	t_cmd	*cmd;
 	t_shell	*shell;
@@ -806,10 +817,28 @@ Test(Execution, wrong_directory_cmd, .init=redirect_all_std)
 }
 
 /* ************************************************************************** */
+/*	Execution																  */
+/* ************************************************************************** */
+
+Test(Execution, relative_command, .init=redirect_all_std)
+{
+	t_shell	*shell;
+
+	shell = create_minishell(environ);
+	shell->last_exit_code = -1;
+	shell->cmd_line = "./test/allowed";
+	parse_and_exec_cmd(shell, shell->cmd_line);
+	cr_assert(shell->last_exit_code == 0);
+	cr_assert_stdout_eq_str("allowed\n");
+	cr_assert(shell->last_exit_code == 0);
+	free_minishell(shell);
+}
+
+/* ************************************************************************** */
 /*	Pipe																	  */
 /* ************************************************************************** */
 
-Test(Execution, pipe_echo_cat_e, .init=redirect_all_std)
+Test(Pipe, pipe_echo_cat_e, .init=redirect_all_std)
 {
 	t_shell *shell;
 
@@ -822,7 +851,7 @@ Test(Execution, pipe_echo_cat_e, .init=redirect_all_std)
 	free_minishell(shell);
 }
 
-Test(Execution, pipe_ls_wc, .init=redirect_all_std)
+Test(Pipe, pipe_ls_wc, .init=redirect_all_std)
 {
 	t_shell *shell;
 
@@ -835,7 +864,7 @@ Test(Execution, pipe_ls_wc, .init=redirect_all_std)
 	free_minishell(shell);
 }
 
-Test(Execution, pipe_yes_head, .init=redirect_all_std)
+Test(Pipe, pipe_yes_head, .init=redirect_all_std)
 {
 	t_shell *shell;
 

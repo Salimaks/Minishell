@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/11 15:42:30 by mkling            #+#    #+#             */
-/*   Updated: 2025/01/09 11:49:32 by alex             ###   ########.fr       */
+/*   Updated: 2025/01/09 12:05:42 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,13 +48,7 @@ int	assemble_heredoc(t_shell *shell, t_cmd *cmd, t_list *file_node)
 	}
 }
 
-
-
-
-
-
 /* FILE METHOD */
-
 // char	*increment_char(t_shell *shell, char *string)
 // {
 // 	size_t	len;

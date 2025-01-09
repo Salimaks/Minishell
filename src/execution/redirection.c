@@ -6,13 +6,13 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 17:34:05 by mkling            #+#    #+#             */
-/*   Updated: 2025/01/09 12:02:06 by alex             ###   ########.fr       */
+/*   Updated: 2025/01/09 12:04:51 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	open_file(t_file *file, t_cmd *cmd, int mode)
+static int	open_file(t_file *file, t_cmd *cmd, int mode)
 {
 	file->fd = 0;
 	if (access(file->path, F_OK) == -1)

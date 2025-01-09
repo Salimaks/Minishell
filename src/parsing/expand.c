@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/14 16:54:16 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/30 17:08:45 by alex             ###   ########.fr       */
+/*   Updated: 2025/01/09 14:26:01 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,6 @@ void	expand_in_string(t_shell *shell, t_list *node)
 	if (!node || !node->content)
 		return ;
 	token_list = NULL;
-	fprintf(stderr, "string is %s\n", (char *)node->content);
 	scan(shell, &token_list, (char *)node->content);
 	apply_to_list(shell, token_list, id_variables);
 	apply_to_list(shell, token_list, group_strings);
