@@ -6,15 +6,19 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 17:34:05 by mkling            #+#    #+#             */
-/*   Updated: 2025/01/09 11:51:07 by alex             ###   ########.fr       */
+/*   Updated: 2025/01/09 12:02:06 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	open_file(t_file *file, t_cmd *cmd, int mode)
+int	open_file(t_file *file, t_cmd *cmd, int mode)
 {
 	file->fd = 0;
+	if (access(file->path, F_OK) == -1)
+		return (set_cmd_error(NO_FILE, cmd, "No file"), NO_FILE);
+	if (access(file->path, R_OK) == -1)
+		return (set_cmd_error(READ_ERROR, cmd, "Forbidden file"), READ_ERROR);
 	if (mode == READ)
 		file->fd = open(file->path, O_RDONLY);
 	if (mode == WRITE)
@@ -22,7 +26,8 @@ void	open_file(t_file *file, t_cmd *cmd, int mode)
 	if (mode == APPEND)
 		file->fd = open(file->path, O_RDWR | O_APPEND | O_CREAT, 0666);
 	if (file->fd == -1)
-		return (set_cmd_error(OPEN_ERROR, cmd, "Error while opening file"));
+		return (set_cmd_error(OPEN_ERROR, cmd, "Error while opening file"), 1);
+	return (SUCCESS);
 }
 
 void	set_infile_fd(t_shell *shell, t_cmd *cmd)
@@ -40,13 +45,9 @@ void	set_infile_fd(t_shell *shell, t_cmd *cmd)
 		if (file->mode == HEREDOC)
 			assemble_heredoc(shell, cmd, cmd->infiles);
 		else
-		{
-			if (access(file->path, F_OK) == -1)
-				return (set_cmd_error(NO_FILE, cmd, "No input file"));
-			if (access(file->path, R_OK) == -1)
-				return (set_cmd_error(READ_ERROR, cmd, "Forbidden input file"));
 			open_file(file, cmd, READ);
-		}
+		if (cmd->exit_code)
+			return ;
 		if (cmd->infiles->next)
 			close(file->fd);
 		cmd->infiles = cmd->infiles->next;
@@ -66,12 +67,9 @@ void	set_outfile_fd(t_cmd *cmd)
 	while (cmd->outfiles)
 	{
 		file = (t_file *)cmd->outfiles->content;
-		if (access(file->path, F_OK) == 0 && access(file->path, W_OK) == -1)
-			return (set_cmd_error(READ_ERROR, cmd, "Forbidden output file"));
-		if (file->mode == APPEND)
-			open_file(file, cmd, APPEND);
-		else
-			open_file(file, cmd, WRITE);
+		open_file(file, cmd, file->mode);
+		if (cmd->exit_code)
+			return ;
 		if (cmd->outfiles->next)
 			close(file->fd);
 		cmd->outfiles = cmd->outfiles->next;

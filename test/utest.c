@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/20 15:58:43 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/30 13:32:55 by alex             ###   ########.fr       */
+/*   Updated: 2025/01/09 12:02:27 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -680,7 +680,7 @@ Test(Redirection, set_infile_forbidden, .init=redirect_all_std)
 
 	set_infile_fd(&shell, &cmd);
 	cr_assert(eq(int, cmd.fd_in, -1));
-	cr_assert_stderr_eq_str("shell: echo: Forbidden input file\n");
+	cr_assert_stderr_eq_str("shell: echo: Forbidden file\n");
 	chmod("test/forbidden1.txt", 0777);
 	unlink("test/forbidden1.txt");
 }
@@ -706,7 +706,7 @@ Test(Redirection, set_outfile_forbidden, .init=redirect_all_std)
 
 	set_outfile_fd(&cmd);
 	cr_assert(eq(int, cmd.fd_out, -1));
-	cr_assert_stderr_eq_str("shell: echo: Forbidden output file\n");
+	cr_assert_stderr_eq_str("shell: echo: Forbidden file\n");
 	chmod("test/forbidden.txt", 0777);
 	unlink("test/forbidden.txt");
 }

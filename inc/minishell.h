@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2025/01/09 11:46:23 by alex             ###   ########.fr       */
+/*   Updated: 2025/01/09 11:58:04 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,7 +150,6 @@ char		**extract_list_as_array(t_shell *shell, t_list *head);
 
 /* REDIRECTION */
 
-void		open_file(t_file *file, t_cmd *cmd, int mode);
 void		redirect_for_cmd(t_shell *shell, t_cmd *cmd);
 int			create_pipe(t_shell *shell, int *pipe_fd);
 int			connect_pipes_and_exec(t_shell *shell, t_tree *tree,
