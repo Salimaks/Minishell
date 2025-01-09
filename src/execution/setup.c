@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 12:37:12 by alex              #+#    #+#             */
-/*   Updated: 2024/12/28 20:38:20 by alex             ###   ########.fr       */
+/*   Updated: 2025/01/09 11:44:46 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,12 +55,7 @@ void	create_file(t_shell *shell, t_cmd *cmd, t_token *token)
 	if (!node)
 		return (set_error(MALLOC_FAIL, shell, "Failed to alloc file node"));
 	if (file->mode == HEREDOC)
-	{
 		file->delim = file->path;
-		file->path = generate_heredoc_filepath(shell);
-		if (!file->path)
-			return (set_error(MALLOC_FAIL, shell, "Failed hered generation"));
-	}
 	if (file->mode == INFILE || file->mode == HEREDOC)
 		ft_lstadd_back(&cmd->infiles, node);
 	if (file->mode == OUTFILE || file->mode == APPEND)

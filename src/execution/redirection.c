@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 17:34:05 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/28 23:14:22 by alex             ###   ########.fr       */
+/*   Updated: 2025/01/09 11:51:07 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,11 +39,14 @@ void	set_infile_fd(t_shell *shell, t_cmd *cmd)
 		file = (t_file *)cmd->infiles->content;
 		if (file->mode == HEREDOC)
 			assemble_heredoc(shell, cmd, cmd->infiles);
-		if (access(file->path, F_OK) == -1)
-			return (set_cmd_error(NO_FILE, cmd, "No input file"));
-		if (access(file->path, R_OK) == -1)
-			return (set_cmd_error(READ_ERROR, cmd, "Forbidden input file"));
-		open_file(file, cmd, READ);
+		else
+		{
+			if (access(file->path, F_OK) == -1)
+				return (set_cmd_error(NO_FILE, cmd, "No input file"));
+			if (access(file->path, R_OK) == -1)
+				return (set_cmd_error(READ_ERROR, cmd, "Forbidden input file"));
+			open_file(file, cmd, READ);
+		}
 		if (cmd->infiles->next)
 			close(file->fd);
 		cmd->infiles = cmd->infiles->next;

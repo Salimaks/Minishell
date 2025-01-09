@@ -6,7 +6,7 @@
 /*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/30 12:33:56 by alex             ###   ########.fr       */
+/*   Updated: 2025/01/09 11:46:23 by alex             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ typedef struct s_files
 	char			*path;		// pathfile
 	char			*delim;		// delimiter if heredoc, else NULL
 	int				fd;			// resulting fd once opened
-	bool			is_quoted;	// is a quote in delimiter, meaining expand
+	bool			is_quoted;	// is the delimiter quoted, expanding content
 }	t_file;
 
 typedef struct s_cmd
@@ -122,9 +122,7 @@ void		parser(t_shell *shell);
 
 /* HEREDOC */
 
-char		*generate_heredoc_filepath(t_shell *shell);
-void		assemble_heredoc(t_shell *shell, t_cmd *cmd, t_list *file_node);
-void		destroy_heredoc(t_shell *shell, t_list *file_node);
+int			assemble_heredoc(t_shell *shell, t_cmd *cmd, t_list *file_node);
 
 /* EXECUTION */
 
