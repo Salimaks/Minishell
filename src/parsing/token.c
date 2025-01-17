@@ -6,7 +6,7 @@
 /*   By: skassimi <skassimi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/29 18:04:03 by alex              #+#    #+#             */
-/*   Updated: 2024/12/29 11:45:30 by skassimi         ###   ########.fr       */
+/*   Updated: 2025/01/09 14:23:53 by skassimi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ void	add_token(t_shell *shell, int lexem, char letter)
 	node = ft_lstnew(token);
 	if (!node)
 		return (set_error(MALLOC_FAIL, shell, "Failed to alloc token node"));
-	ft_lstadd_back(&shell->token_list, node);
+	ft_lstadd_back(&shell->token_list, node, token->lexem);
 }
 
 void	apply_to_list(t_shell *shell, t_list *node,

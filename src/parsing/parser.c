@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: skassimi <skassimi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/12/29 11:45:47 by skassimi         ###   ########.fr       */
+/*   Created: 2025/01/09 14:09:22 by skassimi          #+#    #+#             */
+/*   Updated: 2025/01/09 14:15:01 by skassimi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,7 +72,7 @@ t_tree	*parse_command(t_shell *shell, t_list **node)
 			parse_outfiles(shell, cmd, node);
 		else if (token->lexem == WORD || token->lexem == STRING)
 			ft_lstadd_back(&cmd->arg_list,
-				ft_lstnew(ft_strdup(token->content)));
+				ft_lstnew(ft_strdup(token->content)),token->lexem);
 		*node = (*node)->next;
 		token = ((t_token *)(*node)->content);
 	}

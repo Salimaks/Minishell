@@ -6,7 +6,7 @@
 /*   By: skassimi <skassimi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 09:19:30 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/29 11:46:26 by skassimi         ###   ########.fr       */
+/*   Updated: 2025/01/09 14:16:15 by skassimi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ int	cd(t_shell *shell, char *path)
 
 // cd sans argument renvoie vers le home
 
-int cd(char *path)
-{
-    chdir(path);
-}
+// int cd(char *path)
+// {
+//     chdir(path);
+// }

@@ -3,26 +3,26 @@
 /*                                                        :::      ::::::::   */
 /*   readline.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: skassimi <skassimi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/28 13:51:38 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/26 14:42:25 by alex             ###   ########.fr       */
+/*   Updated: 2025/01/09 17:24:54 by skassimi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	print_tokens(t_list *node)
-{
-	while (node != NULL)
-	{
-		printf("TOKEN %d :", ((t_token *)node->content)->lexem);
-		if (node->content != NULL)
-			printf("%s", ((t_token *)node->content)->content);
-		printf("\n");
-		node = node->next;
-	}
-}
+// void	print_tokens(t_list *node)
+// {
+// 	while (node != NULL)
+// 	{
+// 		printf("TOKEN %d :", ((t_token *)node->content)->lexem);
+// 		if (node->content != NULL)
+// 			printf("%s", ((t_token *)node->content)->content);
+// 		printf("\n");
+// 		node = node->next;
+// 	}
+// }
 
 void	parse_and_exec_cmd(t_shell *shell, char *input)
 {

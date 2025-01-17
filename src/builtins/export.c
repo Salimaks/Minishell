@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   export.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
+/*   By: skassimi <skassimi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 09:19:50 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/23 10:35:22 by alex             ###   ########.fr       */
+/*   Updated: 2025/01/09 14:19:28 by skassimi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ int	export(t_shell *shell, char **argv, int fdout)
 		current_env = ft_lstnew(ft_strdup(argv[i]));
 		if (!current_env || !current_env->content)
 			return (-1);
-		ft_lstadd_back(&shell->env_list, current_env);
+		ft_lstadd_back(&shell->env_list, current_env, ENV);
 		i++;
 	}
 	return (0);

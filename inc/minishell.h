@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: skassimi <skassimi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2024/12/29 11:43:33 by skassimi         ###   ########.fr       */
+/*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
+/*   Updated: 2025/01/09 17:32:55 by skassimi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@
 # include <signal.h>
 # include <readline/readline.h>
 # include <readline/history.h>
-# include "/mnt/nfs/homes/skassimi/Minishell/inc/libft/inc/libft.h"
+# include "/home/skassimi/Minishell/inc/libft/inc/libft.h"
 
 typedef struct s_token
 {
@@ -108,6 +108,12 @@ t_cmd		*create_cmd(void);
 void		create_file(t_shell *shell, t_cmd *cmd, t_token *token);
 void		apply_to_list(t_shell *s, t_list *n, void f(t_shell *, t_list *));
 void		parser(t_shell *shell);
+t_list		*tokenizer(t_shell *shell, char *input);
+void		free_tokens(t_list *current);
+char		*ft_strndup(const char *src, int size);
+int			is_not_space(char c);
+void	tokenize_special(char **input, t_list **tokens);
+
 
 /* HEREDOC */
 
@@ -185,6 +191,7 @@ enum e_lexem
 	OPERATOR	= 4,
 	END			= 5,
 	START		= 6,
+	ENV			= 7,
 	VARIABLE,
 	CMD,
 	OUTFILE,

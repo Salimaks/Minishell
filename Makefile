@@ -6,7 +6,7 @@
 #    By: skassimi <skassimi@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: Invalid date        by                   #+#    #+#              #
-#    Updated: 2024/12/29 11:44:29 by skassimi         ###   ########.fr        #
+#    Updated: 2025/01/09 14:26:18 by skassimi         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -41,11 +41,15 @@ FUNC_EXEC	= 	execution.c \
 				ast.c
 
 FUNC_PARS	=	tokenizer.c \
+				token.c \
 				tokens.c \
 				parser.c \
+				readline.c \
+				lexer.c \
 				signals.c \
 				syntax.c \
-				cleanup.c
+				cleanup.c \
+				scanner.c
 
 FUNC_BUTI	=	cd.c \
 				echo.c \

@@ -3,19 +3,13 @@
 /*                                                        :::      ::::::::   */
 /*   libft.h                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-<<<<<<< HEAD
-/*   By: alex <alex@student.42.fr>                  +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/05/21 14:15:08 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/21 20:54:02 by alex             ###   ########.fr       */
-=======
 /*   By: skassimi <skassimi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/05/21 14:15:08 by mkling            #+#    #+#             */
-/*   Updated: 2024/12/27 10:49:44 by skassimi         ###   ########.fr       */
->>>>>>> origin/salimas
+/*   Created: 2025/01/09 13:19:31 by skassimi          #+#    #+#             */
+/*   Updated: 2025/01/09 14:10:48 by skassimi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 
 #ifndef LIBFT_H
 # define LIBFT_H
@@ -92,12 +86,9 @@ void	ft_swap_int(int *a, int *b);
 int		is_too_long_for_int(char *str);
 int		ft_abs(int num);
 int		ft_isdigit_or_hexa(int c);
-<<<<<<< HEAD
 void	ft_free_matrix(int	**matrix);
 int		ft_atoi_base(char *str, char *base);
 void	ft_lstpop(t_list **head, t_list *node, void (*del)(void *));
 int		ft_iseven(int num);
-=======
->>>>>>> origin/salimas
 
 # endif

@@ -6,7 +6,7 @@
 /*   By: skassimi <skassimi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 10:22:13 by skassimi          #+#    #+#             */
-/*   Updated: 2024/12/29 11:04:55 by skassimi         ###   ########.fr       */
+/*   Updated: 2025/01/09 16:43:23 by skassimi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,35 +50,35 @@ void	free_tokens(t_list *current)
 	}
 }
 
-// void    print_tokens(t_list *tokens)
-// {
-//     while (tokens && tokens->content != NULL)
-//     {
-//         printf("Token : %s\n", tokens->content);
-//         tokens = tokens->next;
-//     }
-// }
+void    print_tokens(t_list *tokens)
+{
+    while (tokens && tokens->content != NULL)
+    {
+        printf("Token : %s\n", tokens->content);
+        tokens = tokens->next;
+    }
+}
 
 void	tokenize_special(char **input, t_list **tokens)
 {
 	if ((**input == '>' && *(*input + 1) == '>') || (**input == '<' && *(*input + 1) == '<'))
 	{
-		ft_lstadd_back(tokens, ft_lstnew(ft_strndup(*input, 2)), T_SPECIAL);
+		ft_lstadd_back(tokens, ft_lstnew(ft_strndup(*input, 2)), OPERATOR);
 		*input += 3;
 	}
 	else if (**input == '$' && *(*input + 1) == '?')
 	{
-		ft_lstadd_back(tokens, ft_lstnew(ft_strndup(*input, 2)), T_EXIT);
+		ft_lstadd_back(tokens, ft_lstnew(ft_strndup(*input, 2)), END);
 		*input += 3;
 	}
 	else if (**input == '$' && ft_isalpha(*(*input + 1)))
 	{
-		ft_lstadd_back(tokens, ft_lstnew(ft_strndup(*input, 2)), T_ENV_VAR);
-		*input += 3;
+		ft_lstadd_back(tokens, ft_lstnew(ft_strndup(*input, 0)), OPERATOR);
+		*input += 1;
 	}
 	else
 	{
-		ft_lstadd_back(tokens, ft_lstnew(ft_strndup(*input, 1)), T_SPECIAL);
+		ft_lstadd_back(tokens, ft_lstnew(ft_strndup(*input, 1)), DELIMITER);
 		*input += 2;
 	}
 }
