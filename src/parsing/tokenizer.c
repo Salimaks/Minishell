@@ -6,15 +6,31 @@
 /*   By: skassimi <skassimi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/03 09:23:00 by skassimi          #+#    #+#             */
-/*   Updated: 2025/01/09 17:18:09 by skassimi         ###   ########.fr       */
+/*   Updated: 2025/02/13 12:51:52 by skassimi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	is_special_token(char c)
+int	is_special_token(char *str)
 {
-	return (c == '>' || c == '<' || c == '|' || c == '$');
+	if (str && *str && ft_strlen(str) >= 2)
+	{
+		if (!ft_strncmp(str, "<<", 2))
+			return (HEREDOC);
+		if (!ft_strncmp(str, ">>", 2))
+			return (APPEND);
+	}
+	if (*str && ft_strlen(str) >= 1)
+	{
+		if (!ft_strncmp(str, "<", 1))
+			return (INFILE);
+		if (!ft_strncmp(str, ">", 1))
+			return (OUTFILE);
+		if (!ft_strncmp(str, "|", 1))
+			return (PIPE);
+	}
+	return (0);
 }
 
 /*void	tokenize_env(char **input, t_list **tokens)

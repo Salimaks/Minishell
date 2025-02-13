@@ -6,7 +6,7 @@
 /*   By: skassimi <skassimi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/27 12:02:49 by skassimi          #+#    #+#             */
-/*   Updated: 2025/01/09 17:32:55 by skassimi         ###   ########.fr       */
+/*   Updated: 2025/02/13 13:10:49 by skassimi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,10 +111,11 @@ void		create_file(t_shell *shell, t_cmd *cmd, t_token *token);
 void		apply_to_list(t_shell *s, t_list *n, void f(t_shell *, t_list *));
 void		parser(t_shell *shell);
 t_list		*tokenizer(t_shell *shell, char *input);
+int			is_special_token(char *str);
 void		free_tokens(t_list *current);
 char		*ft_strndup(const char *src, int size);
 int			is_not_space(char c);
-void	tokenize_special(char **input, t_list **tokens);
+void		tokenize_special(char **input, t_list **tokens);
 
 
 /* HEREDOC */
@@ -199,6 +200,7 @@ enum e_lexem
 	OUTFILE,
 	INFILE,
 	HEREDOC,
+	PIPE,
 	APPEND,
 	STRING,
 	DOUB_QUOTE	= '"',

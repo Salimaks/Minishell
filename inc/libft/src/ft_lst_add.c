@@ -6,7 +6,7 @@
 /*   By: skassimi <skassimi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: Invalid date        by                   #+#    #+#             */
-/*   Updated: 2025/01/09 14:10:23 by skassimi         ###   ########.fr       */
+/*   Updated: 2025/02/13 13:03:19 by skassimi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,13 +37,13 @@ void	ft_lstadd_front(t_list **lst, t_list *new)
 	(*lst) = new;
 }
 
-void	ft_lstadd_back(t_list **lst, t_list *new, int type)
+int	ft_lstadd_back(t_list **lst, t_list *new, int type)
 {
 	t_list	*last;
 
 	new->type = type;
 	if (new == NULL)
-		return ;
+		return (0);
 	if (*lst == NULL)
 	{
 		*lst = new;
@@ -54,6 +54,7 @@ void	ft_lstadd_back(t_list **lst, t_list *new, int type)
 		last = last->next;
 	last->next = new;
 	new->prev = last;
+	return (1);
 }
 
 void	ft_lstdelone(t_list *lst, void (*del)(void *))

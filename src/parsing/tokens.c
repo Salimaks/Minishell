@@ -6,7 +6,7 @@
 /*   By: skassimi <skassimi@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/29 10:22:13 by skassimi          #+#    #+#             */
-/*   Updated: 2025/01/09 16:43:23 by skassimi         ###   ########.fr       */
+/*   Updated: 2025/02/13 13:10:05 by skassimi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,35 +50,35 @@ void	free_tokens(t_list *current)
 	}
 }
 
-void    print_tokens(t_list *tokens)
+/*void    print_tokens(t_list *tokens)
 {
     while (tokens && tokens->content != NULL)
     {
         printf("Token : %s\n", tokens->content);
         tokens = tokens->next;
     }
-}
+}*/
 
 void	tokenize_special(char **input, t_list **tokens)
 {
-	if ((**input == '>' && *(*input + 1) == '>') || (**input == '<' && *(*input + 1) == '<'))
-	{
-		ft_lstadd_back(tokens, ft_lstnew(ft_strndup(*input, 2)), OPERATOR);
-		*input += 3;
-	}
-	else if (**input == '$' && *(*input + 1) == '?')
-	{
-		ft_lstadd_back(tokens, ft_lstnew(ft_strndup(*input, 2)), END);
-		*input += 3;
-	}
-	else if (**input == '$' && ft_isalpha(*(*input + 1)))
-	{
-		ft_lstadd_back(tokens, ft_lstnew(ft_strndup(*input, 0)), OPERATOR);
-		*input += 1;
-	}
-	else
-	{
-		ft_lstadd_back(tokens, ft_lstnew(ft_strndup(*input, 1)), DELIMITER);
-		*input += 2;
-	}
+	int	type;
+
+	type = is_special_token(*input);
+	if (!type)
+		return (false);
+	if (type == INFILE && !ft_lstadd_back(tokens, ft_lstnew(ft_strdup("<")), INFILE))
+		return (false);
+	else if (type == HEREDOC && !ft_lstadd_back(tokens, ft_lstnew(ft_strdup("<<")), HEREDOC))
+		return (false);
+	else if (type == OUTFILE && !ft_lstadd_back(tokens, ft_lstnew(ft_strdup(">")), OUTFILE))
+		return (false);
+	else if (type == APPEND && !ft_lstadd_back(tokens, ft_strdup(">>"), APPEND))
+		return (false);
+	else if (type == PIPE && !ft_lstadd_back(tokens, ft_strdup("|"), PIPE))
+		return (false);
+	if (type == INFILE || type == OUTFILE || type == PIPE)
+		(*command)++;
+	else if (type == HEREDOC || type == APPEND)
+		(*command) += 2;
+	return (true);
 }
