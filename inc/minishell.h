@@ -50,11 +50,13 @@ typedef struct s_cmd
 	t_list			*arg_list;	// linked list of command arguments
 	t_list			*infiles;	// linked list of input files
 	t_list			*outfiles;	// linked list of output files
+	int				append;
 	int				fd_out;		// fd of the final output redirection
 	int				fd_in;		// fd of the final input redirection
 	int				exit_code;	// value returned by the execution of command
 	size_t			cmd_index;	// number of the command among other commands
 	int				fork_pid;	// process id of fork sent to execute command
+	struct s_cmd	*next;
 }	t_cmd;
 
 typedef struct s_ast

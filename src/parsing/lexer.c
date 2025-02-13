@@ -86,8 +86,3 @@ void	lexer(t_shell *shell)
 	// print_tokens(shell->token_list);
 }
 
-// TO DO
-// escape character
-// when to expand variables
-// id variables
-
